@@ -1,0 +1,50 @@
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 70px - 250px); /* Lấy chiều cao màn hình trừ Navbar (70px) và Footer (tạm tính 250px) */
+  padding: 2rem 0;
+  background-color: var(--light-surface); /* Nền nhạt cho cả trang */
+}
+
+.login-box {
+  background-color: var(--background);
+  padding: 3rem;
+  border-radius: var(--border-radius);
+  box-shadow: 0 8px 24px rgba(0, 64, 92, 0.1);
+  width: 100%;
+  max-width: 450px;
+  text-align: center;
+}
+
+.login-box h2 {
+  margin-bottom: 0.5rem;
+}
+
+.login-box p {
+  margin-bottom: 2rem;
+  color: var(--body-text);
+}
+
+/* Căn lề trái cho label của form */
+.login-box .form-group label {
+  text-align: left;
+}
+
+.login-btn {
+  width: 100%; /* Nút đăng nhập dài hết cỡ */
+  margin-top: 1rem;
+}
+
+.login-links {
+  margin-top: 2rem;
+}
+
+.login-links p {
+  margin-top: 1rem;
+  margin-bottom: 0;
+}
+
+.login-links a {
+  font-weight: bold;
+}

@@ -1,0 +1,47 @@
+.hero {
+  /* Gradient màu của bạn */
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  padding: 6rem 0;
+  text-align: center;
+  color: white;
+}
+
+.hero-container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.hero h1 {
+  color: white;
+  font-size: 3rem;
+  font-weight: 700;
+}
+
+.hero p {
+  font-size: 1.25rem;
+  margin-bottom: 2rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  opacity: 0.9;
+}
+
+/* Kiểu cho mục gợi ý AI */
+.ai-suggestion {
+  margin-top: 2rem; /* Thêm khoảng cách với banner */
+  margin-bottom: 3rem; 
+  text-align: center; 
+  background-color: var(--light-surface); 
+  padding: 2.5rem; 
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 12px rgba(0, 64, 92, 0.05);
+}
+
+.ai-suggestion h2 {
+  font-size: 1.75rem;
+}
+
+.featured-workshops {
+  padding-bottom: 2rem;
+}

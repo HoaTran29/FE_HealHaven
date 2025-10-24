@@ -1,0 +1,86 @@
+.signup-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 70px - 200px); /* Tương tự trang login */
+  padding: 3rem 0;
+  background-color: var(--light-surface); /* Nền nhạt cho cả trang */
+}
+
+.signup-box {
+  background-color: var(--background);
+  padding: 3rem;
+  border-radius: var(--border-radius);
+  box-shadow: 0 8px 24px rgba(0, 64, 92, 0.1);
+  width: 100%;
+  max-width: 500px; /* Rộng hơn login 1 chút */
+  text-align: center;
+}
+
+.signup-box h2 {
+  margin-bottom: 0.5rem;
+}
+
+.signup-box p {
+  margin-bottom: 2rem;
+  color: var(--body-text);
+}
+
+/* Căn lề trái cho label của form */
+.signup-box .form-group label {
+  text-align: left;
+}
+
+.signup-btn {
+  width: 100%; /* Nút đăng ký dài hết cỡ */
+  margin-top: 1rem;
+}
+
+.signup-links {
+  margin-top: 2rem;
+}
+
+.signup-links p {
+  margin-bottom: 0;
+}
+
+.signup-links a {
+  font-weight: bold;
+}
+
+/* === CSS cho Chọn Vai Trò === */
+.role-selector {
+  display: flex;
+  gap: 1rem;
+}
+
+/* Ẩn nút radio mặc định */
+.role-selector input[type="radio"] {
+  opacity: 0;
+  position: fixed;
+  width: 0;
+}
+
+.role-option {
+  flex: 1; /* Chia đều 2 bên */
+  display: block;
+  padding: 1rem;
+  border: 2px solid #ccc;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  text-align: center;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.role-option:hover {
+  border-color: var(--accent);
+}
+
+/* Kiểu khi được chọn */
+.role-option.selected {
+  border-color: var(--primary);
+  background-color: var(--light-surface);
+  color: var(--primary);
+  box-shadow: 0 0 0 2px var(--primary);
+}
