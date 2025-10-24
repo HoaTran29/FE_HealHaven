@@ -45,3 +45,13 @@
 .featured-workshops {
   padding-bottom: 2rem;
 }
+
+.card-link {
+  text-decoration: none; /* Xóa gạch chân của Link */
+  color: inherit; /* Giữ màu chữ mặc định (không chuyển xanh) */
+  display: block; /* Giúp link hoạt động như một khối */
+}
+
+.card-link:hover {
+  text-decoration: none; /* Đảm bảo không có gạch chân khi hover */
+}

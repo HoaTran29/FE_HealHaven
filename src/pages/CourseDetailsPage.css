@@ -1,0 +1,188 @@
+/* === Header của Trang Khóa học === */
+.course-header {
+  background-color: var(--dark-text); /* Nền tối */
+  color: var(--background);
+  padding: 2.5rem 0;
+  margin-bottom: 2rem;
+}
+
+.course-header h1 {
+  color: var(--background);
+  font-size: 2.75rem;
+}
+
+.course-header .container {
+  padding: 0; /* Ghi đè padding mặc định của container */
+}
+
+.course-breadcrumb {
+  font-size: 0.9rem;
+  opacity: 0.8;
+  margin-bottom: 1rem;
+}
+
+.course-breadcrumb a {
+  color: var(--accent);
+}
+
+.course-subtitle {
+  font-size: 1.2rem;
+  opacity: 0.9;
+  max-width: 70%;
+}
+
+.course-author-header {
+  font-size: 1rem;
+  margin-top: 1rem;
+}
+.course-author-header a {
+  font-weight: bold;
+  color: var(--background);
+  text-decoration: underline;
+}
+
+/* === Bố cục 2 cột === */
+.course-layout {
+  display: grid;
+  grid-template-columns: 70% 1fr; /* 70% cho nội dung, 1fr (phần còn lại) cho sidebar */
+  gap: 2.5rem;
+}
+
+/* === Cột Trái: Nội dung chính === */
+.course-main-content {
+  width: 100%;
+}
+
+.course-video-player {
+  width: 100%;
+  position: relative;
+  padding-bottom: 56.25%; /* Tỷ lệ 16:9 */
+  height: 0;
+  background-color: #000;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.video-placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.2rem;
+  font-style: italic;
+}
+
+/* === Hệ thống Tab === */
+.course-tabs {
+  display: flex;
+  border-bottom: 2px solid #eee;
+  margin-bottom: 1.5rem;
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  padding: 1rem 1.5rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: var(--body-text);
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transform: translateY(2px); /* Dịch xuống 1 chút để gạch chân nằm đè lên border-bottom */
+}
+
+.tab-btn.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+.tab-content {
+  padding: 1rem 0;
+}
+
+/* Nội dung Tab: Chương trình học */
+.lecture-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 1.25rem;
+  border: 1px solid #eee;
+  border-bottom: none;
+}
+.lecture-item:first-child {
+  border-top-left-radius: var(--border-radius);
+  border-top-right-radius: var(--border-radius);
+}
+.lecture-item:last-child {
+  border-bottom: 1px solid #eee;
+  border-bottom-left-radius: var(--border-radius);
+  border-bottom-right-radius: var(--border-radius);
+}
+.lecture-item.active {
+  background-color: var(--light-surface);
+  color: var(--primary);
+  font-weight: bold;
+}
+
+/* Nội dung Tab: Nguyên liệu */
+.materials-list ul {
+  list-style-position: inside;
+  padding-left: 1rem;
+  margin-top: 1rem;
+}
+.materials-list li {
+  margin-bottom: 0.5rem;
+}
+
+/* === Cột Phải: Thẻ Mua hàng === */
+.course-sidebar {
+  width: 100%;
+}
+
+.purchase-card {
+  border: 1px solid #ccc;
+  border-radius: var(--border-radius);
+  padding: 2rem;
+  background-color: var(--background);
+  
+  /* Hiệu ứng "dính" (sticky) khi cuộn */
+  position: sticky;
+  top: 100px; /* 70px (navbar) + 30px (khoảng cách) */
+}
+
+.purchase-price {
+  font-size: 2.25rem;
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+}
+
+.purchase-card p {
+  color: var(--body-text);
+  margin-bottom: 1.5rem;
+}
+
+.purchase-btn {
+  width: 100%;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+}
+
+.purchase-card h4 {
+  color: var(--dark-text);
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+.purchase-card ul {
+  list-style: none;
+}
+.purchase-card li {
+  margin-bottom: 0.75rem;
+}

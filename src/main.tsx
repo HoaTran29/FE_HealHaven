@@ -10,6 +10,7 @@ import App from "./App.tsx";
 import HomePage from "./pages/HomePage.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
 import SignupPage from "./pages/SignupPage.tsx";
+import CourseDetailsPage from "./pages/CourseDetailsPage.tsx";
 
 // Cấu hình các đường dẫn (routes)
 const router = createBrowserRouter([
@@ -30,6 +31,10 @@ const router = createBrowserRouter([
       {
         path: "signup",
         element: <SignupPage />,
+      },
+      {
+        path: "course/:courseId",
+        element: <CourseDetailsPage/>
       },
     ],
   },

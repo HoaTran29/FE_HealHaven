@@ -36,6 +36,7 @@ const HomePage: React.FC = () => {
           <div className="grid">
             
             {/* Card 1 */}
+            <Link to="/course/workshop-dan-len" className="card-link">
             <div className="card">
               <div className="card-img">[Ảnh khóa học Đan len]</div>
               <div className="card-content">
@@ -45,8 +46,10 @@ const HomePage: React.FC = () => {
                 <div className="card-price">399.000 VNĐ</div>
               </div>
             </div>
+            </Link>
 
             {/* Card 2 */}
+            <Link to="/course/ve-mau-nuoc" className="card-link">
             <div className="card">
               <div className="card-img">[Ảnh khóa học Vẽ màu nước]</div>
               <div className="card-content">
@@ -56,8 +59,10 @@ const HomePage: React.FC = () => {
                 <div className="card-price">599.000 VNĐ</div>
               </div>
             </div>
+            </Link>
 
             {/* Card 3 */}
+            <Link to="/course/hoa-kem-nhung" className="card-link">
             <div className="card">
               <div className="card-img">[Ảnh khóa học Kẽm nhung]</div>
               <div className="card-content">
@@ -67,6 +72,7 @@ const HomePage: React.FC = () => {
                 <div className="card-price">450.000 VNĐ</div>
               </div>
             </div>
+            </Link>
 
           </div>
         </section>
