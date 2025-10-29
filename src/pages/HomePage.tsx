@@ -38,7 +38,11 @@ const HomePage: React.FC = () => {
             {/* Card 1 */}
             <Link to="/course/workshop-dan-len" className="card-link">
             <div className="card">
-              <div className="card-img">[Ảnh khóa học Đan len]</div>
+              <img 
+              src="/images/dan-len.webp"
+              alt="Workshop đan len"
+              className="card-img-real"
+              />
               <div className="card-content">
                 <h3>Workshop Đan len cơ bản</h3>
                 <p className="card-author">Nghệ nhân: Trần Văn A</p>
@@ -51,7 +55,11 @@ const HomePage: React.FC = () => {
             {/* Card 2 */}
             <Link to="/course/ve-mau-nuoc" className="card-link">
             <div className="card">
-              <div className="card-img">[Ảnh khóa học Vẽ màu nước]</div>
+              <img 
+              src="/images/mau-nuoc.webp"
+              alt="Workshop Vẽ màu nước"
+              className="card-img-real"
+              />
               <div className="card-content">
                 <h3>Vẽ màu nước: Thiên nhiên</h3>
                 <p className="card-author">Nghệ nhân: Lê Thị B</p>
@@ -64,7 +72,11 @@ const HomePage: React.FC = () => {
             {/* Card 3 */}
             <Link to="/course/hoa-kem-nhung" className="card-link">
             <div className="card">
-              <div className="card-img">[Ảnh khóa học Kẽm nhung]</div>
+              <img 
+              src="/images/kem-nhung.webp"
+              alt="Workshop Hoa kẽm nhung"
+              className="card-img-real"
+              />
               <div className="card-content">
                 <h3>Hoa Kẽm nhung nghệ thuật</h3>
                 <p className="card-author">Nghệ nhân: Nguyễn Văn C</p>

@@ -184,3 +184,10 @@ a:hover {
   border-color: var(--primary);
   box-shadow: 0 0 0 2px var(--light-surface);
 }
+
+.card-img-real{
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  background-color: var(--subtle-accent-bg);
+}

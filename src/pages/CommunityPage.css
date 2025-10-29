@@ -1,0 +1,110 @@
+.community-header {
+  text-align: center;
+  padding: 2rem 0;
+  margin-bottom: 2rem;
+  background-color: var(--light-surface);
+  border-radius: var(--border-radius);
+}
+.community-header h1 { font-size: 2.5rem; }
+.community-header p { margin-bottom: 1.5rem; }
+
+/* === Lưới bài đăng (Masonry/Pinterest style) === */
+.post-grid {
+  column-count: 4; 
+  column-gap: 1.5rem;
+}
+@media (max-width: 1200px) { .post-grid { column-count: 3; } }
+@media (max-width: 900px) { .post-grid { column-count: 2; } }
+@media (max-width: 600px) { .post-grid { column-count: 1; } }
+
+/* CSS cho thẻ Link */
+.post-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.post-card {
+  position: relative;
+  width: 100%;
+  margin-bottom: 1.5rem;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 64, 92, 0.05);
+  cursor: pointer;
+  break-inside: avoid; 
+  transition: all 0.3s ease; 
+}
+.post-card-link:hover .post-card {
+  box-shadow: 0 8px 16px rgba(0, 64, 92, 0.1);
+  transform: translateY(-5px);
+}
+.post-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 0.3s ease;
+}
+.post-card-link:hover .post-image {
+  transform: scale(1.03); 
+}
+
+/* Lớp phủ (Hiển thị ❤️ và 💬) */
+.post-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.5), transparent 60%);
+  color: white;
+  padding: 1rem;
+  opacity: 0;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: flex-end; 
+}
+.post-card-link:hover .post-overlay { opacity: 1; }
+.post-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem; 
+  font-size: 1rem;
+  font-weight: bold;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+.post-meta span {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem; 
+}
+
+/* Thông tin người dùng (Luôn hiện) */
+.post-user {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  display: flex;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  padding: 5px 10px 5px 5px;
+  transition: opacity 0.3s ease;
+  opacity: 1; 
+}
+.post-card-link:hover .post-user { opacity: 0; }
+.post-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: var(--primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: bold;
+  margin-right: 8px;
+}
+.post-username {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: var(--dark-text);
+}

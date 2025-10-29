@@ -11,6 +11,9 @@ import HomePage from "./pages/HomePage.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
 import SignupPage from "./pages/SignupPage.tsx";
 import CourseDetailsPage from "./pages/CourseDetailsPage.tsx";
+import CourseListPage from "./pages/CourseListPage.tsx";
+import CommunityPage from "./pages/CommunityPage.tsx";
+import PostDetailPage from "./pages/PostDetailPage.tsx";
 
 // Cấu hình các đường dẫn (routes)
 const router = createBrowserRouter([
@@ -34,7 +37,19 @@ const router = createBrowserRouter([
       },
       {
         path: "course/:courseId",
-        element: <CourseDetailsPage/>
+        element: <CourseDetailsPage />,
+      },
+      {
+        path: "courses",
+        element: <CourseListPage />,
+      },
+      {
+        path: "community",
+        element: <CommunityPage />,
+      },
+      {
+        path: "post/:postId",
+        element: <PostDetailPage />,
       },
     ],
   },

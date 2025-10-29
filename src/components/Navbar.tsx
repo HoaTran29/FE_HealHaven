@@ -8,7 +8,7 @@ const Navbar: React.FC = () => {
       <div className="navbar-container">
         {/* Logo trỏ về trang chủ */}
         <Link to="/" className="nav-logo">
-          Heal Haven
+          <img src="/logo.png" alt="HealHaven Logo" className="logo-image"/>
         </Link>
         
         {/* Các link điều hướng */}

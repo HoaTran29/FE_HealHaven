@@ -27,6 +27,13 @@
   color: var(--primary);
   text-decoration: none;
 }
+
+.logo-image{
+  height: 80px;
+  width: auto;
+  display: block;
+}
+
 .nav-logo:hover {
   text-decoration: none;
 }
