@@ -67,11 +67,5 @@ const CourseListPage: React.FC = () => {
   )
 }
 
-// Thêm một class CSS (giống HomePage) để xóa gạch chân link
-const cardLinkStyle: React.CSSProperties = {
-  textDecoration: 'none',
-  color: 'inherit',
-  display: 'block'
-};
 
 export default CourseListPage
