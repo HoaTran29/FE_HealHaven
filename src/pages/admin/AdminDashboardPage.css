@@ -1,0 +1,58 @@
+.admin-dashboard-page h1 {
+  color: var(--dark-text);
+  margin-bottom: 2rem;
+}
+
+/* === Lưới Thẻ KPI === */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.kpi-card {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.kpi-card h4 {
+  color: var(--body-text);
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.kpi-card p {
+  font-size: 1.75rem;
+  font-weight: bold;
+  color: var(--primary);
+  margin: 0;
+}
+
+/* === Lưới Biểu đồ === */
+.charts-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr; /* Biểu đồ đường 2 phần, tròn 1 phần */
+  gap: 1.5rem;
+}
+
+/* Style chung cho thẻ chứa biểu đồ */
+.chart-card {
+  background-color: white;
+  padding: 2rem;
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.chart-card h3 {
+  color: var(--dark-text);
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+/* Fix lỗi font-size của Recharts */
+.recharts-wrapper {
+  font-size: 0.9rem;
+}

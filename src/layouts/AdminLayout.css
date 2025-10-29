@@ -1,0 +1,83 @@
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* === THANH MENU DỌC (SIDEBAR) === */
+.admin-sidebar {
+  width: 260px;
+  background-color: var(--dark-text); /* Dùng màu Navy đậm */
+  color: #f0f0f0;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.sidebar-header {
+  padding: 1.5rem;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.sidebar-logo {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: white;
+  text-decoration: none;
+  display: block;
+}
+.sidebar-logo:hover {
+  text-decoration: none;
+}
+.sidebar-header span {
+  font-size: 0.9rem;
+  color: var(--accent); /* Màu cyan */
+}
+
+.admin-nav {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+}
+
+.admin-nav a {
+  display: block;
+  padding: 1rem 1.5rem;
+  color: #e0e0e0;
+  text-decoration: none;
+  border-radius: var(--border-radius);
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.admin-nav a:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  text-decoration: none;
+}
+
+/* Kiểu cho NavLink khi active */
+.admin-nav a.active {
+  background-color: var(--primary); /* Màu xanh chính */
+  color: white;
+  font-weight: bold;
+}
+
+.admin-nav .back-to-site {
+  margin-top: 2rem;
+  color: var(--accent);
+  background-color: rgba(0, 184, 184, 0.1);
+}
+.admin-nav .back-to-site:hover {
+  background-color: var(--accent);
+  color: var(--dark-text);
+}
+
+
+/* === VÙNG NỘI DUNG CHÍNH === */
+.admin-main-content {
+  flex-grow: 1;
+  background-color: #f4f7fa; /* Nền xám rất nhạt */
+  padding: 2.5rem;
+  overflow-y: auto;
+}

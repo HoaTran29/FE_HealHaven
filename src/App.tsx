@@ -1,7 +1,9 @@
 import React from 'react'
-import { Outlet } from 'react-router-dom'
+import { Outlet, ScrollRestoration } from 'react-router-dom'
 import Navbar from './components/Navbar' 
 import Footer from './components/Footer' 
+import AiChatFab from './pages/AiChatFab'
+import AiChatWidget from './pages/AiChatWidget'
 
 const App: React.FC = () => {
   return (
@@ -14,6 +16,9 @@ const App: React.FC = () => {
       </main>
       
       { <Footer /> }
+      <ScrollRestoration/>
+      <AiChatFab/>
+      <AiChatWidget/>
     </>
   )
 }
