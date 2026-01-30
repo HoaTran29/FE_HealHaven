@@ -1,157 +1,87 @@
-/* === Chat Widget (Giống Messenger) === */
 .ai-chat-widget {
   position: fixed;
-  bottom: 20px;
+  bottom: 90px;
   right: 20px;
   width: 350px;
-  height: 500px; /* Cố định chiều cao */
-  background-color: var(--background);
-  border-radius: var(--border-radius);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  z-index: 1999;
+  height: 500px;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 5px 25px rgba(0,0,0,0.2);
   display: flex;
   flex-direction: column;
+  z-index: 1000;
   overflow: hidden;
-  animation: slideIn 0.3s ease-out;
-}
-
-@keyframes slideIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
 }
 
 .chat-header {
+  background: var(--primary, #7c9a92);
+  color: white;
+  padding: 15px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.75rem 1rem;
-  background-color: var(--primary);
-  color: white;
-  flex-shrink: 0; /* Không co lại */
-}
-.chat-header h3 { color: white; margin-bottom: 0; font-size: 1.1rem; }
-.chat-close-btn { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; opacity: 0.8; }
-.chat-close-btn:hover { opacity: 1; }
-
-.chat-body {
-  flex-grow: 1; /* Lấp đầy không gian còn lại */
-  padding: 1.5rem;
-  overflow-y: auto;
-  background-color: #f9f9f9; /* Nền chat màu xám nhẹ */
-}
-
-/* === Form ban đầu === */
-.ai-chat-form { padding: 0; }
-.chat-greeting {
-  font-size: 1.1rem;
   font-weight: bold;
-  color: var(--dark-text);
-  margin-bottom: 1.5rem;
-  text-align: center;
 }
-.ai-chat-form .form-group { margin-bottom: 1rem; }
-.ai-chat-form .form-select,
-.ai-chat-form input {
-  font-size: 0.9rem;
-  padding: 0.6rem 0.8rem;
-}
-.chat-submit-btn { width: 100%; margin-top: 0.5rem; }
 
-/* === Bong bóng chat === */
-.message-list {
+.chat-content {
+  flex: 1;
+  padding: 15px;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 10px;
+  background-color: #f9f9f9;
 }
 
-.chat-message {
-  padding: 0.75rem 1rem;
-  border-radius: 18px; /* Bo tròn */
-  max-width: 80%; /* Chiều rộng tối đa */
-  line-height: 1.5;
-}
-.chat-message p {
-  margin: 0;
-  white-space: pre-wrap; /* Giữ các dấu xuống dòng */
-}
-
-/* Tin nhắn của AI */
-.ai-response {
-  background-color: var(--subtle-accent-bg); /* Màu mint */
-  color: var(--dark-text);
-  align-self: flex-start; /* Căn trái */
-  border-bottom-left-radius: 4px; /* Vuông 1 góc */
-}
-
-/* Tin nhắn của User */
-.user-response {
-  background-color: var(--primary); /* Màu xanh chính */
-  color: white;
-  align-self: flex-end; /* Căn phải */
-  border-bottom-right-radius: 4px; /* Vuông 1 góc */
-}
-
-.ai-thinking {
-  text-align: center;
-  font-style: italic;
-  color: var(--body-text);
-  align-self: center;
-}
-.ai-thinking p {
-  background: #eee;
-  display: inline-block;
-  padding: 0.5rem 1rem;
-  border-radius: 18px;
-}
-
-
-/* === Khung chat (Input) === */
-.chat-input-area {
+.message-row {
   display: flex;
-  border-top: 1px solid #ddd;
-  padding: 0.75rem;
-  background-color: var(--background);
-  flex-shrink: 0; /* Không co lại */
+  width: 100%;
 }
 
-.chat-input {
-  flex-grow: 1;
-  border: 1px solid #ccc;
+.message-row.user {
+  justify-content: flex-end;
+}
+
+.message-bubble {
+  max-width: 80%;
+  padding: 10px 15px;
+  border-radius: 15px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.user .message-bubble {
+  background: var(--primary, #7c9a92);
+  color: white;
+  border-bottom-right-radius: 2px;
+}
+
+.assistant .message-bubble {
+  background: #e1e1e1;
+  color: #333;
+  border-bottom-left-radius: 2px;
+}
+
+.chat-footer {
+  padding: 15px;
+  border-top: 1px solid #eee;
+  display: flex;
+  gap: 10px;
+}
+
+.chat-footer input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
   border-radius: 20px;
-  padding: 0.75rem 1rem;
-  font-size: 0.9rem;
-  margin-right: 0.5rem;
-}
-.chat-input:focus {
   outline: none;
-  border-color: var(--primary);
 }
 
-.chat-send-btn {
-  background: var(--primary);
+.chat-footer button {
+  background: var(--primary, #7c9a92);
   color: white;
   border: none;
-  border-radius: 50%; /* Nút gửi tròn */
-  width: 45px;
-  height: 45px;
-  /* font-size: 1.2rem; */ /* Không cần font-size nữa */
+  padding: 8px 15px;
+  border-radius: 20px;
   cursor: pointer;
-  transition: opacity 0.2s ease;
-
-  /* Thêm các dòng này để căn giữa icon */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-}
-
-/* Thêm style cho icon SVG bên trong */
-.chat-send-btn svg {
-  width: 22px;
-  height: 22px;
-  margin-left: 2px; /* Căn chỉnh icon máy bay cho đẹp */
-}
-
-.chat-send-btn:hover {
-  opacity: 0.8;
 }

@@ -7,19 +7,23 @@ import AiChatWidget from './pages/AiChatWidget'
 
 const App: React.FC = () => {
   return (
-    <>
-      { <Navbar /> }
+    <div className="app-container">
+      {/* F1.1: Header & Điều hướng */}
+      <Navbar /> 
       
-      <main>
-        {/* <Outlet /> là "lỗ hổng" nơi các trang con (HomePage, LoginPage...) sẽ được render */}
+      <main className="min-h-screen">
         <Outlet /> 
       </main>
       
-      { <Footer /> }
+      {/* F1.4: Footer */}
+      <Footer />
+      
       <ScrollRestoration/>
+      
+      {/* F1.3: Tiện ích Trợ lý AI */}
       <AiChatFab/>
       <AiChatWidget/>
-    </>
+    </div>
   )
 }
 

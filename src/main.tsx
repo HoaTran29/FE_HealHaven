@@ -30,8 +30,8 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Suspense fallback={<PageLoader />}><HomePage /></Suspense> },
       { path: 'login', element: <Suspense fallback={<PageLoader />}><LoginPage /></Suspense> },
-      { path: 'signup', element: <Suspense fallback={<PageLoader />}><SignupPage /></Suspense> },
-      { path: 'workshops', element: <Suspense fallback={<PageLoader />}><WorkshopListPage /></Suspense> }, // F2.2
+      { path: 'signup', element: <Suspense fallback={<PageLoader />}><SignupPage /></Suspense> }, 
+      { path: 'workshops', element: <Suspense fallback={<PageLoader />}><WorkshopListPage /></Suspense> },// F2.2
       { path: 'workshop/:id', element: <Suspense fallback={<PageLoader />}><WorkshopDetailsPage /></Suspense> }, // F2.3
       { path: 'checkout', element: <Suspense fallback={<PageLoader />}><CheckoutPage /></Suspense> }, // F2.4
       { path: 'my-schedule', element: <Suspense fallback={<PageLoader />}><MyOrdersPage /></Suspense> }, // F2.6

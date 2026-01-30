@@ -8,9 +8,17 @@
   --secondary: #006a6e;
   --background: #FFFFFF;
   --body-text: #5a5a5a;
+  --secondary: #f4f1ea;
+  --text-main: #333;
+  --bg-app: #ffffff;
   
   --font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   --border-radius: 8px;
+}
+
+[data-theme='dark'] {
+  --bg-app: #1a1a1a;
+  --text-main: #f5f5f5;
 }
 
 /* === RESET CƠ BẢN === */

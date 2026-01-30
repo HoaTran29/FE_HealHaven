@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import './WorkshopListPage.css';
 
-const CourseListPage: React.FC = () => {
+const WorkshopListPage: React.FC = () => {
+  const navigate = useNavigate();
   const [filter, setFilter] = useState({ category: '', area: '', price: '' });
 
   return (
@@ -31,7 +34,7 @@ const CourseListPage: React.FC = () => {
             <h4>Đan len chữa lành</h4>
             <p>Host: Tiệm Thủ Công</p>
             <span className="price">350.000đ</span>
-            <button onClick={() => window.location.href='/workshop/1'}>Xem chi tiết</button>
+            <button onClick={() => navigate('/workshop/1')}>Xem chi tiết</button>
           </div>
         </div>
       </section>

@@ -70,11 +70,11 @@ const mockCourseData: any = {
 
 const WorkshopDetailsPage: React.FC = () => {
   // --- 3. LẤY courseId TỪ URL ---
-  const { courseId } = useParams<{ courseId: string }>();
+  const { id } = useParams<{ id: string }>();
   
   // Lấy dữ liệu của khóa học dựa trên courseId
   // Nếu không tìm thấy, dùng 'workshop-dan-len' làm mặc định (hoặc hiển thị trang 404)
-  const course = mockCourseData[courseId || 'workshop-dan-len'] || mockCourseData['workshop-dan-len'];
+  const course = mockCourseData[id || 'workshop-dan-len'] || mockCourseData['workshop-dan-len'];
 
   // Tab mặc định là 'curriculum'
   const [activeTab, setActiveTab] = React.useState('curriculum');
@@ -85,7 +85,7 @@ const WorkshopDetailsPage: React.FC = () => {
       <header className="course-header">
         <div className="container">
           <p className="course-breadcrumb">
-            <Link to="/courses">Khóa học</Link> &gt; 
+            <Link to="/workshops">Khóa học</Link> &gt; 
             <span>{course.title}</span> {/* <-- Động */}
           </p>
           <h1>{course.title}</h1> {/* <-- Động */}
