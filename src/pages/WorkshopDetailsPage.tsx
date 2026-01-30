@@ -1,6 +1,6 @@
 import React from 'react' // Bỏ useState vì chúng ta sẽ dùng tab mặc định
 import { Link, useParams } from 'react-router-dom' // <-- 1. Import useParams
-import './CourseDetailsPage.css'
+import './WorkshopDetailsPage.css'
 
 // --- 2. TẠO DỮ LIỆU GIẢ (MOCK DATA) ---
 // Khi có BE, bạn sẽ call API bằng courseId và lấy về data này
@@ -68,7 +68,7 @@ const mockCourseData: any = {
 // --- HẾT DỮ LIỆU GIẢ ---
 
 
-const CourseDetailsPage: React.FC = () => {
+const WorkshopDetailsPage: React.FC = () => {
   // --- 3. LẤY courseId TỪ URL ---
   const { courseId } = useParams<{ courseId: string }>();
   
@@ -201,4 +201,4 @@ const CourseDetailsPage: React.FC = () => {
   )
 }
 
-export default CourseDetailsPage
+export default WorkshopDetailsPage

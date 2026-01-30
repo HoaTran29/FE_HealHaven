@@ -18,7 +18,7 @@ const Navbar: React.FC = () => {
             <NavLink to="/">Trang chủ</NavLink>
           </li>
           <li>
-            <NavLink to="/courses">Khóa học</NavLink>
+            <NavLink to="/workshop">Workshop</NavLink>
           </li>
           <li>
             <NavLink to="/community">Cộng đồng</NavLink>
