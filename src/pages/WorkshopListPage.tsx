@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import './WorkshopListPage.css';
 
 const WorkshopListPage: React.FC = () => {
-  const navigate = useNavigate();
   const [filter, setFilter] = useState({ category: '', area: '', price: '' });
 
   // Dữ liệu mẫu hiển thị (F2.2)
@@ -31,7 +30,7 @@ const WorkshopListPage: React.FC = () => {
           <h3>Bộ lọc tìm kiếm</h3>
           <div className="filter-group">
             <label>Khu vực</label>
-            <select onChange={(e) => setFilter({...filter, area: e.target.value})}>
+            <select onChange={(e) => setFilter({ ...filter, area: e.target.value })}>
               <option value="">Tất cả khu vực</option>
               <option value="q1">Quận 1</option>
               <option value="q3">Quận 3</option>
@@ -40,7 +39,7 @@ const WorkshopListPage: React.FC = () => {
 
           <div className="filter-group">
             <label>Mức giá</label>
-            <select onChange={(e) => setFilter({...filter, price: e.target.value})}>
+            <select onChange={(e) => setFilter({ ...filter, price: e.target.value })}>
               <option value="">Tất cả giá</option>
               <option value="low">Dưới 500k</option>
               <option value="high">Trên 500k</option>

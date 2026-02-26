@@ -15,7 +15,7 @@ const HomePage: React.FC = () => {
             Khám phá sự sáng tạo và tìm thấy bình yên trong từng sản phẩm thủ
             công.
           </p>
-          <Link to="/courses" className="btn btn-accent">
+          <Link to="/workshops" className="btn btn-accent">
             Khám phá Workshop
           </Link>
         </div>
@@ -42,7 +42,7 @@ const HomePage: React.FC = () => {
           {/* Lưới chứa các thẻ khóa học */}
           <div className="grid">
             {/* Card 1 */}
-            <Link to="/course/workshop-dan-len" className="card-link">
+            <Link to="/workshop/workshop-dan-len" className="card-link">
               <div className="card">
                 <img
                   src="/images/dan-len.webp"
@@ -59,7 +59,7 @@ const HomePage: React.FC = () => {
             </Link>
 
             {/* Card 2 */}
-            <Link to="/course/ve-mau-nuoc" className="card-link">
+            <Link to="/workshop/ve-mau-nuoc" className="card-link">
               <div className="card">
                 <img
                   src="/images/mau-nuoc.webp"
@@ -76,7 +76,7 @@ const HomePage: React.FC = () => {
             </Link>
 
             {/* Card 3 */}
-            <Link to="/course/hoa-kem-nhung" className="card-link">
+            <Link to="/workshop/hoa-kem-nhung" className="card-link">
               <div className="card">
                 <img
                   src="/images/kem-nhung.webp"

@@ -2,20 +2,20 @@ import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import './UserProfilePage.css' // CSS riêng cho trang này
 
-// Dữ liệu giả cho "Khóa học của tôi"
-const myCourses = [
+// Dữ liệu giả cho "Workshop của tôi"
+const myWorkshops = [
   {
     id: 'workshop-dan-len',
     title: 'Workshop Đan len cơ bản',
     author: 'Nghệ nhân: Trần Văn A',
-    img: '/images/dan-len.jpg', // Dùng ảnh từ public
-    progress: 80, // % hoàn thành
+    img: '/images/dan-len.webp',
+    progress: 80,
   },
   {
     id: 've-mau-nuoc',
     title: 'Vẽ màu nước: Thiên nhiên',
     author: 'Nghệ nhân: Lê Thị B',
-    img: '/images/mau-nuoc.jpg',
+    img: '/images/mau-nuoc.webp',
     progress: 30,
   }
 ];
@@ -45,23 +45,23 @@ const UserProfilePage: React.FC = () => {
       {/* === Nội dung chính (Tab) === */}
       <div className="container">
         <div className="profile-content-layout">
-          
+
           {/* Cột Trái: Thanh điều hướng Tab */}
           <aside className="profile-sidebar">
             <nav className="profile-nav">
-              <button 
+              <button
                 className={`profile-nav-link ${activeTab === 'profile' ? 'active' : ''}`}
                 onClick={() => setActiveTab('profile')}
               >
                 Hồ sơ công khai
               </button>
-              <button 
-                className={`profile-nav-link ${activeTab === 'my-courses' ? 'active' : ''}`}
-                onClick={() => setActiveTab('my-courses')}
+              <button
+                className={`profile-nav-link ${activeTab === 'my-workshops' ? 'active' : ''}`}
+                onClick={() => setActiveTab('my-workshops')}
               >
-                Khóa học của tôi
+                Workshop của tôi
               </button>
-              <button 
+              <button
                 className={`profile-nav-link ${activeTab === 'settings' ? 'active' : ''}`}
                 onClick={() => setActiveTab('settings')}
               >
@@ -75,7 +75,7 @@ const UserProfilePage: React.FC = () => {
 
           {/* Cột Phải: Nội dung Tab */}
           <main className="profile-tab-content">
-            
+
             {/* --- Tab 1: Hồ sơ --- */}
             {activeTab === 'profile' && (
               <div className="tab-pane">
@@ -84,9 +84,9 @@ const UserProfilePage: React.FC = () => {
                 {/* (Bạn có thể thêm form chỉnh sửa ở đây) */}
                 <div className="form-group">
                   <label htmlFor="bio">Tiểu sử ngắn</label>
-                  <textarea 
-                    id="bio" 
-                    rows={4} 
+                  <textarea
+                    id="bio"
+                    rows={4}
                     placeholder="Viết gì đó về bạn..."
                     defaultValue="Yêu thích làm đồ thủ công và chia sẻ đam mê."
                   ></textarea>
@@ -94,25 +94,23 @@ const UserProfilePage: React.FC = () => {
                 <button className="btn btn-primary">Lưu thay đổi</button>
               </div>
             )}
-            
+
             {/* --- Tab 2: Khóa học của tôi --- */}
-            {activeTab === 'my-courses' && (
+            {activeTab === 'my-workshops' && (
               <div className="tab-pane">
-                <h3>Khóa học của tôi</h3>
-                <div className="my-courses-grid">
-                  {myCourses.map(course => (
-                    <Link to={`/course/${course.id}`} className="course-card-link" key={course.id}>
-                      {/* Tái sử dụng .card từ index.css */}
-                      <div className="card my-course-card"> 
-                        <img src={course.img} alt={course.title} className="card-img-real" />
-                        {/* Thêm thanh tiến độ */}
+                <h3>Workshop của tôi</h3>
+                <div className="my-workshops-grid">
+                  {myWorkshops.map(ws => (
+                    <Link to={`/workshop/${ws.id}`} className="workshop-card-link" key={ws.id}>
+                      <div className="card my-workshop-card">
+                        <img src={ws.img} alt={ws.title} className="card-img-real" />
                         <div className="progress-bar">
-                          <div className="progress" style={{width: `${course.progress}%`}}></div>
+                          <div className="progress" style={{ width: `${ws.progress}%` }}></div>
                         </div>
                         <div className="card-content">
-                          <h3>{course.title}</h3>
-                          <p className="card-author">{course.author}</p>
-                          <span>{course.progress}% hoàn thành</span>
+                          <h3>{ws.title}</h3>
+                          <p className="card-author">{ws.author}</p>
+                          <span>{ws.progress}% hoàn thành</span>
                         </div>
                       </div>
                     </Link>
@@ -120,13 +118,13 @@ const UserProfilePage: React.FC = () => {
                 </div>
               </div>
             )}
-            
+
             {/* --- Tab 3: Cài đặt --- */}
             {activeTab === 'settings' && (
               <div className="tab-pane">
                 <h3>Cài đặt tài khoản</h3>
                 <p>Quản lý thông tin đăng nhập và bảo mật.</p>
-                
+
                 <h4>Đổi mật khẩu</h4>
                 <form>
                   <div className="form-group">

@@ -1,0 +1,281 @@
+/* ===================================================
+   SETTINGS PAGE
+=================================================== */
+
+.settings-page {
+    padding-top: 2rem;
+    padding-bottom: 4rem;
+    min-height: 80vh;
+}
+
+.settings-header {
+    margin-bottom: 2.5rem;
+}
+
+.settings-header h1 {
+    font-size: 2rem;
+}
+
+.settings-header p {
+    color: var(--body-text);
+    margin: 0;
+}
+
+.settings-content {
+    max-width: 680px;
+}
+
+/* --- Section --- */
+.settings-section {
+    background: white;
+    border: 1px solid #e5f3f3;
+    border-radius: 14px;
+    padding: 1.75rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 10px rgba(0, 64, 92, 0.05);
+}
+
+.settings-section h2 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--dark-text);
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #eef7f7;
+}
+
+/* --- Row --- */
+.settings-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid #f5f5f5;
+    gap: 1rem;
+}
+
+.settings-row:last-of-type {
+    border-bottom: none;
+}
+
+.settings-row-title {
+    font-weight: 600;
+    color: var(--dark-text);
+    font-size: 0.95rem;
+}
+
+.settings-row-desc {
+    font-size: 0.82rem;
+    color: var(--body-text);
+    margin-top: 2px;
+}
+
+/* --- Toggle Switch --- */
+.toggle-switch {
+    position: relative;
+    width: 48px;
+    height: 26px;
+    background: #d0d0d0;
+    border-radius: 13px;
+    cursor: pointer;
+    border: none;
+    flex-shrink: 0;
+    transition: background 0.3s ease;
+}
+
+.toggle-switch.on {
+    background: var(--primary);
+}
+
+.toggle-knob {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: white;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
+}
+
+.toggle-switch.on .toggle-knob {
+    transform: translateX(22px);
+}
+
+/* --- Theme Preview --- */
+.theme-preview {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.preview-card {
+    flex: 1;
+    max-width: 200px;
+    border-radius: 10px;
+    padding: 1rem;
+    border: 2px solid transparent;
+    transition: border-color 0.3s;
+    position: relative;
+}
+
+.preview-light {
+    background: #f8fbfc;
+    border-color: var(--primary);
+}
+
+.preview-dark {
+    background: #1a2a35;
+    border-color: var(--accent);
+}
+
+.preview-bar {
+    height: 8px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.preview-light .preview-bar {
+    background: var(--primary);
+}
+
+.preview-dark .preview-bar {
+    background: var(--accent);
+}
+
+.preview-lines {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.preview-line {
+    height: 6px;
+    border-radius: 3px;
+}
+
+.preview-light .preview-line {
+    background: #ddd;
+}
+
+.preview-dark .preview-line {
+    background: #2a4050;
+}
+
+.preview-line.long {
+    width: 100%;
+}
+
+.preview-line.medium {
+    width: 70%;
+}
+
+.preview-line.short {
+    width: 50%;
+}
+
+.preview-label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-top: 0.75rem;
+}
+
+.preview-light .preview-label {
+    color: var(--primary);
+}
+
+.preview-dark .preview-label {
+    color: var(--accent);
+}
+
+/* --- Language buttons --- */
+.lang-options {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.lang-btn {
+    padding: 0.65rem 1.5rem;
+    border-radius: 10px;
+    border: 2px solid #e5f3f3;
+    background: white;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    color: var(--body-text);
+}
+
+.lang-btn.selected {
+    border-color: var(--primary);
+    background: var(--light-surface);
+    color: var(--primary);
+}
+
+.lang-btn:hover:not(.selected) {
+    border-color: var(--accent);
+}
+
+.lang-notice {
+    font-size: 0.82rem;
+    color: #888;
+    margin-top: 0.75rem;
+    background: #f9f5e8;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    border: 1px solid #ffe099;
+}
+
+/* --- DARK MODE --- */
+[data-theme='dark'] .settings-section {
+    background: #1e3040;
+    border-color: #2a4050;
+}
+
+[data-theme='dark'] .settings-section h2 {
+    color: #c0d8e8;
+    border-bottom-color: #2a4050;
+}
+
+[data-theme='dark'] .settings-row {
+    border-bottom-color: #2a4050;
+}
+
+[data-theme='dark'] .settings-row-title {
+    color: #e0f0f8;
+}
+
+[data-theme='dark'] .settings-row-desc {
+    color: #8aabb8;
+}
+
+[data-theme='dark'] .settings-page {
+    background: transparent;
+}
+
+[data-theme='dark'] .lang-btn {
+    background: #162535;
+    border-color: #2a4050;
+    color: #8aabb8;
+}
+
+[data-theme='dark'] .lang-btn.selected {
+    border-color: var(--accent);
+    background: rgba(0, 184, 184, 0.1);
+    color: var(--accent);
+}
+
+/* --- Responsive --- */
+@media (max-width: 480px) {
+    .settings-section {
+        padding: 1.25rem;
+    }
+
+    .settings-header h1 {
+        font-size: 1.5rem;
+    }
+}

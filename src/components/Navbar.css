@@ -1,13 +1,13 @@
-/* CSS riêng cho Navbar */
+/* CSS cho Navbar */
 .navbar {
   background-color: var(--background);
   padding: 1rem 0;
   border-bottom: 1px solid var(--light-surface);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  position: sticky; /* Giữ navbar ở trên cùng khi cuộn */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  position: sticky;
   top: 0;
   z-index: 1000;
-  height: 70px; /* Cố định chiều cao */
+  height: 70px;
   display: flex;
   align-items: center;
 }
@@ -19,6 +19,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: relative;
 }
 
 .nav-logo {
@@ -28,39 +29,39 @@
   text-decoration: none;
 }
 
-.logo-image{
+.nav-logo:hover {
+  text-decoration: none;
+}
+
+.logo-image {
   height: 80px;
   width: auto;
   display: block;
 }
 
-.nav-logo:hover {
-  text-decoration: none;
-}
-
+/* --- Nav links --- */
 .nav-links {
   list-style: none;
   display: flex;
-  align-items: center; /* Căn giữa các mục */
+  align-items: center;
 }
 
 .nav-links li {
-  margin-left: 2rem;
+  margin-left: 1.5rem;
 }
 
 .nav-links a {
   color: var(--dark-text);
   font-weight: 500;
   text-decoration: none;
-  padding-bottom: 5px; /* Thêm không gian cho gạch chân */
-  border-bottom: 2px solid transparent; /* Gạch chân trong suốt */
-  transition: all 0.3s ease;
+  padding-bottom: 5px;
+  border-bottom: 2px solid transparent;
+  transition: all 0.25s ease;
 }
 
-/* Kiểu cho NavLink khi đang 'active' (trang hiện tại) */
 .nav-links a.active {
   color: var(--primary);
-  border-bottom: 2px solid var(--primary); /* Gạch chân khi active */
+  border-bottom: 2px solid var(--primary);
 }
 
 .nav-links a:hover {
@@ -68,11 +69,361 @@
   text-decoration: none;
 }
 
-/* Nút Đăng ký không cần hiệu ứng gạch chân */
 .nav-links a.btn {
   border-bottom: none;
 }
+
 .nav-links a.btn:hover {
   border-bottom: none;
-  color: white; /* Giữ chữ trắng khi hover nút */
+  color: white;
+}
+
+/* --- Dark mode toggle --- */
+.theme-toggle-btn {
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  color: var(--dark-text);
+  line-height: 1;
+}
+
+.theme-toggle-btn:hover {
+  background: var(--light-surface);
+  border-color: var(--primary);
+}
+
+/* --- Avatar & Dropdown --- */
+.nav-user-item {
+  position: relative;
+}
+
+.nav-avatar-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: 2px solid var(--light-surface);
+  border-radius: 24px;
+  padding: 4px 12px 4px 4px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  color: var(--dark-text);
+}
+
+.nav-avatar-btn:hover {
+  border-color: var(--primary);
+  background: var(--light-surface);
+}
+
+.nav-avatar-text {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.nav-avatar-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.nav-username {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--dark-text);
+}
+
+.dropdown-arrow {
+  font-size: 0.6rem;
+  color: var(--body-text);
+}
+
+/* --- Dropdown menu --- */
+.nav-dropdown {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  min-width: 220px;
+  background: white;
+  border: 1px solid #e5f3f3;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 64, 92, 0.15);
+  overflow: hidden;
+  animation: dropdownFadeIn 0.18s ease;
+  z-index: 200;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-header {
+  padding: 12px 16px;
+  background: linear-gradient(135deg, var(--light-surface), #e8f9f9);
+}
+
+.dropdown-name {
+  font-weight: 700;
+  color: var(--dark-text);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.dropdown-email {
+  font-size: 0.78rem;
+  color: var(--body-text);
+  margin: 2px 0 0;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: #e5f3f3;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 16px;
+  font-size: 0.88rem;
+  color: var(--dark-text);
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.dropdown-item:hover {
+  background: #f0fafa;
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.dropdown-item-admin {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.dropdown-item-logout {
+  color: #dc3545;
+}
+
+.dropdown-item-logout:hover {
+  background: #fff5f5;
+  color: #dc3545;
+}
+
+/* --- Hamburger --- */
+.nav-hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  z-index: 1100;
+}
+
+.nav-hamburger span {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background-color: var(--dark-text);
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+.nav-hamburger.open span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.nav-hamburger.open span:nth-child(2) {
+  opacity: 0;
+}
+
+.nav-hamburger.open span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* --- Overlay --- */
+.nav-overlay {
+  display: none;
+}
+
+/* --- DARK MODE Navbar --- */
+[data-theme='dark'] .navbar {
+  background-color: #1a2a35;
+  border-bottom-color: #2a4050;
+}
+
+[data-theme='dark'] .nav-links a {
+  color: #c0d8e8;
+}
+
+[data-theme='dark'] .nav-links a:hover,
+[data-theme='dark'] .nav-links a.active {
+  color: var(--accent);
+}
+
+[data-theme='dark'] .nav-avatar-btn {
+  border-color: #2a4050;
+  color: #c0d8e8;
+}
+
+[data-theme='dark'] .nav-avatar-btn:hover {
+  background: #2a4050;
+}
+
+[data-theme='dark'] .nav-username {
+  color: #c0d8e8;
+}
+
+[data-theme='dark'] .nav-dropdown {
+  background: #1e3040;
+  border-color: #2a4050;
+}
+
+[data-theme='dark'] .dropdown-header {
+  background: #162535;
+}
+
+[data-theme='dark'] .dropdown-name {
+  color: #e0f0f8;
+}
+
+[data-theme='dark'] .dropdown-item {
+  color: #c0d8e8;
+}
+
+[data-theme='dark'] .dropdown-item:hover {
+  background: #2a4050;
+  color: var(--accent);
+}
+
+[data-theme='dark'] .dropdown-divider {
+  background: #2a4050;
+}
+
+[data-theme='dark'] .theme-toggle-btn {
+  border-color: #2a4050;
+  color: #c0d8e8;
+}
+
+[data-theme='dark'] .theme-toggle-btn:hover {
+  background: #2a4050;
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 768px) {
+  .nav-hamburger {
+    display: flex;
+  }
+
+  .nav-links {
+    position: fixed;
+    top: 70px;
+    right: 0;
+    width: 100%;
+    max-width: 300px;
+    height: calc(100vh - 70px);
+    background: white;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1.5rem 1.25rem;
+    gap: 0;
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
+    transform: translateX(100%);
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1050;
+    overflow-y: auto;
+  }
+
+  .nav-links.open {
+    transform: translateX(0);
+  }
+
+  .nav-links li {
+    margin-left: 0;
+    width: 100%;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .nav-links li:last-child {
+    border-bottom: none;
+  }
+
+  .nav-links a {
+    display: block;
+    padding: 0.9rem 0;
+    font-size: 1rem;
+    border-bottom: none;
+  }
+
+  .nav-links a.btn {
+    display: inline-flex;
+    margin-top: 0.5rem;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .nav-user-item {
+    width: 100%;
+  }
+
+  .nav-avatar-btn {
+    width: 100%;
+    border-radius: 8px;
+    padding: 0.9rem 0.5rem;
+  }
+
+  .nav-dropdown {
+    position: static;
+    box-shadow: none;
+    border: 1px solid #e5f3f3;
+    margin-top: 0.5rem;
+    border-radius: 8px;
+  }
+
+  .nav-overlay.open {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 40, 60, 0.35);
+    z-index: 999;
+  }
+
+  /* Dark mode mobile */
+  [data-theme='dark'] .nav-links {
+    background: #1a2a35;
+  }
+
+  [data-theme='dark'] .nav-links li {
+    border-bottom-color: #2a4050;
+  }
 }

@@ -1,10 +1,9 @@
-import React from 'react' // Bỏ useState vì chúng ta sẽ dùng tab mặc định
-import { Link, useParams } from 'react-router-dom' // <-- 1. Import useParams
+import React from 'react'
+import { Link, useParams } from 'react-router-dom'
 import './WorkshopDetailsPage.css'
 
-// --- 2. TẠO DỮ LIỆU GIẢ (MOCK DATA) ---
-// Khi có BE, bạn sẽ call API bằng courseId và lấy về data này
-const mockCourseData: any = {
+// --- DỮ LIỆU GIẢ ---
+const mockWorkshopData: any = {
   'workshop-dan-len': {
     id: 'workshop-dan-len',
     title: 'Workshop Đan len cơ bản',
@@ -69,78 +68,70 @@ const mockCourseData: any = {
 
 
 const WorkshopDetailsPage: React.FC = () => {
-  // --- 3. LẤY courseId TỪ URL ---
   const { id } = useParams<{ id: string }>();
-  
-  // Lấy dữ liệu của khóa học dựa trên courseId
-  // Nếu không tìm thấy, dùng 'workshop-dan-len' làm mặc định (hoặc hiển thị trang 404)
-  const course = mockCourseData[id || 'workshop-dan-len'] || mockCourseData['workshop-dan-len'];
 
-  // Tab mặc định là 'curriculum'
+  // Lấy dữ liệu workshop dựa trên id từ URL
+  const workshop = mockWorkshopData[id || 'workshop-dan-len'] || mockWorkshopData['workshop-dan-len'];
+
   const [activeTab, setActiveTab] = React.useState('curriculum');
 
   return (
-    <div className="course-details-page">
-      {/* === PHẦN HEADER (ĐÃ DÙNG DỮ LIỆU ĐỘNG) === */}
-      <header className="course-header">
+    <div className="workshop-details-page">
+      {/* === HEADER === */}
+      <header className="workshop-header">
         <div className="container">
-          <p className="course-breadcrumb">
-            <Link to="/workshops">Khóa học</Link> &gt; 
-            <span>{course.title}</span> {/* <-- Động */}
+          <p className="workshop-breadcrumb">
+            <Link to="/workshops">Workshop</Link> &gt;
+            <span>{workshop.title}</span>
           </p>
-          <h1>{course.title}</h1> {/* <-- Động */}
-          <p className="course-subtitle">
-            {course.subtitle} {/* <-- Động */}
-          </p>
-          <p className="course-author-header">
-            Tạo bởi <Link to={course.authorLink}>{course.author}</Link> {/* <-- Động */}
+          <h1>{workshop.title}</h1>
+          <p className="workshop-subtitle">{workshop.subtitle}</p>
+          <p className="workshop-author-header">
+            Tổ chức bởi <Link to={workshop.authorLink}>{workshop.author}</Link>
           </p>
         </div>
       </header>
-      
+
       {/* === BỐ CỤC 2 CỘT === */}
       <div className="container">
-        <div className="course-layout">
-          
-          {/* CỘT TRÁI (NỘI DUNG CHÍNH) */}
-          <div className="course-main-content">
-            
-            <div className="course-video-player">
+        <div className="workshop-layout">
+
+          {/* CỘT TRÁI */}
+          <div className="workshop-main-content">
+            <div className="workshop-video-player">
               <div className="video-placeholder">
-                [Video Giới thiệu: {course.title}] {/* <-- Động */}
+                [Video Giới thiệu: {workshop.title}]
               </div>
             </div>
-            
-            {/* Các Tab Nội dung */}
-            <div className="course-tabs">
-              <button 
+
+            {/* Tabs */}
+            <div className="workshop-tabs">
+              <button
                 className={`tab-btn ${activeTab === 'curriculum' ? 'active' : ''}`}
                 onClick={() => setActiveTab('curriculum')}
               >
-                Chương trình học
+                Chương trình
               </button>
-              <button 
+              <button
                 className={`tab-btn ${activeTab === 'materials' ? 'active' : ''}`}
                 onClick={() => setActiveTab('materials')}
               >
                 Nguyên liệu cần thiết
               </button>
-              <button 
+              <button
                 className={`tab-btn ${activeTab === 'reviews' ? 'active' : ''}`}
                 onClick={() => setActiveTab('reviews')}
               >
                 Đánh giá (120)
               </button>
             </div>
-            
-            {/* Nội dung của Tab */}
+
             <div className="tab-content">
-              {/* Nội dung Tab 1: Chương trình học (Động) */}
               {activeTab === 'curriculum' && (
                 <div className="curriculum-list">
-                  {course.curriculum.map((item: any, index: number) => (
-                    <div 
-                      key={index} 
+                  {workshop.curriculum.map((item: any, index: number) => (
+                    <div
+                      key={index}
                       className={`lecture-item ${item.active ? 'active' : ''}`}
                     >
                       <span>{item.name}</span>
@@ -149,47 +140,44 @@ const WorkshopDetailsPage: React.FC = () => {
                   ))}
                 </div>
               )}
-              
-              {/* Nội dung Tab 2: Nguyên liệu (Động) */}
+
               {activeTab === 'materials' && (
                 <div className="materials-list">
-                  <p>Để hoàn thành khóa học, bạn cần chuẩn bị:</p>
+                  <p>Để hoàn thành workshop, bạn cần chuẩn bị:</p>
                   <ul>
-                    {course.materials.map((item: string, index: number) => (
+                    {workshop.materials.map((item: string, index: number) => (
                       <li key={index}>{item}</li>
                     ))}
                   </ul>
-                  <a href="#" className="btn btn-accent" style={{marginTop: '1rem'}}>
+                  <a href="#" className="btn btn-accent" style={{ marginTop: '1rem' }}>
                     Tìm cửa hàng nguyên liệu
                   </a>
                 </div>
               )}
-              
-              {/* Nội dung Tab 3: Đánh giá */}
+
               {activeTab === 'reviews' && (
                 <div className="reviews-list">
                   <p>Tính năng đang được phát triển...</p>
                 </div>
               )}
             </div>
-
           </div>
-          
-          {/* CỘT PHẢI (THẺ MUA HÀNG - ĐỘNG) */}
-          <aside className="course-sidebar">
+
+          {/* CỘT PHẢI - THẺ MUA HÀNG */}
+          <aside className="workshop-sidebar">
             <div className="purchase-card">
-              <h3 className="purchase-price">{course.price}</h3> {/* <-- Động */}
-              <p>Giá gốc: <span style={{textDecoration: 'line-through'}}>{course.originalPrice}</span></p> {/* <-- Động */}
-              
-              <button className="btn btn-primary purchase-btn">
-                Đăng ký học ngay
-              </button>
-              
-              <h4>Khóa học này bao gồm:</h4>
+              <h3 className="purchase-price">{workshop.price}</h3>
+              <p>Giá gốc: <span style={{ textDecoration: 'line-through' }}>{workshop.originalPrice}</span></p>
+
+              <Link to={`/checkout?workshopId=${workshop.id}`} className="btn btn-primary purchase-btn">
+                Đăng ký ngay
+              </Link>
+
+              <h4>Workshop này bao gồm:</h4>
               <ul>
-                <li>✅ 4 giờ video theo yêu cầu</li>
-                <li>✅ Truy cập trọn đời</li>
-                <li>✅ Hỗ trợ từ nghệ nhân</li>
+                <li>✅ Hướng dẫn trực tiếp từ nghệ nhân</li>
+                <li>✅ Nguyên liệu được chuẩn bị sẵn</li>
+                <li>✅ Không gian sáng tạo thoải mái</li>
                 <li>✅ Chứng nhận hoàn thành</li>
               </ul>
             </div>

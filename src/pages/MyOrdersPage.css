@@ -1,0 +1,341 @@
+/* ===================================================
+   MY ORDERS PAGE - Lịch trình của tôi
+=================================================== */
+
+.my-orders-page {
+  padding-top: 2rem;
+  padding-bottom: 4rem;
+  min-height: 80vh;
+}
+
+/* --- Header --- */
+.orders-header {
+  margin-bottom: 2rem;
+}
+
+.orders-header h1 {
+  font-size: 2rem;
+  color: var(--dark-text);
+}
+
+.orders-header p {
+  color: var(--body-text);
+  margin: 0;
+}
+
+/* --- Tabs --- */
+.orders-tabs {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 2px solid #e8f4f4;
+  margin-bottom: 2rem;
+  overflow-x: auto;
+  padding-bottom: 0;
+  scrollbar-width: none;
+}
+
+.orders-tabs::-webkit-scrollbar { display: none; }
+
+.orders-tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.7rem 1.2rem;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  cursor: pointer;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--body-text);
+  white-space: nowrap;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.orders-tab-btn:hover { color: var(--primary); }
+
+.orders-tab-btn.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+  font-weight: 700;
+}
+
+.tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  background-color: var(--light-surface);
+  color: var(--primary);
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.orders-tab-btn.active .tab-count {
+  background-color: var(--primary);
+  color: white;
+}
+
+/* --- Danh sách đơn hàng --- */
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* --- Order Card --- */
+.order-card {
+  display: flex;
+  gap: 0;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e5f3f3;
+  box-shadow: 0 2px 12px rgba(0, 64, 92, 0.06);
+  overflow: hidden;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.order-card:hover {
+  box-shadow: 0 6px 24px rgba(0, 64, 92, 0.1);
+  transform: translateY(-2px);
+}
+
+.order-card.cancelled {
+  opacity: 0.7;
+  filter: grayscale(0.3);
+}
+
+.order-card-image {
+  width: 160px;
+  flex-shrink: 0;
+}
+
+.order-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.order-card-body {
+  flex: 1;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.order-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.order-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--dark-text);
+  text-decoration: none;
+  flex: 1;
+  transition: color 0.2s;
+}
+
+.order-title:hover { color: var(--primary); text-decoration: none; }
+
+/* --- Status Badge --- */
+.order-status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.status-pending   { background: #fff3cd; color: #856404; }
+.status-confirmed { background: #d1e7dd; color: #0f5132; }
+.status-attended  { background: #d8f6f6; color: var(--primary); }
+.status-cancelled { background: #f8d7da; color: #842029; }
+
+/* --- Meta thông tin --- */
+.order-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.35rem 1.5rem;
+}
+
+.order-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.88rem;
+  color: var(--body-text);
+}
+
+.meta-icon { font-size: 0.85rem; }
+
+/* --- Footer của card --- */
+.order-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 0.75rem;
+  border-top: 1px solid #eef7f7;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.order-id {
+  font-size: 0.8rem;
+  color: #aaa;
+}
+
+.order-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* --- Nút nhỏ --- */
+.btn-sm {
+  padding: 0.4rem 0.9rem !important;
+  font-size: 0.82rem !important;
+  min-width: unset !important;
+}
+
+.btn-secondary {
+  background-color: #e8f4f4;
+  color: var(--primary);
+}
+
+.btn-secondary:hover { background-color: var(--light-surface); }
+
+.btn-danger {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-danger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-outline-danger {
+  background: white;
+  color: #dc3545;
+  border: 1px solid #dc3545;
+}
+
+.btn-outline-danger:hover {
+  background-color: #dc3545;
+  color: white;
+}
+
+/* --- Empty state --- */
+.orders-empty {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--body-text);
+}
+
+.empty-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.orders-empty p { margin-bottom: 0.5rem; }
+
+/* --- Modal --- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 40, 60, 0.45);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modal-box {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 20px 60px rgba(0, 40, 92, 0.2);
+}
+
+.modal-box h3 {
+  margin-bottom: 0.25rem;
+  color: var(--dark-text);
+}
+
+.modal-workshop-name {
+  font-size: 0.9rem;
+  color: var(--body-text);
+  margin-bottom: 1.25rem;
+}
+
+.refund-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f0faf9;
+  border: 1px solid #c3e8e8;
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.9rem;
+  color: var(--body-text);
+}
+
+.refund-amount {
+  font-size: 1.1rem;
+  color: var(--primary);
+}
+
+.modal-box .form-group label span {
+  font-weight: normal;
+  color: #999;
+  font-size: 0.85rem;
+}
+
+.modal-box textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: var(--border-radius);
+  font-family: var(--font-family);
+  font-size: 0.95rem;
+  resize: vertical;
+  background: #f9f9f9;
+}
+
+.modal-box textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--light-surface);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+/* --- Responsive --- */
+@media (max-width: 640px) {
+  .order-card { flex-direction: column; }
+  .order-card-image { width: 100%; height: 180px; }
+  .order-meta { grid-template-columns: 1fr; }
+  .orders-header h1 { font-size: 1.5rem; }
+}
