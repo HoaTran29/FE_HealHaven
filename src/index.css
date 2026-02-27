@@ -99,6 +99,33 @@ a {
   font-weight: 500;
 }
 
+/* === GLOBAL BUTTON RESET === */
+button {
+  font-family: var(--font-family);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+button:hover,
+button:focus,
+button:active {
+  text-decoration: none;
+}
+
+/* Link giả dạng button */
+a.btn,
+a[class*="btn"],
+a[class*="link"],
+a[class*="nav"] {
+  text-decoration: none;
+}
+
+a.btn:hover,
+a[class*="btn"]:hover,
+a[class*="link"]:hover {
+  text-decoration: none;
+}
+
 a:hover {
   text-decoration: underline;
 }

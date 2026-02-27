@@ -1,0 +1,236 @@
+/* ===================================================
+   HOST LAYOUT
+=================================================== */
+:root {
+    --host-sidebar-w: 240px;
+}
+
+.host-shell {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* ===== SIDEBAR ===== */
+.host-sidebar {
+    width: var(--host-sidebar-w);
+    flex-shrink: 0;
+    background: linear-gradient(180deg, #005a7a 0%, #007BA2 60%, #0099c6 100%);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 200;
+    transition: transform 0.3s ease;
+    overflow-y: auto;
+}
+
+.host-sidebar-brand {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.25rem 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.brand-link {
+    color: white;
+    font-weight: 800;
+    font-size: 1.05rem;
+    text-decoration: none;
+    letter-spacing: 0.3px;
+    display: flex;
+    align-items: center;
+}
+
+.sidebar-logo {
+    height: 36px;
+    width: auto;
+    object-fit: contain;
+}
+
+.sidebar-close-btn {
+    display: none;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 4px;
+}
+
+.host-sidebar-user {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.host-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: white;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.host-user-name {
+    color: white;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.host-user-role {
+    color: rgba(255, 255, 255, 0.65);
+    font-size: 0.75rem;
+}
+
+/* Nav links */
+.host-nav {
+    flex: 1;
+    padding: 0.75rem 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.host-nav-link {
+    display: block;
+    padding: 0.7rem 1rem;
+    border-radius: 10px;
+    color: rgba(255, 255, 255, 0.75);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: background 0.2s, color 0.2s;
+}
+
+.host-nav-link:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: white;
+    text-decoration: none;
+}
+
+.host-nav-link.active {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.host-sidebar-footer {
+    padding: 1rem 0.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.back-link {
+    font-size: 0.85rem;
+}
+
+/* Overlay mobile */
+.sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 199;
+    display: none;
+}
+
+/* ===== MAIN CONTENT ===== */
+.host-main {
+    flex: 1;
+    margin-left: var(--host-sidebar-w);
+    min-height: 100vh;
+    background: #f4f8fb;
+    display: flex;
+    flex-direction: column;
+}
+
+.host-topbar {
+    display: none;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.85rem 1.25rem;
+    background: white;
+    border-bottom: 1px solid #e5f3f3;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.topbar-menu-btn {
+    background: none;
+    border: none;
+    font-size: 1.3rem;
+    cursor: pointer;
+    color: var(--dark-text);
+}
+
+.topbar-title {
+    font-weight: 700;
+    color: var(--dark-text);
+    font-size: 1rem;
+}
+
+.host-content {
+    padding: 2rem;
+    flex: 1;
+}
+
+/* ===== DARK MODE ===== */
+[data-theme='dark'] .host-main {
+    background: #0e1e28;
+}
+
+[data-theme='dark'] .host-topbar {
+    background: #1e3040;
+    border-color: #2a4050;
+}
+
+[data-theme='dark'] .topbar-title {
+    color: #c0d8e8;
+}
+
+[data-theme='dark'] .topbar-menu-btn {
+    color: #c0d8e8;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+    .host-sidebar {
+        transform: translateX(-100%);
+    }
+
+    .host-sidebar.open {
+        transform: translateX(0);
+    }
+
+    .sidebar-close-btn {
+        display: block;
+    }
+
+    .sidebar-overlay {
+        display: block;
+    }
+
+    .host-main {
+        margin-left: 0;
+    }
+
+    .host-topbar {
+        display: flex;
+    }
+
+    .host-content {
+        padding: 1.25rem;
+    }
+}

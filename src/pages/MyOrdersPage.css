@@ -34,7 +34,9 @@
   scrollbar-width: none;
 }
 
-.orders-tabs::-webkit-scrollbar { display: none; }
+.orders-tabs::-webkit-scrollbar {
+  display: none;
+}
 
 .orders-tab-btn {
   display: flex;
@@ -53,7 +55,9 @@
   transition: color 0.2s, border-color 0.2s;
 }
 
-.orders-tab-btn:hover { color: var(--primary); }
+.orders-tab-btn:hover {
+  color: var(--primary);
+}
 
 .orders-tab-btn.active {
   color: var(--primary);
@@ -145,7 +149,10 @@
   transition: color 0.2s;
 }
 
-.order-title:hover { color: var(--primary); text-decoration: none; }
+.order-title:hover {
+  color: var(--primary);
+  text-decoration: none;
+}
 
 /* --- Status Badge --- */
 .order-status-badge {
@@ -157,10 +164,25 @@
   white-space: nowrap;
 }
 
-.status-pending   { background: #fff3cd; color: #856404; }
-.status-confirmed { background: #d1e7dd; color: #0f5132; }
-.status-attended  { background: #d8f6f6; color: var(--primary); }
-.status-cancelled { background: #f8d7da; color: #842029; }
+.status-pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-confirmed {
+  background: #d1e7dd;
+  color: #0f5132;
+}
+
+.status-attended {
+  background: #d8f6f6;
+  color: var(--primary);
+}
+
+.status-cancelled {
+  background: #f8d7da;
+  color: #842029;
+}
 
 /* --- Meta thông tin --- */
 .order-meta {
@@ -177,7 +199,9 @@
   color: var(--body-text);
 }
 
-.meta-icon { font-size: 0.85rem; }
+.meta-icon {
+  font-size: 0.85rem;
+}
 
 /* --- Footer của card --- */
 .order-card-footer {
@@ -214,7 +238,9 @@
   color: var(--primary);
 }
 
-.btn-secondary:hover { background-color: var(--light-surface); }
+.btn-secondary:hover {
+  background-color: var(--light-surface);
+}
 
 .btn-danger {
   background-color: #dc3545;
@@ -249,7 +275,9 @@
   margin-bottom: 1rem;
 }
 
-.orders-empty p { margin-bottom: 0.5rem; }
+.orders-empty p {
+  margin-bottom: 0.5rem;
+}
 
 /* --- Modal --- */
 .modal-overlay {
@@ -334,8 +362,149 @@
 
 /* --- Responsive --- */
 @media (max-width: 640px) {
-  .order-card { flex-direction: column; }
-  .order-card-image { width: 100%; height: 180px; }
-  .order-meta { grid-template-columns: 1fr; }
-  .orders-header h1 { font-size: 1.5rem; }
+  .order-card {
+    flex-direction: column;
+  }
+
+  .order-card-image {
+    width: 100%;
+    height: 180px;
+  }
+
+  .order-meta {
+    grid-template-columns: 1fr;
+  }
+
+  .orders-header h1 {
+    font-size: 1.5rem;
+  }
+}
+
+/* ===================================================
+   DARK MODE
+=================================================== */
+[data-theme='dark'] .orders-header h1 {
+  color: #c0d8e8;
+}
+
+[data-theme='dark'] .orders-header p {
+  color: #8aabb8;
+}
+
+[data-theme='dark'] .orders-tabs {
+  border-bottom-color: #2a4050;
+}
+
+[data-theme='dark'] .orders-tab-btn {
+  color: #8aabb8;
+}
+
+[data-theme='dark'] .orders-tab-btn:hover {
+  color: var(--accent);
+}
+
+[data-theme='dark'] .orders-tab-btn.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+[data-theme='dark'] .tab-count {
+  background: #2a4050;
+  color: #8aabb8;
+}
+
+[data-theme='dark'] .orders-tab-btn.active .tab-count {
+  background: var(--primary);
+  color: white;
+}
+
+[data-theme='dark'] .order-card {
+  background: #1e3040;
+  border-color: #2a4050;
+}
+
+[data-theme='dark'] .order-title {
+  color: #c0d8e8;
+}
+
+[data-theme='dark'] .order-title:hover {
+  color: var(--accent);
+}
+
+[data-theme='dark'] .order-meta-item {
+  color: #8aabb8;
+}
+
+[data-theme='dark'] .order-id {
+  color: #4a6070;
+}
+
+[data-theme='dark'] .order-card-footer {
+  border-top-color: #2a4050;
+}
+
+/* Badges dark mode */
+[data-theme='dark'] .status-pending {
+  background: rgba(133, 100, 4, 0.3);
+  color: #ffd166;
+}
+
+[data-theme='dark'] .status-confirmed {
+  background: rgba(15, 81, 50, 0.3);
+  color: #86efac;
+}
+
+[data-theme='dark'] .status-attended {
+  background: rgba(0, 64, 92, 0.3);
+  color: var(--accent);
+}
+
+[data-theme='dark'] .status-cancelled {
+  background: rgba(132, 32, 41, 0.3);
+  color: #fca5a5;
+}
+
+/* Buttons dark */
+[data-theme='dark'] .btn-secondary {
+  background: #162535;
+  color: var(--accent);
+}
+
+[data-theme='dark'] .btn-secondary:hover {
+  background: #2a4050;
+}
+
+[data-theme='dark'] .btn-outline-danger {
+  background: transparent;
+  border-color: #f87171;
+  color: #f87171;
+}
+
+/* Modal dark */
+[data-theme='dark'] .modal-box {
+  background: #1e3040;
+}
+
+[data-theme='dark'] .modal-box h3 {
+  color: #c0d8e8;
+}
+
+[data-theme='dark'] .modal-workshop-name {
+  color: #8aabb8;
+}
+
+[data-theme='dark'] .modal-box textarea {
+  background: #162535;
+  border-color: #2a4050;
+  color: #c0d8e8;
+}
+
+[data-theme='dark'] .refund-info {
+  background: rgba(0, 64, 92, 0.2);
+  border-color: #2a4050;
+  color: #8aabb8;
+}
+
+[data-theme='dark'] .refund-amount {
+  color: var(--accent);
 }

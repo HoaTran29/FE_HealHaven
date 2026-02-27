@@ -1,14 +1,23 @@
-/* === Header của Trang Workshop === */
+/* ===================================================
+   WORKSHOP DETAILS PAGE
+=================================================== */
+.workshop-details-page {
+  padding-bottom: 3rem;
+}
+
+/* === Header === */
 .workshop-header {
-  background-color: var(--dark-text);
-  color: var(--background);
+  background: linear-gradient(135deg, #007BA2 0%, #00b4d8 60%, #00c9a7 100%);
+  color: white;
   padding: 2.5rem 0;
   margin-bottom: 2rem;
 }
 
 .workshop-header h1 {
-  color: var(--background);
-  font-size: 2.75rem;
+  color: #ffffff;
+  font-size: 2.25rem;
+  text-shadow: 0 2px 8px rgba(0, 40, 60, 0.35);
+  font-weight: 800;
 }
 
 .workshop-header .container {
@@ -16,76 +25,140 @@
 }
 
 .workshop-breadcrumb {
-  font-size: 0.9rem;
-  opacity: 0.8;
-  margin-bottom: 1rem;
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.90);
+  margin-bottom: 0.75rem;
 }
 
 .workshop-breadcrumb a {
-  color: var(--accent);
+  color: #ccf5ff;
+  text-decoration-color: rgba(255, 255, 255, 0.5);
+  font-weight: 600;
 }
 
 .workshop-subtitle {
-  font-size: 1.2rem;
-  opacity: 0.9;
-  max-width: 70%;
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 500;
+  text-shadow: 0 1px 4px rgba(0, 40, 60, 0.25);
+  max-width: 72%;
+  margin-bottom: 0.5rem;
+}
+
+.wd-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0.6rem 0;
+}
+
+.wd-stars {
+  color: #f59e0b;
+  font-size: 1rem;
+}
+
+.wd-reviews {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.wd-rating strong {
+  color: white;
 }
 
 .workshop-author-header {
-  font-size: 1rem;
-  margin-top: 1rem;
+  font-size: 0.95rem;
+  margin-top: 0.5rem;
 }
 
 .workshop-author-header a {
   font-weight: bold;
-  color: var(--background);
+  color: var(--accent);
   text-decoration: underline;
 }
 
-/* === Bố cục 2 cột === */
+/* === Layout 2 cột === */
 .workshop-layout {
   display: grid;
-  grid-template-columns: 70% 1fr;
-  gap: 2.5rem;
+  grid-template-columns: 1fr 340px;
+  gap: 2rem;
+  align-items: start;
 }
 
-/* === Cột Trái === */
 .workshop-main-content {
   width: 100%;
   min-width: 0;
 }
 
-.workshop-video-player {
-  width: 100%;
-  position: relative;
-  padding-bottom: 56.25%;
-  /* Tỷ lệ 16:9 */
-  height: 0;
-  background-color: #000;
-  border-radius: var(--border-radius);
+/* ===================================================
+   IMAGE GALLERY
+=================================================== */
+.wd-gallery {
+  margin-bottom: 1.75rem;
+  border-radius: 12px;
   overflow: hidden;
-  margin-bottom: 2rem;
 }
 
-.video-placeholder {
-  position: absolute;
-  top: 0;
-  left: 0;
+/* Ảnh chính */
+.wd-gallery-main {
+  width: 100%;
+  height: 340px;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #1a2a35;
+  margin-bottom: 0.6rem;
+}
+
+.wd-gallery-main img {
   width: 100%;
   height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 1.2rem;
-  font-style: italic;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
 }
 
-/* === Hệ thống Tab === */
+.wd-gallery-main:hover img {
+  transform: scale(1.03);
+}
+
+/* Hàng thumbnails */
+.wd-gallery-thumbs {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  padding-bottom: 4px;
+}
+
+.wd-gallery-thumbs img {
+  width: 80px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 6px;
+  cursor: pointer;
+  opacity: 0.65;
+  flex-shrink: 0;
+  border: 2px solid transparent;
+  transition: opacity 0.2s, border-color 0.2s, transform 0.2s;
+}
+
+.wd-gallery-thumbs img:hover {
+  opacity: 0.9;
+  transform: scale(1.04);
+}
+
+.wd-gallery-thumbs img.active {
+  opacity: 1;
+  border-color: var(--primary);
+}
+
+/* ===================================================
+   TABS
+=================================================== */
 .workshop-tabs {
   display: flex;
   border-bottom: 2px solid #eee;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
   overflow-x: auto;
   scrollbar-width: none;
 }
@@ -97,9 +170,9 @@
 .tab-btn {
   background: none;
   border: none;
-  padding: 0.9rem 1.25rem;
-  font-size: 1rem;
-  font-weight: bold;
+  padding: 0.85rem 1.1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
   color: var(--body-text);
   cursor: pointer;
   border-bottom: 3px solid transparent;
@@ -113,37 +186,47 @@
   border-bottom-color: var(--primary);
 }
 
-.tab-content {
-  padding: 1rem 0;
+.tab-btn:hover:not(.active) {
+  color: var(--dark-text);
 }
 
-/* Tab: Chương trình */
+.tab-content {
+  padding: 0.75rem 0;
+}
+
+/* Curriculum */
 .lecture-item {
   display: flex;
   justify-content: space-between;
-  padding: 1.25rem;
+  align-items: center;
+  padding: 1rem 1.25rem;
   border: 1px solid #eee;
   border-bottom: none;
+  font-size: 0.92rem;
 }
 
 .lecture-item:first-child {
-  border-top-left-radius: var(--border-radius);
-  border-top-right-radius: var(--border-radius);
+  border-radius: var(--border-radius) var(--border-radius) 0 0;
 }
 
 .lecture-item:last-child {
   border-bottom: 1px solid #eee;
-  border-bottom-left-radius: var(--border-radius);
-  border-bottom-right-radius: var(--border-radius);
+  border-radius: 0 0 var(--border-radius) var(--border-radius);
 }
 
 .lecture-item.active {
-  background-color: var(--light-surface);
+  background: var(--light-surface);
   color: var(--primary);
-  font-weight: bold;
+  font-weight: 700;
 }
 
-/* Tab: Nguyên liệu */
+.lecture-time {
+  font-size: 0.82rem;
+  color: var(--body-text);
+  white-space: nowrap;
+}
+
+/* Materials */
 .materials-list ul {
   list-style-position: inside;
   padding-left: 1rem;
@@ -152,66 +235,356 @@
 
 .materials-list li {
   margin-bottom: 0.5rem;
+  font-size: 0.92rem;
 }
 
-/* === Cột Phải: Thẻ Đăng ký === */
+/* Location tab */
+.wd-location-tab {
+  padding: 0.5rem 0;
+}
+
+.wd-address {
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.wd-map-wrap {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #e5f3f3;
+  box-shadow: 0 2px 8px rgba(0, 64, 92, 0.08);
+  height: 300px;
+}
+
+.wd-map-wrap iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
+/* Reviews tab */
+.review-summary {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background: var(--light-surface);
+  border-radius: 12px;
+}
+
+.review-score {
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.review-stars {
+  font-size: 1.4rem;
+  color: #f59e0b;
+}
+
+.review-count {
+  font-size: 0.85rem;
+  color: var(--body-text);
+  margin-top: 0.25rem;
+}
+
+/* ===================================================
+   SIDEBAR (CỘT PHẢI)
+=================================================== */
 .workshop-sidebar {
   width: 100%;
 }
 
 .purchase-card {
-  border: 1px solid #ccc;
-  border-radius: var(--border-radius);
-  padding: 2rem;
-  background-color: var(--background);
+  background: white;
+  border: 1px solid #e5f3f3;
+  border-radius: 14px;
+  padding: 1.75rem;
+  box-shadow: 0 4px 20px rgba(0, 64, 92, 0.1);
   position: sticky;
-  top: 100px;
+  top: 90px;
 }
 
-.purchase-price {
-  font-size: 2.25rem;
-  color: var(--primary);
-  margin-bottom: 0.5rem;
-}
-
-.purchase-card p {
-  color: var(--body-text);
-  margin-bottom: 1.5rem;
-}
-
-.purchase-btn {
-  width: 100%;
-  padding-top: 1rem;
-  padding-bottom: 1rem;
-  font-size: 1.1rem;
-  margin-bottom: 1.5rem;
-  text-align: center;
-  display: block;
-}
-
-.purchase-card h4 {
-  color: var(--dark-text);
-  font-size: 1.1rem;
+/* Giá */
+.wd-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
   margin-bottom: 1rem;
 }
 
-.purchase-card ul {
-  list-style: none;
+.purchase-price {
+  font-size: 2rem;
+  color: var(--primary);
+  font-weight: 800;
+  margin: 0;
 }
 
-.purchase-card li {
+.wd-original-price {
+  font-size: 0.95rem;
+  color: #aaa;
+}
+
+/* Thông tin nhanh */
+.wd-quick-info {
+  list-style: none;
+  background: var(--light-surface);
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+  margin-bottom: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.wd-quick-info li {
+  font-size: 0.88rem;
+  color: var(--dark-text);
+  margin: 0;
+}
+
+/* Seat bar */
+.seat-bar-wrap {
+  margin-bottom: 1.1rem;
+}
+
+.seat-bar-track {
+  width: 100%;
+  height: 8px;
+  background: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 0.4rem;
+}
+
+.seat-bar-fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+.seat-bar-fill.low {
+  background: #f59e0b;
+}
+
+.seat-bar-fill.full {
+  background: #dc3545;
+}
+
+.seat-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--body-text);
+}
+
+.text-red {
+  color: #dc3545 !important;
+}
+
+.text-orange {
+  color: #d97706 !important;
+}
+
+/* Nút đăng ký */
+.purchase-btn {
+  width: 100%;
+  padding: 0.9rem 1rem;
+  font-size: 1rem;
+  text-align: center;
+  display: block;
+  margin-bottom: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+/* Bao gồm */
+.purchase-card h4 {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--body-text);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
   margin-bottom: 0.75rem;
 }
 
-/* === RESPONSIVE === */
-@media (max-width: 900px) {
+.wd-included {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.wd-included li {
+  font-size: 0.88rem;
+  color: var(--dark-text);
+}
+
+.btn-disabled {
+  background: #ddd;
+  color: #888;
+  cursor: not-allowed;
+  border-radius: var(--border-radius);
+  border: none;
+}
+
+/* ===================================================
+   DARK MODE
+=================================================== */
+[data-theme='dark'] .workshop-header {
+  background: linear-gradient(135deg, #0a1820 0%, #004060 100%);
+}
+
+[data-theme='dark'] .workshop-header h1 {
+  color: #ffffff;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme='dark'] .workshop-header p,
+[data-theme='dark'] .workshop-subtitle {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+[data-theme='dark'] .workshop-breadcrumb {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+[data-theme='dark'] .workshop-breadcrumb a {
+  color: #4dd9f5;
+}
+
+[data-theme='dark'] .workshop-author-header {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+[data-theme='dark'] .workshop-author-header a {
+  color: #4dd9f5;
+  text-decoration-color: #4dd9f5;
+}
+
+[data-theme='dark'] .wd-rating strong {
+  color: #ffffff;
+}
+
+[data-theme='dark'] .wd-reviews {
+  color: rgba(255, 255, 255, 0.80);
+}
+
+/* Purchase card → #007BA2 */
+[data-theme='dark'] .purchase-card {
+  background-color: #007BA2;
+  border-color: #0095c4;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .purchase-price {
+  color: white;
+}
+
+[data-theme='dark'] .wd-original-price {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+[data-theme='dark'] .wd-quick-info {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+[data-theme='dark'] .wd-quick-info li {
+  color: white;
+}
+
+[data-theme='dark'] .seat-bar-track {
+  background: rgba(255, 255, 255, 0.30);
+}
+
+[data-theme='dark'] .seat-bar-fill {
+  background: #ffffff;
+}
+
+[data-theme='dark'] .seat-bar-fill.low {
+  background: #ffd166;
+}
+
+[data-theme='dark'] .seat-bar-fill.full {
+  background: #ff6b6b;
+}
+
+[data-theme='dark'] .seat-label {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+[data-theme='dark'] .purchase-card h4 {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Nút đăng ký: nền trắng, chữ đậm để nổi trên card #007BA2 */
+[data-theme='dark'] .purchase-card .purchase-btn.btn-primary {
+  background: #ffffff;
+  color: #007BA2;
+  border: none;
+  font-weight: 700;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+}
+
+[data-theme='dark'] .purchase-card .purchase-btn.btn-primary:hover {
+  background: #e8f9ff;
+  color: #005a7a;
+  transform: translateY(-1px);
+  box-shadow: 0 5px 16px rgba(0, 0, 0, 0.3);
+}
+
+
+[data-theme='dark'] .wd-included li {
+  color: white;
+}
+
+[data-theme='dark'] .workshop-tabs {
+  border-bottom-color: #2a4050;
+}
+
+[data-theme='dark'] .tab-btn {
+  color: #8aabb8;
+}
+
+[data-theme='dark'] .tab-btn.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+[data-theme='dark'] .lecture-item {
+  border-color: #2a4050;
+  background: #1e3040;
+  color: #c0d8e8;
+}
+
+[data-theme='dark'] .lecture-item.active {
+  background: rgba(0, 184, 184, 0.12);
+  color: var(--accent);
+}
+
+[data-theme='dark'] .wd-map-wrap {
+  border-color: #2a4050;
+}
+
+[data-theme='dark'] .review-summary {
+  background: #1e3040;
+}
+
+/* ===================================================
+   RESPONSIVE
+=================================================== */
+@media (max-width: 960px) {
   .workshop-layout {
     grid-template-columns: 1fr;
   }
 
   .workshop-sidebar {
     order: -1;
-    /* Sidebar lên trên trên mobile */
+    /* Card đăng ký lên đầu trên mobile */
   }
 
   .purchase-card {
@@ -219,7 +592,7 @@
   }
 
   .workshop-header h1 {
-    font-size: 2rem;
+    font-size: 1.85rem;
   }
 
   .workshop-subtitle {
@@ -233,11 +606,16 @@
   }
 
   .tab-btn {
-    padding: 0.75rem 0.9rem;
-    font-size: 0.9rem;
+    padding: 0.7rem 0.85rem;
+    font-size: 0.88rem;
   }
 
-  .purchase-price {
-    font-size: 1.75rem;
+  .wd-gallery-main {
+    height: 220px;
+  }
+
+  .wd-gallery-thumbs img {
+    width: 64px;
+    height: 48px;
   }
 }

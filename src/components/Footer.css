@@ -140,3 +140,8 @@
     text-align: center;
   }
 }
+
+/* --- DARK MODE --- */
+[data-theme='dark'] .footer {
+  background-color: #007BA2;
+}

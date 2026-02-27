@@ -486,3 +486,148 @@
         height: 160px;
     }
 }
+
+/* ===================================================
+   DARK MODE
+=================================================== */
+[data-theme='dark'] .checkout-title {
+    color: #c0d8e8;
+}
+
+[data-theme='dark'] .checkout-section {
+    background: #1e3040;
+    border-color: #2a4050;
+}
+
+[data-theme='dark'] .checkout-section h3 {
+    color: #c0d8e8;
+}
+
+[data-theme='dark'] .wsm-title {
+    color: #c0d8e8;
+}
+
+[data-theme='dark'] .seat-count {
+    color: #c0d8e8;
+}
+
+[data-theme='dark'] .seat-btn {
+    background: #162535;
+    border-color: var(--primary);
+    color: var(--accent);
+}
+
+[data-theme='dark'] .payment-option {
+    border-color: #2a4050;
+    color: #c0d8e8;
+}
+
+[data-theme='dark'] .payment-option.selected {
+    border-color: var(--primary);
+    background: rgba(0, 64, 92, 0.2);
+}
+
+[data-theme='dark'] .bank-info-box {
+    background: #162535;
+    border-color: #2a4050;
+    color: #8aabb8;
+}
+
+[data-theme='dark'] .file-upload-area {
+    border-color: #2a4050;
+    color: #8aabb8;
+}
+
+[data-theme='dark'] .file-upload-area:hover {
+    background: rgba(0, 64, 92, 0.2);
+    border-color: var(--primary);
+}
+
+/* Order summary card → đồng nhất màu #007BA2 dark mode */
+[data-theme='dark'] .order-summary-card {
+    background: #007BA2;
+    border-color: #0095c4;
+}
+
+[data-theme='dark'] .order-summary-card h3 {
+    color: white;
+}
+
+[data-theme='dark'] .summary-row {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+[data-theme='dark'] .summary-total {
+    color: white;
+}
+
+[data-theme='dark'] .summary-total strong {
+    color: #b2f0ff;
+}
+
+[data-theme='dark'] .summary-divider {
+    border-top-color: rgba(255, 255, 255, 0.2);
+}
+
+[data-theme='dark'] .checkout-disclaimer {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+[data-theme='dark'] .refund-policy-box {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+[data-theme='dark'] .refund-policy-box h4 {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+[data-theme='dark'] .refund-policy-box ul {
+    color: rgba(255, 255, 255, 0.75);
+}
+
+/* Nút thanh toán trong dark mode → nền trắng, chữ #007BA2 */
+[data-theme='dark'] .order-summary-card .checkout-pay-btn {
+    background: white;
+    color: #007BA2;
+    font-weight: 700;
+}
+
+[data-theme='dark'] .order-summary-card .checkout-pay-btn:hover {
+    background: #e8f9ff;
+}
+
+/* E-Ticket */
+[data-theme='dark'] .ticket-card {
+    background: #1e3040;
+}
+
+[data-theme='dark'] .ticket-header {
+    background: linear-gradient(135deg, #007BA2, #00c9a7);
+}
+
+[data-theme='dark'] .ticket-body {
+    color: #c0d8e8;
+}
+
+[data-theme='dark'] .ticket-hole {
+    background: #162535;
+    border-color: #2a4050;
+}
+
+[data-theme='dark'] .ticket-line {
+    border-top-color: #2a4050;
+}
+
+[data-theme='dark'] .ticket-footer {
+    background: #162535;
+    border-top-color: #2a4050;
+}
+
+[data-theme='dark'] .qr-cell {
+    background: #2a4050;
+}
+
+[data-theme='dark'] .qr-cell.filled {
+    background: #c0d8e8;
+}

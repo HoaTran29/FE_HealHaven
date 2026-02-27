@@ -1,11 +1,191 @@
+/* === LOGIN PAGE === */
 .login-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: calc(100vh - 70px - 250px); /* Lấy chiều cao màn hình trừ Navbar (70px) và Footer (tạm tính 250px) */
-  padding: 2rem 0;
-  background-color: var(--light-surface); /* Nền nhạt cho cả trang */
+  min-height: calc(100vh - 70px - 200px);
+  padding: 2rem 1rem;
+  background: linear-gradient(135deg, var(--light-surface) 0%, #e8f6f3 100%);
 }
+
+.login-box {
+  background-color: var(--background);
+  padding: 2.5rem;
+  border-radius: 16px;
+  box-shadow: 0 8px 40px rgba(0, 64, 92, 0.12);
+  width: 100%;
+  max-width: 440px;
+  text-align: center;
+}
+
+.auth-logo img {
+  height: 48px;
+  margin-bottom: 1rem;
+}
+
+.login-box h2 {
+  margin-bottom: 0.4rem;
+  font-size: 1.6rem;
+}
+
+.auth-subtitle {
+  color: var(--body-text);
+  margin-bottom: 1.75rem;
+  font-size: 0.9rem;
+}
+
+.login-box .form-group label {
+  text-align: left;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.forgot-link {
+  font-size: 0.82rem;
+  font-weight: normal;
+  color: var(--primary);
+}
+
+/* --- input with eye icon --- */
+.input-with-icon {
+  position: relative;
+}
+
+.input-with-icon input {
+  padding-right: 2.75rem;
+}
+
+.toggle-pass-btn {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0;
+}
+
+/* --- error box --- */
+.auth-error {
+  background: #fff0f0;
+  border: 1px solid #f5c6cb;
+  color: #842029;
+  border-radius: 8px;
+  padding: 0.7rem 1rem;
+  font-size: 0.88rem;
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+.login-btn {
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+/* --- Divider --- */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 1.5rem 0;
+  color: #bbb;
+  font-size: 0.82rem;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #eee;
+}
+
+/* --- OAuth --- */
+.btn-oauth {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.7rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background: white;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+  color: var(--dark-text);
+  margin-bottom: 0.5rem;
+}
+
+.btn-oauth:hover {
+  background: #f8f8f8;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.auth-footer-text {
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+  color: var(--body-text);
+}
+
+.auth-footer-text a {
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.auth-terms {
+  font-size: 0.78rem;
+  color: #aaa;
+  margin-top: 0.75rem;
+}
+
+.auth-terms a {
+  color: var(--body-text);
+}
+
+/* Dark mode */
+[data-theme='dark'] .login-container {
+  background: linear-gradient(135deg, #0e1e28, #111e27);
+}
+
+[data-theme='dark'] .login-box {
+  background: #1e3040;
+}
+
+[data-theme='dark'] .auth-error {
+  background: #2a1a1a;
+  border-color: #5c2020;
+  color: #f5b8b8;
+}
+
+[data-theme='dark'] .btn-oauth {
+  background: #1a2c3a;
+  border-color: #2a4050;
+  color: #c0d8e8;
+}
+
+[data-theme='dark'] .btn-oauth:hover {
+  background: #2a4050;
+}
+
+[data-theme='dark'] .auth-divider::before,
+[data-theme='dark'] .auth-divider::after {
+  background: #2a4050;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .login-box {
+    padding: 1.75rem 1.25rem;
+  }
+}
+
 
 .login-box {
   background-color: var(--background);
@@ -32,7 +212,8 @@
 }
 
 .login-btn {
-  width: 100%; /* Nút đăng nhập dài hết cỡ */
+  width: 100%;
+  /* Nút đăng nhập dài hết cỡ */
   margin-top: 1rem;
 }
 

@@ -15,7 +15,7 @@ const HomePage: React.FC = () => {
             Khám phá sự sáng tạo và tìm thấy bình yên trong từng sản phẩm thủ
             công.
           </p>
-          <Link to="/workshops" className="btn btn-accent">
+          <Link to="/workshops" className="btn btn-primary">
             Khám phá Workshop
           </Link>
         </div>

@@ -66,6 +66,7 @@ const Navbar: React.FC = () => {
           <ul className={`nav-links ${isMenuOpen ? 'open' : ''}`}>
             <li><NavLink to="/" end onClick={closeMenu}>Trang chủ</NavLink></li>
             <li><NavLink to="/workshops" onClick={closeMenu}>Workshop</NavLink></li>
+            <li><NavLink to="/gallery" onClick={closeMenu}>Triển lãm</NavLink></li>
             <li><NavLink to="/community" onClick={closeMenu}>Cộng đồng</NavLink></li>
 
             {/* Dark mode toggle */}
