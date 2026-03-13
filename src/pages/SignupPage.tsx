@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth, type User } from '../contexts/AuthContext'
 import { authApi } from '../services/api'
+import { Eye, EyeOff } from 'lucide-react'
 import './SignupPage.css'
 
 const SignupPage: React.FC = () => {
@@ -10,12 +11,14 @@ const SignupPage: React.FC = () => {
 
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
+  const [phoneNumber, setPhoneNumber] = useState('')
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
   const [role, setRole] = useState<'attendee' | 'host'>('attendee')
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [showPass, setShowPass] = useState(false)
+  const [showConfirm, setShowConfirm] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -26,13 +29,13 @@ const SignupPage: React.FC = () => {
       return
     }
     if (password.length < 6) {
-      setError('Mật khẩu phải có ít nhất 6 ký tự.')
+      setError('Mật khẩu phải có nhất 6 ký tự.')
       return
     }
 
     setIsLoading(true)
     try {
-      const res = await authApi.signup({ fullName, email, password, role })
+      const res = await authApi.signup({ fullName, email, password, phoneNumber, role })
       const beUser = res.user
       const roleRaw = beUser.role?.toLowerCase() ?? role
       const roleMapped = roleRaw === 'provider' ? 'venue' : roleRaw
@@ -60,10 +63,6 @@ const SignupPage: React.FC = () => {
   return (
     <div className="signup-container">
       <div className="signup-box">
-        <div className="auth-logo">
-          <img src="/logo.png" alt="HealHaven" />
-        </div>
-
         <h2>Tạo tài khoản</h2>
         <p className="auth-subtitle">Bắt đầu hành trình sáng tạo của bạn ngay hôm nay.</p>
 
@@ -98,6 +97,20 @@ const SignupPage: React.FC = () => {
             />
           </div>
 
+          {/* Phone Number */}
+          <div className="form-group">
+            <label htmlFor="phoneNumber">Số điện thoại</label>
+            <input
+              type="tel"
+              id="phoneNumber"
+              placeholder="09xx xxx xxx"
+              value={phoneNumber}
+              onChange={e => setPhoneNumber(e.target.value)}
+              required
+              autoComplete="tel"
+            />
+          </div>
+
           {/* Mật khẩu */}
           <div className="form-group">
             <label htmlFor="password">Mật khẩu</label>
@@ -116,8 +129,9 @@ const SignupPage: React.FC = () => {
                 className="toggle-pass-btn"
                 onClick={() => setShowPass(!showPass)}
                 tabIndex={-1}
+                aria-label={showPass ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
               >
-                {showPass ? '🙈' : '👁️'}
+                {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
           </div>
@@ -125,15 +139,26 @@ const SignupPage: React.FC = () => {
           {/* Xác nhận mật khẩu */}
           <div className="form-group">
             <label htmlFor="confirm">Xác nhận mật khẩu</label>
-            <input
-              type={showPass ? 'text' : 'password'}
-              id="confirm"
-              placeholder="Nhập lại mật khẩu"
-              value={confirm}
-              onChange={e => setConfirm(e.target.value)}
-              required
-              autoComplete="new-password"
-            />
+            <div className="input-with-icon">
+              <input
+                type={showConfirm ? 'text' : 'password'}
+                id="confirm"
+                placeholder="Nhập lại mật khẩu"
+                value={confirm}
+                onChange={e => setConfirm(e.target.value)}
+                required
+                autoComplete="new-password"
+              />
+              <button
+                type="button"
+                className="toggle-pass-btn"
+                onClick={() => setShowConfirm(!showConfirm)}
+                tabIndex={-1}
+                aria-label={showConfirm ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+              >
+                {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
           </div>
 
           {/* Vai trò */}

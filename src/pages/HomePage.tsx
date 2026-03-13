@@ -1,10 +1,32 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useChat } from "../contexts/ChatContext";
+import { workshopApi, type Workshop } from "../services/api";
 import "./HomePage.css"; // CSS riêng cho Trang chủ
 
 const HomePage: React.FC = () => {
   const { openChat } = useChat();
+  const [featuredWorkshops, setFeaturedWorkshops] = useState<Workshop[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchFeatured = async () => {
+      try {
+        setIsLoading(true);
+        // Lấy 3 workshop mới nhất làm nổi bật
+        const res = await workshopApi.getList({ size: 3 });
+        setFeaturedWorkshops(res.content || []);
+      } catch (error) {
+        console.error("Lỗi khi tải workshop nổi bật:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchFeatured();
+  }, []);
+
+  const fmtVND = (v: number) => new Intl.NumberFormat('vi-VN').format(v) + ' VNĐ';
+
   return (
     <>
       {/* === HERO BANNER === */}
@@ -41,56 +63,37 @@ const HomePage: React.FC = () => {
 
           {/* Lưới chứa các thẻ khóa học */}
           <div className="grid">
-            {/* Card 1 */}
-            <Link to="/workshop/workshop-dan-len" className="card-link">
-              <div className="card">
-                <img
-                  src="/images/ws1303.png"
-                  alt="Workshop đan len"
-                  className="card-img-real"
-                />
-                <div className="card-content">
-                  <h3>Workshop Đan len cơ bản</h3>
-                  <p className="card-author">Nghệ nhân: Trần Văn A</p>
-                  <p>Học cách đan mũ len và khăn choàng chỉ trong 2 giờ.</p>
-                  <div className="card-price">399.000 VNĐ</div>
-                </div>
-              </div>
-            </Link>
-
-            {/* Card 2 */}
-            <Link to="/workshop/ve-mau-nuoc" className="card-link">
-              <div className="card">
-                <img
-                  src="/images/mau-nuoc.webp"
-                  alt="Workshop Vẽ màu nước"
-                  className="card-img-real"
-                />
-                <div className="card-content">
-                  <h3>Vẽ màu nước: Thiên nhiên</h3>
-                  <p className="card-author">Nghệ nhân: Lê Thị B</p>
-                  <p>Kỹ thuật vẽ lá, hoa và bầu trời bằng màu nước.</p>
-                  <div className="card-price">599.000 VNĐ</div>
-                </div>
-              </div>
-            </Link>
-
-            {/* Card 3 */}
-            <Link to="/workshop/hoa-kem-nhung" className="card-link">
-              <div className="card">
-                <img
-                  src="/images/kem-nhung.webp"
-                  alt="Workshop Hoa kẽm nhung"
-                  className="card-img-real"
-                />
-                <div className="card-content">
-                  <h3>Hoa Kẽm nhung nghệ thuật</h3>
-                  <p className="card-author">Nghệ nhân: Nguyễn Văn C</p>
-                  <p>Tạo ra những bó hoa kẽm nhung sống động như thật.</p>
-                  <div className="card-price">450.000 VNĐ</div>
-                </div>
-              </div>
-            </Link>
+            {isLoading ? (
+               <div style={{ textAlign: 'center', gridColumn: '1 / -1', padding: '2rem' }}>Đang tải workshop...</div>
+            ) : featuredWorkshops.length === 0 ? (
+               <div style={{ textAlign: 'center', gridColumn: '1 / -1', padding: '2rem' }}>Hiện chưa có workshop nào nổi bật.</div>
+            ) : (
+              featuredWorkshops.map((ws) => {
+                const wId = ws.workshopId || (ws as any).id;
+                return (
+                  <Link to={`/workshop/${wId}`} key={wId} className="card-link">
+                    <div className="card">
+                      <img
+                        src={ws.image || "/images/ws1303.png"}
+                        alt={ws.title}
+                        className="card-img-real"
+                        onError={(e) => { e.currentTarget.src = "/images/ws1303.png"; }}
+                      />
+                      <div className="card-content">
+                        <h3>{ws.title}</h3>
+                        <p className="card-author">Nghệ nhân: {ws.host?.fullName || 'N/A'}</p>
+                        <p className="line-clamp-2">{ws.subtitle || ws.title}</p>
+                        <div className="card-price">{fmtVND(ws.price)}</div>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })
+            )}
+          </div>
+          
+          <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+            <Link to="/workshops" className="btn btn-ghost">Xem tất cả workshop →</Link>
           </div>
         </section>
       </div>

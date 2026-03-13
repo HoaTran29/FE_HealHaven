@@ -53,7 +53,7 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
 // 1. AUTH — POST /auth/**  (Public)
 // ============================================================
 export interface LoginPayload { email: string; password: string }
-export interface SignupPayload { fullName: string; email: string; password: string; role: 'attendee' | 'host' }
+export interface SignupPayload { fullName: string; email: string; password: string; phoneNumber: string; role: 'attendee' | 'host' }
 
 export interface BeUser {
     userId: number;

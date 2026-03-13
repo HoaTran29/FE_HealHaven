@@ -40,6 +40,53 @@
   margin-top: 0.5rem;
 }
 
+/* === Input with icon (Password toggle) === */
+.input-with-icon {
+  position: relative;
+  display: block; /* Đảm bảo chiều ngang bao phủ */
+}
+
+.input-with-icon input {
+  padding-right: 3rem !important;
+}
+
+.toggle-pass-btn {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--body-text);
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  border-radius: 50%;
+  z-index: 5;
+  outline: none;
+}
+
+.toggle-pass-btn:hover {
+  background-color: rgba(0, 126, 159, 0.1);
+  color: var(--primary);
+}
+
+.toggle-pass-btn:active {
+  transform: translateY(-50%) scale(0.9);
+}
+
+[data-theme='dark'] .toggle-pass-btn {
+  color: #8aabb8;
+}
+
+[data-theme='dark'] .toggle-pass-btn:hover {
+  background-color: rgba(0, 184, 184, 0.1);
+  color: var(--accent);
+}
+
 /* === Role Selector === */
 .role-selector {
   display: flex;

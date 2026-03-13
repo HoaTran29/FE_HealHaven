@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth, type User } from '../contexts/AuthContext'
 import { authApi } from '../services/api'
+import { Eye, EyeOff } from 'lucide-react'
 import './LoginPage.css'
 
 const LoginPage: React.FC = () => {
@@ -108,9 +109,9 @@ const LoginPage: React.FC = () => {
                 className="toggle-pass-btn"
                 onClick={() => setShowPass(!showPass)}
                 tabIndex={-1}
-                aria-label="Hiện/ẩn mật khẩu"
+                aria-label={showPass ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
               >
-                {showPass ? '🙈' : '👁️'}
+                {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
           </div>
