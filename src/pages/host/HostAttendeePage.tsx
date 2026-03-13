@@ -16,7 +16,7 @@ const HostAttendeePage: React.FC = () => {
         workshopApi.getMyWorkshops().then(res => {
             if (res.content && res.content.length > 0) {
                 setWorkshops(res.content);
-                setSelectedWs(res.content[0].id);
+                setSelectedWs(String(res.content[0].id));
             }
         });
     }, []);

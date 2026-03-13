@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { venueApi, venueBookingApi, type Venue, type VenueBooking } from '../../services/api';
+import { venueApi, venueBookingApi, type Venue } from '../../services/api';
 import './VenuePage.css';
 
 const DAYS = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
@@ -33,14 +33,13 @@ const VenueCalendarPage: React.FC = () => {
     const [selectedVenueId, setSelectedVenueId] = useState<string>('');
     const [slots, setSlots] = useState<Slot[]>([]);
     const [dateLabels, setDateLabels] = useState<string[]>([]);
-    const [bookings, setBookings] = useState<VenueBooking[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         venueApi.getMyVenues().then(res => {
             if (res && res.length > 0) {
                 setVenues(res);
-                setSelectedVenueId(res[0].id);
+                setSelectedVenueId(String(res[0].id));
             }
             setIsLoading(false);
         }).catch(err => {
@@ -56,7 +55,7 @@ const VenueCalendarPage: React.FC = () => {
 
         venueBookingApi.getByVenue(selectedVenueId).then(res => {
             const list = res || [];
-            setBookings(list);
+            // setBookings(list);
 
             // Map bookings to slots
             const newSlots = [...emptySlots];
@@ -110,7 +109,7 @@ const VenueCalendarPage: React.FC = () => {
                 <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
                     <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>Không gian:</span>
                     {isLoading ? <span>Đang tải...</span> : venues.map(v => (
-                        <button key={v.id} className={`venue-chip-btn ${selectedVenueId === v.id ? 'active' : ''}`} onClick={() => setSelectedVenueId(v.id)}>{v.name}</button>
+                        <button key={v.id} className={`venue-chip-btn ${selectedVenueId === String(v.id) ? 'active' : ''}`} onClick={() => setSelectedVenueId(String(v.id))}>{v.name}</button>
                     ))}
                 </div>
                 {venues.length > 0 && (

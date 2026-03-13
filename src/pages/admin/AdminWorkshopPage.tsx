@@ -116,7 +116,7 @@ const AdminWorkshopPage: React.FC = () => {
                       <td className="td-muted">{w.host?.fullName || 'N/A'}</td>
                       <td><span className="admin-chip">{w.category}</span></td>
                       <td className="td-amount">{new Intl.NumberFormat('vi').format(w.price || 0)}đ</td>
-                      <td className="td-muted">{new Date(w.date || '').toLocaleDateString('vi-VN')}</td>
+                      <td className="td-muted">{new Date(w.date || Date.now()).toLocaleDateString('vi-VN')}</td>
                       <td><span className={`admin-badge ${(st).toLowerCase()}`}>{STATUS_LABEL[st] || st}</span></td>
                       <td>
                         <div className="action-row">
@@ -160,7 +160,7 @@ const AdminWorkshopPage: React.FC = () => {
                 <div className="d-row"><span>Danh mục:</span><strong>{detail.category}</strong></div>
                 <div className="d-row"><span>Giá:</span><strong>{new Intl.NumberFormat('vi').format(detail.price)}đ</strong></div>
                 <div className="d-row"><span>Số chỗ:</span><strong>{detail.maxSeats} người</strong></div>
-                <div className="d-row"><span>Ngày:</span><strong>{new Date(detail.date).toLocaleDateString()}</strong></div>
+                <div className="d-row"><span>Ngày:</span><strong>{new Date(detail.date || Date.now()).toLocaleDateString()}</strong></div>
                 <div className="d-row"><span>Giờ:</span><strong>{detail.time}</strong></div>
                 <div className="d-row"><span>Khu vực:</span><strong>{detail.area || detail.city}</strong></div>
                 <div className="d-row"><span>Trạng thái:</span><span className={`admin-badge ${(detail.status || 'DRAFT').toLowerCase()}`}>{STATUS_LABEL[detail.status || 'DRAFT'] || detail.status}</span></div>

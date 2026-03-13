@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis,
-  CartesianGrid, Tooltip, PieChart, Pie, Cell, Bar, Legend
+  CartesianGrid, Tooltip, PieChart, Pie, Cell, Legend
 } from 'recharts';
-import { TrendingUp, Users, Clock, MapPin, CreditCard, Star } from 'lucide-react';
+import { TrendingUp, Users, Clock, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { adminApi, type AdminStatsOverview, type AdminRevenueData } from '../../services/api';
 import './AdminPage.css';

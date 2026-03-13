@@ -65,9 +65,9 @@ const HostWorkshopPage: React.FC = () => {
     const openEdit = (w: Workshop) => {
         setEditing(w);
         setForm({
-            title: w.title, category: w.category, date: w.date, time: w.time || '',
+            title: w.title, category: w.category, date: w.date || '', time: w.time || '',
             price: String(w.price), seats: String(w.maxSeats),
-            description: w.subtitle || '', address: w.address || '', materials: w.materials?.join('\n') || '',
+            description: w.subtitle || '', address: w.address || '', materials: Array.isArray(w.materials) ? w.materials.join('\n') : (w.materials || ''),
         });
         setImageFile(null);
 
@@ -122,7 +122,7 @@ const HostWorkshopPage: React.FC = () => {
                 await workshopApi.update(String(editing.id), payload);
             } else {
                 const res: any = await workshopApi.create(payload);
-                savedId = res.id || res.workshopId;
+                savedId = String(res.id || res.workshopId);
             }
 
             if (submitAfterSave && savedId) {
@@ -202,9 +202,9 @@ const HostWorkshopPage: React.FC = () => {
                                     <tr key={w.id}>
                                         <td className="td-title">{w.title}</td>
                                         <td className="td-tag">{w.category}</td>
-                                        <td className="td-muted">{new Date(w.date).toLocaleDateString('vi-VN')} {w.time || ''}</td>
+                                        <td className="td-muted">{new Date(w.date || Date.now()).toLocaleDateString('vi-VN')} {w.time || ''}</td>
                                         <td className="td-amount">{new Intl.NumberFormat('vi-VN').format(w.price)}đ</td>
-                                        <td>{w.maxSeats - w.availableSeats}/{w.maxSeats}</td>
+                                        <td>{(w.maxSeats || 0) - (w.availableSeats || 0)}/{w.maxSeats || 0}</td>
                                         <td><span className={`badge-status ${(w.status || 'DRAFT').toLowerCase()}`}>{STATUS_LABEL[w.status || 'DRAFT'] || 'Không rõ'}</span></td>
                                         <td>
                                             <div className="action-btns">
