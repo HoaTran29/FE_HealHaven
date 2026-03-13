@@ -1,48 +1,62 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { venueBookingApi, type VenueBooking } from '../../services/api';
 import './VenuePage.css';
 
-type BookingStatus = 'pending' | 'confirmed' | 'cancelled';
-
-interface Booking {
-    id: string; host: string; email: string; space: string;
-    date: string; startTime: string; hours: number; total: number;
-    status: BookingStatus; note: string; createdAt: string;
-}
-
-const INIT_BOOKINGS: Booking[] = [
-    { id: 'BK-001', host: 'Trần Minh A', email: 'minha@gmail.com', space: 'Studio A', date: '2026-03-15', startTime: '09:00', hours: 3, total: 600000, status: 'pending', note: 'Workshop đan len, cần thêm bàn', createdAt: '26/02' },
-    { id: 'BK-002', host: 'Lê Thu B', email: 'thub@gmail.com', space: 'Studio B', date: '2026-03-18', startTime: '14:00', hours: 2, total: 360000, status: 'pending', note: '', createdAt: '25/02' },
-    { id: 'BK-003', host: 'Nguyễn C', email: 'nguyenc@gmail.com', space: 'Sân vườn', date: '2026-03-20', startTime: '08:00', hours: 4, total: 480000, status: 'pending', note: 'Workshop ngoài trời cần điện', createdAt: '25/02' },
-    { id: 'BK-004', host: 'Khánh D', email: 'khanhd@gmail.com', space: 'Studio A', date: '2026-03-10', startTime: '10:00', hours: 2, total: 400000, status: 'confirmed', note: '', createdAt: '20/02' },
-    { id: 'BK-005', host: 'Minh E', email: 'minhe@gmail.com', space: 'Studio B', date: '2026-03-08', startTime: '14:00', hours: 2, total: 360000, status: 'confirmed', note: '', createdAt: '18/02' },
-    { id: 'BK-006', host: 'Hoa F', email: 'hoaf@gmail.com', space: 'Studio A', date: '2026-03-05', startTime: '09:00', hours: 3, total: 600000, status: 'cancelled', note: 'Hủy do xung đột lịch', createdAt: '15/02' },
-];
-
 const STATUS_LABEL: Record<string, string> = {
-    pending: '⏳ Chờ duyệt', confirmed: '✅ Xác nhận', cancelled: '🔴 Từ chối',
+    REQUESTING: '⏳ Chờ duyệt', CONFIRMED: '✅ Xác nhận', REJECTED: '🔴 Từ chối', CANCELLED: '❌ Đã huỷ'
 };
 
-const FILTERS: { key: BookingStatus | 'all'; label: string }[] = [
+const FILTERS: { key: string | 'all'; label: string }[] = [
     { key: 'all', label: 'Tất cả' },
-    { key: 'pending', label: '⏳ Chờ duyệt' },
-    { key: 'confirmed', label: '✅ Xác nhận' },
-    { key: 'cancelled', label: '🔴 Từ chối' },
+    { key: 'REQUESTING', label: '⏳ Chờ duyệt' },
+    { key: 'CONFIRMED', label: '✅ Xác nhận' },
+    { key: 'REJECTED', label: '🔴 Từ chối' },
 ];
 
 const VenueBookingPage: React.FC = () => {
-    const [bookings, setBookings] = useState<Booking[]>(INIT_BOOKINGS);
-    const [filter, setFilter] = useState<BookingStatus | 'all'>('all');
+    const [bookings, setBookings] = useState<VenueBooking[]>([]);
+    const [filter, setFilter] = useState<string | 'all'>('all');
     const [detailId, setDetailId] = useState<string | null>(null);
     const [rejectNote, setRejectNote] = useState('');
     const [rejectId, setRejectId] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+
+    const fetchBookings = () => {
+        setIsLoading(true);
+        venueBookingApi.getAllForProvider()
+            .then(res => setBookings(res || []))
+            .catch(err => console.error(err))
+            .finally(() => setIsLoading(false));
+    };
+
+    useEffect(() => {
+        fetchBookings();
+    }, []);
 
     const filtered = filter === 'all' ? bookings : bookings.filter(b => b.status === filter);
-    const detail = bookings.find(b => b.id === detailId);
+    const detail = bookings.find(b => String(b.bookingId || b.id) === detailId);
 
-    const approve = (id: string) => setBookings(prev => prev.map(b => b.id === id ? { ...b, status: 'confirmed' } : b));
-    const reject = (id: string, note: string) => {
-        setBookings(prev => prev.map(b => b.id === id ? { ...b, status: 'cancelled', note } : b));
-        setRejectId(null); setDetailId(null); setRejectNote('');
+    const approve = async (id: string | number) => {
+        try {
+            await venueBookingApi.approve(id);
+            alert("Đã phê duyệt yêu cầu đặt phòng!");
+            fetchBookings();
+        } catch (error) {
+            console.error(error);
+            alert("Phê duyệt thất bại!");
+        }
+    };
+
+    const reject = async (id: string | number, note: string) => {
+        try {
+            await venueBookingApi.reject(id, note);
+            // Cập nhật lại list sau khi huỷ
+            fetchBookings();
+            setRejectId(null); setDetailId(null); setRejectNote('');
+        } catch (error) {
+            console.error(error);
+            alert("Từ chối thất bại!");
+        }
     };
 
     return (
@@ -53,7 +67,7 @@ const VenueBookingPage: React.FC = () => {
                     <p className="venue-page-subtitle">Xem xét và xác nhận các yêu cầu đặt không gian.</p>
                 </div>
                 <div className="pending-count-badge">
-                    {bookings.filter(b => b.status === 'pending').length} đơn chờ
+                    {bookings.filter(b => b.status === 'REQUESTING').length} đơn chờ
                 </div>
             </div>
 
@@ -74,38 +88,38 @@ const VenueBookingPage: React.FC = () => {
                 <div className="table-wrap">
                     <table className="venue-table">
                         <thead>
-                            <tr><th>Mã</th><th>Host</th><th>Không gian</th><th>Ngày / Giờ</th><th>Tổng</th><th>Trạng thái</th><th>Hành động</th></tr>
+                            <tr><th>Mã</th><th>Tên địa điểm</th><th>Ngày / Giờ</th><th>Tổng</th><th>Trạng thái</th><th>Hành động</th></tr>
                         </thead>
                         <tbody>
-                            {filtered.map(b => (
-                                <tr key={b.id}>
-                                    <td><code className="venue-code">{b.id}</code></td>
-                                    <td>
-                                        <div className="td-title">{b.host}</div>
-                                        <div className="td-muted" style={{ fontSize: '0.78rem' }}>{b.email}</div>
-                                    </td>
-                                    <td className="td-muted">{b.space}</td>
-                                    <td className="td-muted">
-                                        {new Date(b.date).toLocaleDateString('vi-VN')} · {b.startTime} · {b.hours}h
-                                    </td>
-                                    <td className="td-amount">{new Intl.NumberFormat('vi').format(b.total)}đ</td>
-                                    <td><span className={`venue-badge ${b.status}`}>{STATUS_LABEL[b.status]}</span></td>
-                                    <td>
-                                        <div className="action-btns2">
-                                            <button className="btn-venue-sm info" onClick={() => setDetailId(b.id)}>👁️ Chi tiết</button>
-                                            {b.status === 'pending' && (
-                                                <>
-                                                    <button className="btn-venue-sm approve" onClick={() => approve(b.id)}>✅</button>
-                                                    <button className="btn-venue-sm reject2" onClick={() => { setRejectId(b.id); setDetailId(b.id); }}>🔴</button>
-                                                </>
-                                            )}
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
+                            {isLoading ? <tr><td colSpan={6}>Đang tải...</td></tr> : filtered.map(b => {
+                                const start = new Date(b.startTime);
+
+                                return (
+                                    <tr key={String(b.bookingId || b.id || Math.random())}>
+                                        <td><code className="venue-code">{String(b.bookingId || b.id).substring(0, 8)}</code></td>
+                                        <td className="td-muted">{b.venueName || b.venueId}</td>
+                                        <td className="td-muted">
+                                            {b.bookingDate ? new Date(b.bookingDate).toLocaleDateString('vi-VN') : start.toLocaleDateString('vi-VN')} · {typeof b.startTime === 'string' && !b.startTime.includes('T') ? b.startTime : start.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
+                                        </td>
+                                        <td className="td-amount">{new Intl.NumberFormat('vi').format(b.totalPrice || 0)}đ</td>
+                                        <td><span className={`venue-badge ${b.status.toLowerCase()}`}>{STATUS_LABEL[b.status] || b.status}</span></td>
+                                        <td>
+                                            <div className="action-btns2">
+                                                <button className="btn-venue-sm info" onClick={() => setDetailId(String(b.bookingId || b.id))}>👁️ Chi tiết</button>
+                                                {b.status === 'REQUESTING' && (
+                                                    <>
+                                                        <button className="btn-venue-sm approve" onClick={() => approve(String(b.bookingId || b.id))}>✅</button>
+                                                        <button className="btn-venue-sm reject2" onClick={() => { setRejectId(String(b.bookingId || b.id)); setDetailId(String(b.bookingId || b.id)); }}>🔴</button>
+                                                    </>
+                                                )}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                )
+                            })}
                         </tbody>
                     </table>
-                    {filtered.length === 0 && <div className="venue-empty">Không có đơn nào.</div>}
+                    {!isLoading && filtered.length === 0 && <div className="venue-empty">Không có đơn nào.</div>}
                 </div>
             </div>
 
@@ -119,19 +133,17 @@ const VenueBookingPage: React.FC = () => {
                         </div>
                         <div className="venue-modal-body">
                             <div className="detail-grid">
-                                <div className="detail-row"><span>Host:</span><strong>{detail.host}</strong></div>
-                                <div className="detail-row"><span>Email:</span><strong>{detail.email}</strong></div>
-                                <div className="detail-row"><span>Không gian:</span><strong>{detail.space}</strong></div>
-                                <div className="detail-row"><span>Ngày:</span><strong>{new Date(detail.date).toLocaleDateString('vi-VN')}</strong></div>
-                                <div className="detail-row"><span>Giờ bắt đầu:</span><strong>{detail.startTime}</strong></div>
-                                <div className="detail-row"><span>Số giờ:</span><strong>{detail.hours} giờ</strong></div>
-                                <div className="detail-row"><span>Tổng tiền:</span><strong className="td-amount">{new Intl.NumberFormat('vi').format(detail.total)}đ</strong></div>
-                                <div className="detail-row"><span>Trạng thái:</span><span className={`venue-badge ${detail.status}`}>{STATUS_LABEL[detail.status]}</span></div>
+                                <div className="detail-row"><span>Không gian:</span><strong>{detail.venueName || detail.venueId}</strong></div>
+                                {detail.bookingDate && <div className="detail-row"><span>Ngày thuê:</span><strong>{new Date(detail.bookingDate).toLocaleDateString('vi-VN')}</strong></div>}
+                                <div className="detail-row"><span>Bắt đầu lúc:</span><strong>{detail.startTime}</strong></div>
+                                <div className="detail-row"><span>Kết thúc lúc:</span><strong>{detail.endTime}</strong></div>
+                                <div className="detail-row"><span>Tổng tiền:</span><strong className="td-amount">{new Intl.NumberFormat('vi').format(detail.totalPrice || 0)}đ</strong></div>
+                                <div className="detail-row"><span>Trạng thái:</span><span className={`venue-badge ${detail.status.toLowerCase()}`}>{STATUS_LABEL[detail.status] || detail.status}</span></div>
                                 {detail.note && <div className="detail-row full"><span>Ghi chú:</span><span>{detail.note}</span></div>}
                             </div>
 
                             {/* Reject form */}
-                            {rejectId === detail.id && detail.status === 'pending' && (
+                            {rejectId === String(detail.bookingId || detail.id) && detail.status === 'REQUESTING' && (
                                 <div className="reject-form">
                                     <label>Lý do từ chối *</label>
                                     <textarea rows={3} value={rejectNote} onChange={e => setRejectNote(e.target.value)} placeholder="VD: Ngày đó đã có đặt trước..." />
@@ -139,19 +151,19 @@ const VenueBookingPage: React.FC = () => {
                             )}
                         </div>
                         <div className="venue-modal-footer">
-                            {detail.status === 'pending' && rejectId !== detail.id && (
+                            {detail.status === 'REQUESTING' && rejectId !== String(detail.bookingId || detail.id) && (
                                 <>
-                                    <button className="btn btn-ghost" onClick={() => setRejectId(detail.id)}>🔴 Từ chối</button>
-                                    <button className="btn btn-venue" onClick={() => { approve(detail.id); setDetailId(null); }}>✅ Xác nhận</button>
+                                    <button className="btn btn-ghost" onClick={() => setRejectId(String(detail.bookingId || detail.id))}>🔴 Từ chối</button>
+                                    <button className="btn btn-venue" onClick={() => { approve(String(detail.bookingId || detail.id)); setDetailId(null); }}>✅ Xác nhận</button>
                                 </>
                             )}
-                            {detail.status === 'pending' && rejectId === detail.id && (
+                            {detail.status === 'REQUESTING' && rejectId === String(detail.bookingId || detail.id) && (
                                 <>
                                     <button className="btn btn-ghost" onClick={() => setRejectId(null)}>← Quay lại</button>
-                                    <button className="btn btn-danger" onClick={() => reject(detail.id, rejectNote)} disabled={!rejectNote.trim()}>Gửi từ chối</button>
+                                    <button className="btn btn-danger" onClick={() => reject(String(detail.bookingId || detail.id), rejectNote)} disabled={!rejectNote.trim()}>Gửi từ chối</button>
                                 </>
                             )}
-                            {detail.status !== 'pending' && (
+                            {detail.status !== 'REQUESTING' && (
                                 <button className="btn btn-ghost" onClick={() => setDetailId(null)}>Đóng</button>
                             )}
                         </div>

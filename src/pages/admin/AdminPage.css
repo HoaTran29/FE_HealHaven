@@ -63,8 +63,15 @@
     transform: translateY(-2px);
 }
 
-.kpi-icon {
-    font-size: 1.75rem;
+.kpi-icon-wrap {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--kc, #007BA2) 12%, white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
 }
 
 .kpi-value {
@@ -191,8 +198,32 @@
     font-size: 0.88rem;
 }
 
-.activity-icon {
-    font-size: 1.1rem;
+.activity-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #007BA2;
+    flex-shrink: 0;
+}
+
+.activity-item.activity-approve .activity-dot {
+    background: #16a34a;
+}
+
+.activity-item.activity-user .activity-dot {
+    background: #007BA2;
+}
+
+.activity-item.activity-finance .activity-dot {
+    background: #d97706;
+}
+
+.activity-item.activity-venue .activity-dot {
+    background: #7c3aed;
+}
+
+.activity-item.activity-report .activity-dot {
+    background: #dc3545;
 }
 
 .activity-msg {
@@ -404,10 +435,12 @@
     background: none;
     border: 1px solid #eee;
     border-radius: 7px;
-    padding: 6px 8px;
-    font-size: 0.9rem;
+    padding: 5px 10px;
+    font-size: 0.8rem;
+    font-weight: 600;
     cursor: pointer;
     transition: background 0.15s;
+    white-space: nowrap;
 }
 
 .adm-btn.info {

@@ -120,7 +120,6 @@ const GalleryPage: React.FC = () => {
         <div className="gallery-page">
             {/* Hero Banner */}
             <section className="gallery-hero">
-                <div className="gallery-hero-overlay" />
                 <div className="gallery-hero-content">
                     <h1 className="gallery-hero-title">🖼️ Triển lãm Tác phẩm</h1>
                     <p className="gallery-hero-sub">Khám phá những sản phẩm thủ công tuyệt đẹp từ cộng đồng Heal Haven.</p>

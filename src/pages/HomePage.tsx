@@ -25,7 +25,7 @@ const HomePage: React.FC = () => {
       <div className="container">
         {/* === Mục 1: AI Gợi ý cho bạn === */}
         <section className="ai-suggestion">
-          <h2>Trợ lý Sáng tạo AI 🤖</h2>
+          <h2>Trợ lý Sáng tạo AI</h2>
           <p>
             Bạn đang cảm thấy thế nào? Hãy để AI gợi ý một dự án thủ công dành
             riêng cho bạn.
@@ -45,7 +45,7 @@ const HomePage: React.FC = () => {
             <Link to="/workshop/workshop-dan-len" className="card-link">
               <div className="card">
                 <img
-                  src="/images/dan-len.webp"
+                  src="/images/ws1303.png"
                   alt="Workshop đan len"
                   className="card-img-real"
                 />

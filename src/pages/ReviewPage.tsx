@@ -7,21 +7,21 @@ const COMPLETED = [
     {
         id: 'ORD-001', workshopId: 'ws1',
         workshopTitle: 'Workshop Đan len cơ bản',
-        host: 'Nghệ nhân Trần Văn A',
+        host: { fullName: 'Nghệ nhân Trần Văn A' },
         date: '15/03/2026', emoji: '🧶',
         gradient: 'linear-gradient(135deg, #fde68a, #f59e0b)',
     },
     {
         id: 'ORD-002', workshopId: 'ws2',
         workshopTitle: 'Vẽ màu nước: Thiên nhiên',
-        host: 'Họa sĩ Lê Thị B',
+        host: { fullName: 'Họa sĩ Lê Thị B' },
         date: '10/03/2026', emoji: '🎨',
         gradient: 'linear-gradient(135deg, #bfdbfe, #6366f1)',
     },
     {
         id: 'ORD-005', workshopId: 'ws5',
         workshopTitle: 'Làm gốm căn bản',
-        host: 'Nghệ nhân Phạm Thị Hoa',
+        host: { fullName: 'Nghệ nhân Phạm Thị Hoa' },
         date: '05/03/2026', emoji: '🏺',
         gradient: 'linear-gradient(135deg, #d1fae5, #10b981)',
     },
@@ -132,7 +132,7 @@ const ReviewPage: React.FC = () => {
                                     <div className="roi-visual" style={{ background: o.gradient }}>{o.emoji}</div>
                                     <div className="roi-info">
                                         <div className="roi-title">{o.workshopTitle}</div>
-                                        <div className="roi-meta">{o.host} · {o.date}</div>
+                                        <div className="roi-meta">{o.host?.fullName} · {o.date}</div>
                                     </div>
                                     <span className="roi-arrow">→</span>
                                 </li>
@@ -156,7 +156,7 @@ const ReviewPage: React.FC = () => {
                                 <span className="rws-emoji">{selectedOrder.emoji}</span>
                                 <div>
                                     <div className="rws-title">{selectedOrder.workshopTitle}</div>
-                                    <div className="rws-host">{selectedOrder.host}</div>
+                                    <div className="rws-host">{selectedOrder.host?.fullName}</div>
                                 </div>
                             </div>
 

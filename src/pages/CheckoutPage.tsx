@@ -1,152 +1,146 @@
-import React, { useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import { bookingApi, workshopApi, type Workshop } from '../services/api';
 import './CheckoutPage.css';
-
-// --- DỮ LIỆU GIẢ WORKSHOP (sẽ fetch từ API dựa trên workshopId) ---
-const mockWorkshopInfo = {
-  id: 'workshop-dan-len',
-  title: 'Workshop Đan len cơ bản',
-  host: 'Nghệ nhân Trần Văn A',
-  date: '2026-03-15',
-  time: '09:00 - 11:00',
-  location: 'Quận 3, TP.HCM',
-  image: '/images/dan-len.webp',
-  pricePerSeat: 399000,
-  maxSeats: 10,
-  availableSeats: 7,
-};
-
-type PaymentMethod = 'vnpay' | 'momo' | 'transfer';
-type CheckoutStep = 'form' | 'ticket';
-
-// --- MÃ QR PLACEHOLDER ---
-const QRCodePlaceholder: React.FC<{ ticketId: string }> = ({ ticketId }) => (
-  <div className="qr-placeholder">
-    <div className="qr-grid">
-      {Array.from({ length: 81 }).map((_, i) => (
-        <div key={i} className={`qr-cell ${Math.random() > 0.45 ? 'filled' : ''}`} />
-      ))}
-    </div>
-    <p className="qr-ticket-id">{ticketId}</p>
-  </div>
-);
 
 const CheckoutPage: React.FC = () => {
   const [searchParams] = useSearchParams();
+  const workshopId = searchParams.get('workshopId') || '';
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { user, isLoading: authLoading } = useAuth(); // Auth context
 
-  const workshopId = searchParams.get('workshopId') || mockWorkshopInfo.id;
-  const workshop = mockWorkshopInfo; // TODO: fetch theo workshopId
+  // Workshop data từ API
+  const [workshop, setWorkshop] = useState<Workshop | null>(null);
+  const [loadingWorkshop, setLoadingWorkshop] = useState(true);
+  const [workshopError, setWorkshopError] = useState('');
 
-  const [step, setStep] = useState<CheckoutStep>('form');
+  // Checkout state
   const [seats, setSeats] = useState(1);
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('vnpay');
-  const [transferFile, setTransferFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [ticketId] = useState(`HH-${Date.now().toString(36).toUpperCase()}`);
+  const [errorMsg, setErrorMsg] = useState('');
 
-  const totalPrice = workshop.pricePerSeat * seats;
+  // Fetch workshop thật từ BE
+  useEffect(() => {
+    // 1. Kiểm tra đăng nhập
+    if (!authLoading && !user) {
+      navigate(`/login?redirect=${encodeURIComponent(location.pathname + location.search)}`);
+      return;
+    }
+
+    // 2. Tải dữ liệu workshop nếu đã đăng nhập
+    if (!workshopId) {
+      setWorkshopError('Không tìm thấy thông tin workshop. Vui lòng quay lại trang danh sách.');
+      setLoadingWorkshop(false);
+      return;
+    }
+
+    // Nếu đang chờ auth data thì khoan tải workshop
+    if (authLoading) return;
+
+    setLoadingWorkshop(true);
+    setWorkshopError('');
+    workshopApi.getById(workshopId)
+      .then(data => setWorkshop(data))
+      .catch(() => setWorkshopError('Không thể tải thông tin workshop. Vui lòng thử lại.'))
+      .finally(() => setLoadingWorkshop(false));
+  }, [workshopId, user, authLoading, navigate, location]);
+
+  const totalPrice = (workshop?.price ?? 0) * seats;
   const formattedTotal = new Intl.NumberFormat('vi-VN').format(totalPrice) + 'đ';
-  const formattedUnit = new Intl.NumberFormat('vi-VN').format(workshop.pricePerSeat) + 'đ';
+  const formattedUnit = new Intl.NumberFormat('vi-VN').format(workshop?.price ?? 0) + 'đ';
 
   const handlePayment = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!workshop) return;
     setIsLoading(true);
-    // TODO: Gọi API tạo đơn hàng, xử lý thanh toán
-    await new Promise(res => setTimeout(res, 1800)); // giả lập delay
-    setIsLoading(false);
-    setStep('ticket');
+    setErrorMsg('');
+    try {
+      // B1: Tạo booking → lấy bookingId thật từ BE
+      const vId = String(workshop.workshopId || workshop.id);
+      const booking = await bookingApi.create({
+        workshopId: vId,
+        quantity: seats
+      });
+
+      // B2: Redirect sang trang thanh toán QR thủ công
+      const bId = booking.bookingId || booking.id;
+      navigate(`/payment/qr?bookingId=${bId}`);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Có lỗi xảy ra khi tạo mã thanh toán.';
+      setErrorMsg(message);
+      setIsLoading(false);
+    }
   };
 
-  if (step === 'ticket') {
+  // ——— Loading workshop ———
+  if (loadingWorkshop || authLoading) {
     return (
       <div className="checkout-container container">
-        <div className="ticket-card">
-          <div className="ticket-header">
-            <div className="ticket-success-icon">✅</div>
-            <h2>Đặt chỗ thành công!</h2>
-            <p>Vé điện tử của bạn đã được tạo. Vui lòng xuất trình mã QR khi check-in.</p>
-          </div>
-
-          <div className="ticket-body">
-            <div className="ticket-info">
-              <h3>{workshop.title}</h3>
-              <table className="ticket-details-table">
-                <tbody>
-                  <tr>
-                    <td>Nghệ nhân</td>
-                    <td>{workshop.host}</td>
-                  </tr>
-                  <tr>
-                    <td>Ngày</td>
-                    <td>{new Date(workshop.date).toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</td>
-                  </tr>
-                  <tr>
-                    <td>Thời gian</td>
-                    <td>{workshop.time}</td>
-                  </tr>
-                  <tr>
-                    <td>Địa điểm</td>
-                    <td>{workshop.location}</td>
-                  </tr>
-                  <tr>
-                    <td>Số chỗ</td>
-                    <td>{seats} người</td>
-                  </tr>
-                  <tr>
-                    <td>Tổng tiền</td>
-                    <td><strong className="ticket-price">{formattedTotal}</strong></td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <div className="ticket-divider">
-              <span className="ticket-hole left" />
-              <div className="ticket-line" />
-              <span className="ticket-hole right" />
-            </div>
-
-            <div className="ticket-qr">
-              <QRCodePlaceholder ticketId={ticketId} />
-              <p className="qr-instruction">Quét mã tại cổng check-in</p>
-            </div>
-          </div>
-
-          <div className="ticket-footer">
-            <Link to="/my-schedule" className="btn btn-primary">Xem lịch trình của tôi</Link>
-            <Link to="/workshops" className="btn btn-secondary">Khám phá Workshop khác</Link>
-          </div>
+        <div className="checkout-loading">
+          <div className="checkout-loading-spinner">🔄</div>
+          <p>Đang chuẩn bị phiên thanh toán...</p>
         </div>
       </div>
     );
   }
 
+  // User not exists return blank (to wait for redirection)
+  if (!user) return null;
+
+  // ——— Lỗi tải workshop ———
+  if (workshopError || !workshop) {
+    return (
+      <div className="checkout-container container">
+        <div className="checkout-error-state">
+          <p>❌ {workshopError || 'Không tìm thấy workshop.'}</p>
+          <Link to="/workshops" className="btn btn-primary">Quay về danh sách Workshop</Link>
+        </div>
+      </div>
+    );
+  }
+
+  // ——— Form Checkout ———
+  const availableSeats = workshop.availableSeats ?? workshop.maxSeats ?? 10;
+  const hostName = workshop.host?.fullName ?? 'Nghệ nhân HealHaven';
+  const workshopDateStr = workshop.startDate || workshop.date || '';
+  const parsedDate = new Date(workshopDateStr);
+  const workshopDate = isNaN(parsedDate.getTime())
+    ? workshopDateStr
+    : parsedDate.toLocaleDateString('vi-VN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
   return (
     <div className="checkout-container container">
       {/* Breadcrumb */}
       <nav className="checkout-breadcrumb">
-        <Link to={`/workshop/${workshopId}`}>← Quay lại Workshop</Link>
+        <Link to={`/workshop/${workshop.workshopId || workshop.id || workshopId}`}>← Quay lại Workshop</Link>
       </nav>
 
       <h1 className="checkout-title">Xác nhận đặt chỗ</h1>
 
+      {errorMsg && (
+        <div className="checkout-error-banner">
+          ❌ {errorMsg}
+        </div>
+      )}
+
       <form onSubmit={handlePayment} className="checkout-layout">
-        {/* =================== CỘT TRÁI: FORM =================== */}
+        {/* =================== CỘT TRÁI =================== */}
         <div className="checkout-form-col">
 
           {/* 1. Thông tin Workshop */}
           <section className="checkout-section">
             <h3>📋 Thông tin Workshop</h3>
             <div className="workshop-summary-mini">
-              <img src={workshop.image} alt={workshop.title} />
               <div>
                 <p className="wsm-title">{workshop.title}</p>
-                <p className="wsm-meta">👤 {workshop.host}</p>
-                <p className="wsm-meta">📅 {workshop.date} &nbsp;|&nbsp; ⏰ {workshop.time}</p>
-                <p className="wsm-meta">📍 {workshop.location}</p>
+                <p className="wsm-meta">🧑‍🎨 {hostName}</p>
+                <p className="wsm-meta">📅 {workshopDate} {workshop.time ? `| ⏰ ${workshop.time}` : ''}</p>
+                {workshop.address && <p className="wsm-meta">📍 {workshop.address}</p>}
                 <p className="wsm-available">
-                  <span className={workshop.availableSeats <= 3 ? 'seats-low' : ''}>
-                    Còn {workshop.availableSeats} chỗ trống
+                  <span className={availableSeats <= 3 ? 'seats-low' : ''}>
+                    Còn {availableSeats} chỗ trống
                   </span>
                 </p>
               </div>
@@ -167,8 +161,8 @@ const CheckoutPage: React.FC = () => {
               <button
                 type="button"
                 className="seat-btn"
-                onClick={() => setSeats(s => Math.min(workshop.availableSeats, s + 1))}
-                disabled={seats >= workshop.availableSeats}
+                onClick={() => setSeats(s => Math.min(availableSeats, s + 1))}
+                disabled={seats >= availableSeats}
               >+</button>
               <span className="seat-unit">× {formattedUnit}/người</span>
             </div>
@@ -177,64 +171,24 @@ const CheckoutPage: React.FC = () => {
           {/* 3. Phương thức thanh toán */}
           <section className="checkout-section">
             <h3>💳 Phương thức thanh toán</h3>
-            <div className="payment-methods">
-              {([
-                { id: 'vnpay', label: 'VNPay', icon: '🏦' },
-                { id: 'momo', label: 'Ví MoMo', icon: '💜' },
-                { id: 'transfer', label: 'Chuyển khoản ngân hàng', icon: '📱' },
-              ] as { id: PaymentMethod; label: string; icon: string }[]).map(m => (
-                <label
-                  key={m.id}
-                  className={`payment-option ${paymentMethod === m.id ? 'selected' : ''}`}
-                >
-                  <input
-                    type="radio"
-                    name="payment"
-                    value={m.id}
-                    checked={paymentMethod === m.id}
-                    onChange={() => setPaymentMethod(m.id)}
-                  />
-                  <span className="payment-icon">{m.icon}</span>
-                  <span>{m.label}</span>
-                </label>
-              ))}
-            </div>
-
-            {paymentMethod === 'transfer' && (
-              <div className="transfer-info">
-                <div className="bank-info-box">
-                  <p><strong>Ngân hàng:</strong> Vietcombank</p>
-                  <p><strong>Số TK:</strong> 1234567890</p>
-                  <p><strong>Tên TK:</strong> CONG TY HEAL HAVEN</p>
-                  <p><strong>Nội dung CK:</strong> HH {ticketId}</p>
+            <div className="vnpay-only-info">
+              <div className="vnpay-badge">
+                <span className="vnpay-logo">🏦</span>
+                <div>
+                  <p className="vnpay-name">Chuyển khoản QR</p>
+                  <p className="vnpay-desc">Thanh toán an toàn qua hình thức chuyển khoản ngân hàng bằng mã QR.</p>
                 </div>
-                <div className="form-group">
-                  <label htmlFor="transfer-proof">
-                    Upload minh chứng chuyển khoản
-                    <span className="required"> *</span>
-                  </label>
-                  <div className="file-upload-area" onClick={() => document.getElementById('transfer-proof')?.click()}>
-                    {transferFile ? (
-                      <span>✅ {transferFile.name}</span>
-                    ) : (
-                      <span>📎 Nhấn để chọn ảnh / PDF</span>
-                    )}
-                  </div>
-                  <input
-                    id="transfer-proof"
-                    type="file"
-                    accept="image/*,.pdf"
-                    style={{ display: 'none' }}
-                    onChange={(e) => setTransferFile(e.target.files?.[0] || null)}
-                    required={paymentMethod === 'transfer'}
-                  />
-                </div>
+                <span className="vnpay-check">✓</span>
               </div>
-            )}
+              <div className="vnpay-logos-row">
+                <span>QR Code</span>
+                <span>Chuyển khoản 24/7</span>
+              </div>
+            </div>
           </section>
         </div>
 
-        {/* =================== CỘT PHẢI: ORDER SUMMARY =================== */}
+        {/* =================== CỘT PHẢI =================== */}
         <aside className="checkout-summary-col">
           <div className="order-summary-card">
             <h3>Tóm tắt đơn hàng</h3>
@@ -258,12 +212,14 @@ const CheckoutPage: React.FC = () => {
             <button
               type="submit"
               className="btn btn-primary checkout-pay-btn"
-              disabled={isLoading || (paymentMethod === 'transfer' && !transferFile)}
+              disabled={isLoading || availableSeats === 0}
             >
               {isLoading ? (
                 <span className="loading-dots">Đang xử lý<span>...</span></span>
+              ) : availableSeats === 0 ? (
+                'Workshop đã hết chỗ'
               ) : (
-                `Thanh toán ${formattedTotal}`
+                `Tiến hành thanh toán ${formattedTotal}`
               )}
             </button>
 

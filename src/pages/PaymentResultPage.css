@@ -1,0 +1,185 @@
+/* ===================================================
+   PAYMENT RESULT PAGE
+=================================================== */
+
+.pres-container {
+    padding-top: 3rem;
+    padding-bottom: 4rem;
+    display: flex;
+    justify-content: center;
+}
+
+.pres-card {
+    width: 100%;
+    max-width: 500px;
+    background: white;
+    border-radius: 20px;
+    padding: 3rem 2.5rem;
+    text-align: center;
+    box-shadow: 0 8px 40px rgba(0, 64, 92, 0.12);
+    border: 1px solid #e5f3f3;
+}
+
+/* === Loading === */
+.pres-spinner {
+    font-size: 3rem;
+    animation: spin 1.5s linear infinite;
+    display: inline-block;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* === Icon === */
+.pres-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    line-height: 1;
+}
+
+/* === Success === */
+.pres-success {
+    border-top: 4px solid #00b894;
+}
+
+.pres-success h2 {
+    color: #00704a;
+}
+
+/* === Failed === */
+.pres-failed {
+    border-top: 4px solid #e53e3e;
+}
+
+.pres-failed h2 {
+    color: #c53030;
+}
+
+/* Message */
+.pres-message {
+    font-size: 1rem;
+    color: var(--body-text);
+    margin-bottom: 1.5rem;
+}
+
+/* Booking info */
+.pres-booking-info {
+    background: #f7fcfd;
+    border: 1px solid #e5f3f3;
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    margin: 0 0 1.5rem;
+    text-align: left;
+}
+
+.pres-info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    padding: 0.4rem 0;
+}
+
+.pres-info-row span {
+    color: var(--body-text);
+}
+
+.pres-info-row strong {
+    color: var(--dark-text);
+    max-width: 60%;
+    text-align: right;
+}
+
+.pres-info-row.highlight {
+    border-top: 1px solid #e5f3f3;
+    margin-top: 0.4rem;
+    padding-top: 0.7rem;
+}
+
+.pres-amount {
+    color: var(--primary) !important;
+    font-size: 1.15rem;
+}
+
+.pres-booking-id {
+    font-family: monospace;
+    background: #e8f0ff;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.82rem;
+    color: #0066cc;
+}
+
+/* Note */
+.pres-note {
+    font-size: 0.85rem;
+    color: var(--body-text);
+    background: #e8f7f2;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Error code */
+.pres-error-code {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: #c53030;
+    background: #fff5f5;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Actions */
+.pres-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: stretch;
+}
+
+.pres-actions .btn {
+    width: 100%;
+}
+
+/* Support note */
+.pres-support {
+    margin-top: 1.25rem;
+    font-size: 0.78rem;
+    color: var(--body-text);
+}
+
+.pres-support a {
+    color: var(--primary);
+}
+
+/* Dark mode */
+[data-theme='dark'] .pres-card {
+    background: #1e3040;
+    border-color: #2a4050;
+}
+
+[data-theme='dark'] .pres-booking-info {
+    background: #162535;
+    border-color: #2a4050;
+}
+
+[data-theme='dark'] .pres-note {
+    background: #1a3a2a;
+}
+
+[data-theme='dark'] .pres-error-code {
+    background: #3a1a1a;
+}

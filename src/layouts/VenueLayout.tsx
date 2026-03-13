@@ -1,7 +1,16 @@
 import React, { useState } from 'react';
 import { NavLink, Outlet, Navigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { LayoutDashboard, Building2, Calendar, ClipboardList, DollarSign, ArrowLeft, Menu, X } from 'lucide-react';
 import './VenueLayout.css';
+
+const NAV_ITEMS = [
+    { to: '/venue', label: 'Dashboard', Icon: LayoutDashboard, end: true },
+    { to: '/venue/spaces', label: 'Không gian', Icon: Building2, end: false },
+    { to: '/venue/calendar', label: 'Lịch trống', Icon: Calendar, end: false },
+    { to: '/venue/bookings', label: 'Đơn thuê', Icon: ClipboardList, end: false },
+    { to: '/venue/finance', label: 'Doanh thu', Icon: DollarSign, end: false },
+];
 
 const VenueLayout: React.FC = () => {
     const { user, isLoading } = useAuth();
@@ -10,15 +19,6 @@ const VenueLayout: React.FC = () => {
     if (isLoading) return <div className="page-loader">Đang tải...</div>;
     if (!user) return <Navigate to="/login" replace />;
 
-
-    const navItems = [
-        { to: '/venue', label: '📊 Dashboard', end: true },
-        { to: '/venue/spaces', label: '🏠 Không gian', end: false },
-        { to: '/venue/calendar', label: '📅 Lịch trống', end: false },
-        { to: '/venue/bookings', label: '📋 Đơn thuê', end: false },
-        { to: '/venue/finance', label: '💰 Doanh thu', end: false },
-    ];
-
     return (
         <div className="venue-shell">
             <aside className={`venue-sidebar ${sidebarOpen ? 'open' : ''}`}>
@@ -26,7 +26,9 @@ const VenueLayout: React.FC = () => {
                     <Link to="/" className="brand-link">
                         <img src="/logo.png" alt="Heal Haven" className="sidebar-logo" />
                     </Link>
-                    <button className="sidebar-close-btn" onClick={() => setSidebarOpen(false)}>✕</button>
+                    <button className="sidebar-close-btn" onClick={() => setSidebarOpen(false)}>
+                        <X size={18} />
+                    </button>
                 </div>
 
                 <div className="venue-sidebar-user">
@@ -38,21 +40,22 @@ const VenueLayout: React.FC = () => {
                 </div>
 
                 <nav className="venue-nav">
-                    {navItems.map(item => (
+                    {NAV_ITEMS.map(({ to, label, Icon, end }) => (
                         <NavLink
-                            key={item.to}
-                            to={item.to}
-                            end={item.end}
+                            key={to} to={to} end={end}
                             className={({ isActive }) => `venue-nav-link ${isActive ? 'active' : ''}`}
                             onClick={() => setSidebarOpen(false)}
                         >
-                            {item.label}
+                            <Icon size={17} strokeWidth={1.8} />
+                            {label}
                         </NavLink>
                     ))}
                 </nav>
 
                 <div className="venue-sidebar-footer">
-                    <Link to="/" className="venue-nav-link back-link">← Về trang chủ</Link>
+                    <Link to="/" className="venue-nav-link back-link">
+                        <ArrowLeft size={15} /> Về trang chủ
+                    </Link>
                 </div>
             </aside>
 
@@ -60,8 +63,10 @@ const VenueLayout: React.FC = () => {
 
             <div className="venue-main">
                 <div className="venue-topbar">
-                    <button className="topbar-menu-btn" onClick={() => setSidebarOpen(true)}>☰</button>
-                    <span className="topbar-title">Venue Dashboard</span>
+                    <button className="topbar-menu-btn" onClick={() => setSidebarOpen(true)}>
+                        <Menu size={20} />
+                    </button>
+                    <span className="topbar-title">Venue</span>
                 </div>
                 <div className="venue-content">
                     <Outlet />

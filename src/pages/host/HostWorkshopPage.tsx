@@ -1,17 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { workshopApi, mediaApi, type Workshop } from '../../services/api';
 import './HostPage.css';
-
-interface Workshop {
-    id: number; title: string; category: string; date: string;
-    time: string; price: number; seats: number; registered: number;
-    status: 'draft' | 'published' | 'cancelled';
-}
-
-const INITIAL_WORKSHOPS: Workshop[] = [
-    { id: 1, title: 'Workshop Đan len cơ bản', category: 'Thủ công', date: '2026-03-15', time: '09:00', price: 399000, seats: 10, registered: 5, status: 'published' },
-    { id: 2, title: 'Vẽ màu nước: Thiên nhiên', category: 'Hội họa', date: '2026-03-20', time: '14:00', price: 599000, seats: 8, registered: 3, status: 'published' },
-    { id: 3, title: 'Hoa Kẽm nhung nghệ thuật', category: 'Thủ công', date: '2026-03-25', time: '10:00', price: 450000, seats: 12, registered: 8, status: 'draft' },
-];
 
 const EMPTY_FORM = {
     title: '', category: '', date: '', time: '', price: '',
@@ -19,61 +9,153 @@ const EMPTY_FORM = {
 };
 
 const STATUS_LABEL: Record<string, string> = {
-    published: '🟢 Đã đăng', draft: '⚪ Nháp', cancelled: '🔴 Hủy',
+    APPROVED: '🟢 Đã duyệt',
+    PENDING_APPROVAL: '🟡 Chờ duyệt',
+    DRAFT: '⚪ Nháp',
+    REJECTED: '🔴 Từ chối',
 };
 
 const HostWorkshopPage: React.FC = () => {
-    const [workshops, setWorkshops] = useState<Workshop[]>(INITIAL_WORKSHOPS);
-    const [filter, setFilter] = useState<'all' | 'published' | 'draft'>('all');
+    const [workshops, setWorkshops] = useState<Workshop[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [filter, setFilter] = useState<'all' | 'APPROVED' | 'DRAFT'>('all');
     const [modalOpen, setModalOpen] = useState(false);
     const [editing, setEditing] = useState<Workshop | null>(null);
     const [form, setForm] = useState({ ...EMPTY_FORM });
-    const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
+    const [imageFile, setImageFile] = useState<File | null>(null);
+    const [imagePreview, setImagePreview] = useState<string>('');
+    const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+    const [isSaving, setIsSaving] = useState(false);
+
+    const [searchParams, setSearchParams] = useSearchParams();
+    const hasAutoOpenedRef = useRef(false);
 
     const filtered = filter === 'all' ? workshops : workshops.filter(w => w.status === filter);
+
+    useEffect(() => {
+        fetchWorkshops();
+    }, []);
+
+    const fetchWorkshops = () => {
+        setIsLoading(true);
+        workshopApi.getMyWorkshops()
+            .then(res => setWorkshops(res.content || []))
+            .catch(err => console.error("Lỗi tải workshop:", err))
+            .finally(() => setIsLoading(false));
+    };
 
     const openCreate = () => {
         setEditing(null);
         setForm({ ...EMPTY_FORM });
+        setImageFile(null);
+        setImagePreview('');
         setModalOpen(true);
     };
+
+    // Tự động mở form tạo nếu URL có query ?create=true (chỉ chạy 1 lần)
+    useEffect(() => {
+        if (searchParams.get('create') === 'true' && !hasAutoOpenedRef.current) {
+            hasAutoOpenedRef.current = true;
+            openCreate();
+            // Xóa query param để khi navigate lại hoặc F5 không bị dính
+            setSearchParams({});
+        }
+    }, [searchParams, setSearchParams]);
 
     const openEdit = (w: Workshop) => {
         setEditing(w);
         setForm({
-            title: w.title, category: w.category, date: w.date, time: w.time,
-            price: String(w.price), seats: String(w.seats),
-            description: '', address: '', materials: '',
+            title: w.title, category: w.category, date: w.date, time: w.time || '',
+            price: String(w.price), seats: String(w.maxSeats),
+            description: w.subtitle || '', address: w.address || '', materials: w.materials?.join('\n') || '',
         });
+        setImageFile(null);
+
+        let initialPreview = '';
+        if (w.images && w.images.length > 0) {
+            initialPreview = w.images[0];
+        } else if (w.image) {
+            initialPreview = w.image;
+        }
+        setImagePreview(initialPreview);
+
         setModalOpen(true);
     };
 
-    const handleSave = () => {
-        if (!form.title || !form.date) return;
-        if (editing) {
-            setWorkshops(ws => ws.map(w => w.id === editing.id
-                ? { ...w, ...form, price: Number(form.price), seats: Number(form.seats) }
-                : w));
-        } else {
-            const newW: Workshop = {
-                id: Date.now(), title: form.title, category: form.category,
-                date: form.date, time: form.time, price: Number(form.price),
-                seats: Number(form.seats), registered: 0, status: 'draft',
-            };
-            setWorkshops(ws => [newW, ...ws]);
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            setImageFile(file);
+            setImagePreview(URL.createObjectURL(file));
         }
-        setModalOpen(false);
     };
 
-    const handleDelete = (id: number) => {
-        setWorkshops(ws => ws.filter(w => w.id !== id));
-        setDeleteConfirm(null);
+    const handleSave = async (submitAfterSave = false) => {
+        if (!form.title || !form.date) return;
+        setIsSaving(true);
+        try {
+            let uploadedImageUrl = editing?.image || (editing?.images && editing?.images[0]) || '';
+
+            // Nếu user có chọn file ảnh mới -> upload
+            if (imageFile) {
+                const uploadRes = await mediaApi.upload(imageFile);
+                uploadedImageUrl = uploadRes.url;
+            }
+
+            const payload: Partial<Workshop> = {
+                title: form.title,
+                category: form.category,
+                date: form.date,
+                time: form.time,
+                price: Number(form.price),
+                maxSeats: Number(form.seats),
+                subtitle: form.description,
+                address: form.address,
+                materials: form.materials.split('\n').filter(Boolean),
+                availableSeats: Number(form.seats),
+                image: uploadedImageUrl,
+                images: uploadedImageUrl ? [uploadedImageUrl] : []
+            };
+
+            let savedId = editing?.id;
+            if (editing) {
+                await workshopApi.update(String(editing.id), payload);
+            } else {
+                const res: any = await workshopApi.create(payload);
+                savedId = res.id || res.workshopId;
+            }
+
+            if (submitAfterSave && savedId) {
+                await workshopApi.submit(String(savedId));
+            }
+
+            fetchWorkshops();
+            setModalOpen(false);
+        } catch (error) {
+            console.error("Lưu workshop thất bại:", error);
+            alert("Lưu workshop hoặc tải ảnh thất bại, vui lòng thử lại!");
+        } finally {
+            setIsSaving(false);
+        }
     };
 
-    const togglePublish = (id: number) => {
-        setWorkshops(ws => ws.map(w => w.id === id
-            ? { ...w, status: w.status === 'published' ? 'draft' : 'published' }
-            : w));
+    const handleDelete = async (id: string) => {
+        try {
+            await workshopApi.delete(id);
+            fetchWorkshops();
+            setDeleteConfirm(null);
+        } catch (error) {
+            console.error("Xóa workshop thất bại:", error);
+        }
+    };
+
+    const togglePublish = async (id: string) => {
+        try {
+            await workshopApi.submit(id);
+            fetchWorkshops();
+        } catch (error) {
+            console.error("Gửi duyệt thất bại:", error);
+        }
     };
 
     return (
@@ -89,9 +171,9 @@ const HostWorkshopPage: React.FC = () => {
 
             {/* Filter tabs */}
             <div className="host-filter-tabs">
-                {(['all', 'published', 'draft'] as const).map(f => (
+                {(['all', 'APPROVED', 'DRAFT'] as const).map(f => (
                     <button key={f} className={`host-tab-btn ${filter === f ? 'active' : ''}`} onClick={() => setFilter(f)}>
-                        {f === 'all' ? 'Tất cả' : f === 'published' ? '🟢 Đã đăng' : '⚪ Nháp'}
+                        {f === 'all' ? 'Tất cả' : f === 'APPROVED' ? '🟢 Đã duyệt' : '⚪ Nháp'}
                         <span className="host-tab-count">{f === 'all' ? workshops.length : workshops.filter(w => w.status === f).length}</span>
                     </button>
                 ))}
@@ -100,40 +182,44 @@ const HostWorkshopPage: React.FC = () => {
             {/* Table */}
             <div className="host-card">
                 <div className="table-wrap">
-                    <table className="host-table">
-                        <thead>
-                            <tr>
-                                <th>Tên Workshop</th>
-                                <th>Danh mục</th>
-                                <th>Ngày / Giờ</th>
-                                <th>Giá</th>
-                                <th>Đăng ký</th>
-                                <th>Trạng thái</th>
-                                <th>Hành động</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {filtered.map(w => (
-                                <tr key={w.id}>
-                                    <td className="td-title">{w.title}</td>
-                                    <td className="td-tag">{w.category}</td>
-                                    <td className="td-muted">{new Date(w.date).toLocaleDateString('vi-VN')} {w.time}</td>
-                                    <td className="td-amount">{new Intl.NumberFormat('vi-VN').format(w.price)}đ</td>
-                                    <td>{w.registered}/{w.seats}</td>
-                                    <td><span className={`badge-status ${w.status}`}>{STATUS_LABEL[w.status]}</span></td>
-                                    <td>
-                                        <div className="action-btns">
-                                            <button className="btn-icon edit" onClick={() => openEdit(w)} title="Sửa">✏️</button>
-                                            <button className="btn-icon publish" onClick={() => togglePublish(w.id)} title={w.status === 'published' ? 'Ẩn' : 'Đăng'}>
-                                                {w.status === 'published' ? '👁️' : '🚀'}
-                                            </button>
-                                            <button className="btn-icon delete" onClick={() => setDeleteConfirm(w.id)} title="Xóa">🗑️</button>
-                                        </div>
-                                    </td>
+                    {isLoading ? (
+                        <div style={{ padding: '20px', textAlign: 'center' }}>Đang tải danh sách...</div>
+                    ) : (
+                        <table className="host-table">
+                            <thead>
+                                <tr>
+                                    <th>Tên Workshop</th>
+                                    <th>Danh mục</th>
+                                    <th>Ngày / Giờ</th>
+                                    <th>Giá</th>
+                                    <th>Đăng ký</th>
+                                    <th>Trạng thái</th>
+                                    <th>Hành động</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {filtered.map(w => (
+                                    <tr key={w.id}>
+                                        <td className="td-title">{w.title}</td>
+                                        <td className="td-tag">{w.category}</td>
+                                        <td className="td-muted">{new Date(w.date).toLocaleDateString('vi-VN')} {w.time || ''}</td>
+                                        <td className="td-amount">{new Intl.NumberFormat('vi-VN').format(w.price)}đ</td>
+                                        <td>{w.maxSeats - w.availableSeats}/{w.maxSeats}</td>
+                                        <td><span className={`badge-status ${(w.status || 'DRAFT').toLowerCase()}`}>{STATUS_LABEL[w.status || 'DRAFT'] || 'Không rõ'}</span></td>
+                                        <td>
+                                            <div className="action-btns">
+                                                <button className="btn-icon edit" onClick={() => openEdit(w)} title="Sửa">✏️</button>
+                                                {(!w.status || w.status === 'DRAFT' || w.status === 'REJECTED') && (
+                                                    <button className="btn-icon publish" onClick={() => togglePublish(String(w.id))} title="Gửi duyệt nhanh">🚀</button>
+                                                )}
+                                                <button className="btn-icon delete" onClick={() => setDeleteConfirm(String(w.id))} title="Xóa">🗑️</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    )}
                     {filtered.length === 0 && (
                         <div className="host-empty">Chưa có workshop nào. <button className="link-btn" onClick={openCreate}>Tạo ngay →</button></div>
                     )}
@@ -149,6 +235,27 @@ const HostWorkshopPage: React.FC = () => {
                             <button className="modal-close" onClick={() => setModalOpen(false)}>✕</button>
                         </div>
                         <div className="host-modal-body">
+                            {/* --- UPLOAD ẢNH --- */}
+                            <div className="form-group">
+                                <label>Ảnh bìa Workshop</label>
+                                <div className="image-upload-wrap" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                    <div
+                                        className="image-preview-box"
+                                        style={{
+                                            width: '120px', height: '80px',
+                                            backgroundColor: '#f1f5f9', borderRadius: '8px',
+                                            backgroundSize: 'cover', backgroundPosition: 'center',
+                                            backgroundImage: imagePreview ? `url(${imagePreview})` : 'none',
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px dashed #cbd5e1'
+                                        }}
+                                    >
+                                        {!imagePreview && <span style={{ color: '#94a3b8', fontSize: '12px' }}>Chưa có ảnh</span>}
+                                    </div>
+                                    <input type="file" accept="image/*" onChange={handleImageChange} />
+                                </div>
+                            </div>
+                            {/* -------------------- */}
+
                             <div className="form-row">
                                 <div className="form-group">
                                     <label>Tên workshop *</label>
@@ -201,9 +308,12 @@ const HostWorkshopPage: React.FC = () => {
                             </div>
                         </div>
                         <div className="host-modal-footer">
-                            <button className="btn btn-ghost" onClick={() => setModalOpen(false)}>Hủy</button>
-                            <button className="btn btn-primary" onClick={handleSave}>
-                                {editing ? '💾 Lưu thay đổi' : '🚀 Tạo Workshop'}
+                            <button className="btn btn-ghost" onClick={() => setModalOpen(false)} disabled={isSaving}>Hủy</button>
+                            <button className="btn" style={{ border: '1px solid #cbd5e1', backgroundColor: '#fff' }} onClick={() => handleSave(false)} disabled={isSaving}>
+                                {isSaving ? '⏳...' : '💾 Lưu Nháp'}
+                            </button>
+                            <button className="btn btn-primary" onClick={() => handleSave(true)} disabled={isSaving}>
+                                {isSaving ? '⏳ Đang xử lý...' : '🚀 Lưu & Gửi Duyệt'}
                             </button>
                         </div>
                     </div>

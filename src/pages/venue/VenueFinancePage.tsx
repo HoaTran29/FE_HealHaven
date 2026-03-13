@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { financialApi, type FinancialStats } from '../../services/api';
 import './VenuePage.css';
 
-const monthlyData = [
+const DEFAULT_MONTHLY_DATA = [
     { month: 'T9/25', revenue: 2800000 },
     { month: 'T10/25', revenue: 4200000 },
     { month: 'T11/25', revenue: 5100000 },
@@ -18,23 +19,37 @@ const spaceData = [
 ];
 
 const txns = [
-    { id: '#V-001', desc: 'Thanh toán đặt Studio A - Trần Minh A', amount: 600000, date: '26/02' },
-    { id: '#V-002', desc: 'Thanh toán đặt Studio B - Lê Thu B', amount: 360000, date: '25/02' },
-    { id: '#V-003', desc: 'Rút tiền về tài khoản', amount: -8000000, date: '20/02' },
-    { id: '#V-004', desc: 'Thanh toán đặt Studio A - Khánh D', amount: 400000, date: '18/02' },
+    { id: '#V-001', desc: 'Thanh toán đặt Studio A - Trần Minh A', amount: 600000, date: '26/02/2026' },
+    { id: '#V-002', desc: 'Thanh toán đặt Studio B - Lê Thu B', amount: 360000, date: '25/02/2026' },
+    { id: '#V-003', desc: 'Rút tiền về tài khoản', amount: -8000000, date: '20/02/2026' },
+    { id: '#V-004', desc: 'Thanh toán đặt Studio A - Khánh D', amount: 400000, date: '18/02/2026' },
 ];
 
 const fmtMoney = (n: number) => new Intl.NumberFormat('vi').format(Math.abs(n)) + 'đ';
 
 const VenueFinancePage: React.FC = () => {
+    const [stats, setStats] = useState<FinancialStats | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
     const [withdrawModal, setWithdrawModal] = useState(false);
     const [form, setForm] = useState({ amount: '', bank: '', account: '' });
     const [done, setDone] = useState(false);
 
+    useEffect(() => {
+        setIsLoading(true);
+        financialApi.getStats()
+            .then(res => setStats(res))
+            .catch(err => console.error(err))
+            .finally(() => setIsLoading(false));
+    }, []);
+
     const submit = () => {
         if (!form.amount || !form.bank || !form.account) return;
         setDone(true);
-        setTimeout(() => { setWithdrawModal(false); setDone(false); setForm({ amount: '', bank: '', account: '' }); }, 2500);
+        setTimeout(() => {
+            setWithdrawModal(false);
+            setDone(false);
+            setForm({ amount: '', bank: '', account: '' });
+        }, 2500);
     };
 
     return (
@@ -48,26 +63,28 @@ const VenueFinancePage: React.FC = () => {
             </div>
 
             {/* Stats */}
-            <div className="venue-stats-grid">
-                {[
-                    { icon: '💰', label: 'Doanh thu tháng này', value: '14.200.000đ', color: '#16a34a' },
-                    { icon: '💳', label: 'Khả dụng để rút', value: '9.840.000đ', color: '#4f46e5' },
-                    { icon: '⏳', label: 'Đang chờ xử lý', value: '4.360.000đ', color: '#d97706' },
-                    { icon: '📊', label: 'Tổng 6 tháng', value: '42.100.000đ', color: '#7c3aed' },
-                ].map((s, i) => (
-                    <div className="venue-stat-card" key={i} style={{ '--vc': s.color } as React.CSSProperties}>
-                        <div className="venue-stat-icon">{s.icon}</div>
-                        <div><div className="venue-stat-value">{s.value}</div><div className="venue-stat-label">{s.label}</div></div>
-                    </div>
-                ))}
-            </div>
+            {isLoading ? <p>Đang tải dữ liệu tài chính...</p> : (
+                <div className="venue-stats-grid">
+                    {[
+                        { icon: '💰', label: 'Doanh thu', value: fmtMoney(stats?.totalRevenue || 14200000), color: '#16a34a' },
+                        { icon: '💳', label: 'Khả dụng để rút', value: fmtMoney(stats?.profit || 9840000), color: '#4f46e5' },
+                        { icon: '⏳', label: 'Đang chờ xử lý', value: '4.360.000đ', color: '#d97706' },
+                        { icon: '📊', label: 'Số dư ước tính', value: fmtMoney(stats?.totalRevenue || 42100000), color: '#7c3aed' },
+                    ].map((s, i) => (
+                        <div className="venue-stat-card" key={i} style={{ '--vc': s.color } as React.CSSProperties}>
+                            <div className="venue-stat-icon">{s.icon}</div>
+                            <div><div className="venue-stat-value">{s.value}</div><div className="venue-stat-label">{s.label}</div></div>
+                        </div>
+                    ))}
+                </div>
+            )}
 
             {/* Charts */}
             <div className="venue-dashboard-grid">
                 <div className="venue-card">
                     <h3 className="venue-chart-title">📊 Doanh thu 6 tháng</h3>
                     <ResponsiveContainer width="100%" height={210}>
-                        <BarChart data={monthlyData} margin={{ top: 5, right: 10, left: 10, bottom: 5 }}>
+                        <BarChart data={stats?.monthlyData || DEFAULT_MONTHLY_DATA} margin={{ top: 5, right: 10, left: 10, bottom: 5 }}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#e8e8f0" />
                             <XAxis dataKey="month" tick={{ fontSize: 12 }} />
                             <YAxis tickFormatter={v => (v / 1000000).toFixed(1) + 'M'} tick={{ fontSize: 11 }} />
@@ -78,16 +95,16 @@ const VenueFinancePage: React.FC = () => {
                 </div>
 
                 <div className="venue-card">
-                    <h3 className="venue-chart-title">🏠 Doanh thu theo không gian</h3>
+                    <h3 className="venue-chart-title">🏠 Phân bổ doanh thu</h3>
                     <div className="space-revenue-list">
-                        {spaceData.map(s => (
-                            <div key={s.name} className="space-rev-row">
+                        {spaceData.map((s, i) => (
+                            <div key={i} className="space-rev-row">
                                 <div className="space-rev-name">{s.name}</div>
                                 <div className="space-rev-bar-wrap">
                                     <div className="space-rev-bar" style={{ width: `${(s.revenue / 10000000) * 100}%` }} />
                                 </div>
                                 <div className="space-rev-amount">{fmtMoney(s.revenue)}</div>
-                                <div className="space-rev-count">{s.bookings} đơn</div>
+                                <div className="space-rev-count">{s.bookings} booking</div>
                             </div>
                         ))}
                     </div>
@@ -96,17 +113,19 @@ const VenueFinancePage: React.FC = () => {
 
             {/* Transactions */}
             <div className="venue-card">
-                <h3 className="venue-chart-title">Lịch sử giao dịch</h3>
+                <h3 className="venue-chart-title">Lịch sử thanh toán</h3>
                 <div className="table-wrap">
                     <table className="venue-table">
-                        <thead><tr><th>Mã</th><th>Mô tả</th><th>Số tiền</th><th>Ngày</th></tr></thead>
+                        <thead><tr><th>Lịch trình</th><th>Mô tả</th><th>Số tiền</th><th>Loại</th></tr></thead>
                         <tbody>
-                            {txns.map(t => (
-                                <tr key={t.id}>
-                                    <td><code className="venue-code">{t.id}</code></td>
-                                    <td>{t.desc}</td>
-                                    <td className={t.amount > 0 ? 'td-amount' : 'td-debit'}>{t.amount > 0 ? '+' : '-'}{fmtMoney(t.amount)}</td>
+                            {txns.map((t, i) => (
+                                <tr key={i}>
                                     <td className="td-muted">{t.date}</td>
+                                    <td>{t.desc}</td>
+                                    <td className={t.amount < 0 ? 'td-debit' : 'td-amount'}>
+                                        {t.amount < 0 ? '-' : '+'}{fmtMoney(t.amount)}
+                                    </td>
+                                    <td>{t.amount > 0 ? 'Thanh toán' : 'Rút tiền'}</td>
                                 </tr>
                             ))}
                         </tbody>
@@ -127,7 +146,7 @@ const VenueFinancePage: React.FC = () => {
                                 <div className="venue-modal-body">
                                     <div className="balance-info-v">
                                         <span>Số dư khả dụng:</span>
-                                        <strong className="available-v">9.840.000đ</strong>
+                                        <strong className="available-v">{fmtMoney(stats?.profit || 9840000)}</strong>
                                     </div>
                                     <div className="form-group2">
                                         <label>Số tiền rút (đ) *</label>

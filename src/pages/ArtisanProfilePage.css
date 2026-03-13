@@ -1,0 +1,513 @@
+/* === ARTISAN PROFILE PAGE === */
+.artisan-page {
+    min-height: 100vh;
+    padding-bottom: 4rem;
+}
+
+/* Hero */
+.artisan-hero {
+    background: #007BA2;
+    padding: 3rem 0 2.5rem;
+}
+
+.artisan-hero-inner {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: flex;
+    align-items: flex-end;
+    gap: 2rem;
+}
+
+/* Avatar */
+.artisan-avatar-wrap {
+    flex-shrink: 0;
+}
+
+.artisan-avatar-img,
+.artisan-avatar-placeholder {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    border: 4px solid rgba(255, 255, 255, 0.4);
+    object-fit: cover;
+}
+
+.artisan-avatar-placeholder {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -1px;
+}
+
+/* Hero info */
+.artisan-hero-info {
+    flex: 1;
+    padding-bottom: 0.25rem;
+}
+
+.artisan-badge-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.artisan-verified-badge {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.artisan-since {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.8rem;
+}
+
+.artisan-name {
+    font-family: var(--font-heading, 'Playfair Display', serif);
+    font-size: 2rem;
+    color: white;
+    margin: 0 0 0.2rem;
+}
+
+.artisan-title {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 1rem;
+    margin: 0 0 0.5rem;
+}
+
+.artisan-location {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 0.88rem;
+    margin-bottom: 1rem;
+}
+
+.loc-dot {
+    width: 6px;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 50%;
+}
+
+/* Stats row */
+.artisan-stats-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.artisan-stat {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.as-value {
+    color: white;
+    font-weight: 700;
+    font-size: 1.05rem;
+}
+
+.as-label {
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 0.82rem;
+}
+
+.artisan-stat-divider {
+    width: 1px;
+    height: 18px;
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.star-display {
+    display: inline-flex;
+    gap: 1px;
+    line-height: 1;
+}
+
+/* Content area */
+.artisan-content {
+    max-width: 1000px;
+    margin: 2.5rem auto;
+    padding: 0 2rem;
+    display: grid;
+    grid-template-columns: 1fr 290px;
+    gap: 2rem;
+    align-items: start;
+}
+
+/* Sections */
+.artisan-section {
+    margin-bottom: 2rem;
+}
+
+.artisan-section-title {
+    font-family: var(--font-heading, 'Playfair Display', serif);
+    font-size: 1.2rem;
+    color: var(--dark-text);
+    margin-bottom: 0.85rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color, #e2eaed);
+}
+
+.artisan-bio {
+    color: var(--body-text);
+    line-height: 1.75;
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+/* Skills */
+.artisan-skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.artisan-skill-chip {
+    background: #f0f8fa;
+    color: #007BA2;
+    border: 1px solid #cce4ec;
+    padding: 0.35rem 0.85rem;
+    border-radius: 20px;
+    font-size: 0.83rem;
+    font-weight: 500;
+}
+
+/* Tabs */
+.artisan-tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 2px solid var(--border-color, #e2eaed);
+    margin-bottom: 1.25rem;
+}
+
+.artisan-tab {
+    padding: 0.65rem 1rem;
+    border: none;
+    background: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--body-text);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+}
+
+.artisan-tab:hover {
+    color: #007BA2;
+}
+
+.artisan-tab.active {
+    color: #007BA2;
+    border-bottom-color: #007BA2;
+    font-weight: 700;
+}
+
+/* Workshop cards */
+.artisan-workshop-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+}
+
+.artisan-ws-card {
+    display: block;
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--border-color, #e2eaed);
+    border-radius: 12px;
+    text-decoration: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.artisan-ws-card:hover {
+    border-color: #007BA2;
+    box-shadow: 0 4px 16px rgba(0, 123, 162, 0.1);
+}
+
+.awsc-category {
+    font-size: 0.75rem;
+    color: #007BA2;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.3rem;
+}
+
+.awsc-title {
+    font-size: 0.97rem;
+    font-weight: 700;
+    color: var(--dark-text);
+    margin-bottom: 0.5rem;
+}
+
+.awsc-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.82rem;
+    color: var(--body-text);
+    margin-bottom: 0.5rem;
+}
+
+.awsc-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--body-text);
+}
+
+.awsc-price {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #007BA2;
+}
+
+/* Reviews */
+.review-summary-bar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    background: #f7fafc;
+    border-radius: 12px;
+    margin-bottom: 1.25rem;
+    border: 1px solid var(--border-color, #e2eaed);
+}
+
+.rsb-score {
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: var(--dark-text);
+    line-height: 1;
+}
+
+.rsb-count {
+    font-size: 0.82rem;
+    color: var(--body-text);
+    margin: 0.2rem 0 0;
+}
+
+.artisan-review-card {
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--border-color, #e2eaed);
+    border-radius: 12px;
+    margin-bottom: 0.85rem;
+}
+
+.arc-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.65rem;
+}
+
+.arc-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #007BA2;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.arc-name {
+    font-weight: 600;
+    font-size: 0.88rem;
+    color: var(--dark-text);
+}
+
+.arc-date {
+    margin-left: auto;
+    font-size: 0.78rem;
+    color: var(--body-text);
+    white-space: nowrap;
+}
+
+.arc-comment {
+    color: var(--body-text);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Sidebar */
+.artisan-sidebar {
+    position: sticky;
+    top: 1.5rem;
+}
+
+.artisan-cta-card {
+    background: white;
+    border: 1px solid var(--border-color, #e2eaed);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+.artisan-cta-card h3 {
+    font-family: var(--font-heading, 'Playfair Display', serif);
+    font-size: 1.15rem;
+    color: var(--dark-text);
+    margin-bottom: 0.6rem;
+}
+
+.artisan-cta-card p {
+    font-size: 0.88rem;
+    color: var(--body-text);
+    margin-bottom: 1.25rem;
+    line-height: 1.6;
+}
+
+.btn-artisan-primary {
+    display: inline-block;
+    background: #007BA2;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.92rem;
+    text-decoration: none;
+    transition: background 0.2s;
+}
+
+.btn-artisan-primary:hover {
+    background: #005f7a;
+}
+
+.btn-block {
+    display: block;
+    text-align: center;
+}
+
+.cta-rating-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    font-size: 0.82rem;
+    color: var(--body-text);
+}
+
+/* Not found */
+.artisan-not-found {
+    max-width: 480px;
+    margin: 8rem auto;
+    text-align: center;
+    padding: 0 2rem;
+}
+
+.anf-icon {
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
+}
+
+.artisan-not-found h2 {
+    color: var(--dark-text);
+    margin-bottom: 0.5rem;
+}
+
+.artisan-not-found p {
+    color: var(--body-text);
+    margin-bottom: 1.5rem;
+}
+
+/* DARK MODE */
+[data-theme='dark'] .artisan-hero {
+    background: #004a60;
+}
+
+[data-theme='dark'] .artisan-section-title {
+    border-bottom-color: #2a3545;
+}
+
+[data-theme='dark'] .artisan-skill-chip {
+    background: #162535;
+    border-color: #2a3545;
+}
+
+[data-theme='dark'] .artisan-tab {
+    color: #8aabb8;
+}
+
+[data-theme='dark'] .artisan-tab.active {
+    color: #00b4d8;
+    border-bottom-color: #00b4d8;
+}
+
+[data-theme='dark'] .artisan-ws-card,
+[data-theme='dark'] .artisan-review-card {
+    border-color: #2a3545;
+}
+
+[data-theme='dark'] .artisan-ws-card:hover {
+    border-color: #007BA2;
+}
+
+[data-theme='dark'] .awsc-title {
+    color: #c0d8e8;
+}
+
+[data-theme='dark'] .artisan-cta-card {
+    background: #1a2535;
+    border-color: #2a3545;
+}
+
+[data-theme='dark'] .review-summary-bar {
+    background: #1e3040;
+    border-color: #2a3545;
+}
+
+[data-theme='dark'] .rsb-score {
+    color: #c0d8e8;
+}
+
+[data-theme='dark'] .artisan-tabs {
+    border-bottom-color: #2a3545;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .artisan-hero-inner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .artisan-avatar-img,
+    .artisan-avatar-placeholder {
+        width: 80px;
+        height: 80px;
+    }
+
+    .artisan-name {
+        font-size: 1.5rem;
+    }
+
+    .artisan-content {
+        grid-template-columns: 1fr;
+    }
+
+    .artisan-sidebar {
+        position: static;
+    }
+}

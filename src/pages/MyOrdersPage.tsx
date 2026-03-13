@@ -1,106 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { bookingApi, type Booking, type BookingStatus } from '../services/api';
 import './MyOrdersPage.css';
 
-// --- KIỂU DỮ LIỆU ---
-type OrderStatus = 'pending' | 'confirmed' | 'attended' | 'cancelled';
-
-interface Order {
-    id: string;
-    workshopId: string;
-    workshopTitle: string;
-    workshopImage: string;
-    host: string;
-    date: string;
-    time: string;
-    location: string;
-    seats: number;
-    totalPrice: string;
-    status: OrderStatus;
-}
-
-// --- DỮ LIỆU GIẢ (Sẽ thay bằng API call) ---
-const mockOrders: Order[] = [
-    {
-        id: 'ORD-001',
-        workshopId: 'workshop-dan-len',
-        workshopTitle: 'Workshop Đan len cơ bản',
-        workshopImage: '/images/dan-len.webp',
-        host: 'Nghệ nhân Trần Văn A',
-        date: '2026-03-15',
-        time: '09:00 - 11:00',
-        location: 'Quận 3, TP.HCM',
-        seats: 2,
-        totalPrice: '798.000đ',
-        status: 'confirmed',
-    },
-    {
-        id: 'ORD-002',
-        workshopId: 've-mau-nuoc',
-        workshopTitle: 'Vẽ màu nước: Thiên nhiên',
-        workshopImage: '/images/mau-nuoc.webp',
-        host: 'Nghệ nhân Lê Thị B',
-        date: '2026-03-20',
-        time: '14:00 - 16:30',
-        location: 'Quận 1, TP.HCM',
-        seats: 1,
-        totalPrice: '599.000đ',
-        status: 'pending',
-    },
-    {
-        id: 'ORD-003',
-        workshopId: 'hoa-kem-nhung',
-        workshopTitle: 'Hoa Kẽm nhung nghệ thuật',
-        workshopImage: '/images/kem-nhung.webp',
-        host: 'Nghệ nhân Nguyễn Văn C',
-        date: '2026-02-10',
-        time: '10:00 - 12:00',
-        location: 'Quận 7, TP.HCM',
-        seats: 1,
-        totalPrice: '450.000đ',
-        status: 'attended',
-    },
-    {
-        id: 'ORD-004',
-        workshopId: 'workshop-dan-len',
-        workshopTitle: 'Workshop Đan len cơ bản',
-        workshopImage: '/images/dan-len.webp',
-        host: 'Nghệ nhân Trần Văn A',
-        date: '2026-01-20',
-        time: '09:00 - 11:00',
-        location: 'Quận 3, TP.HCM',
-        seats: 1,
-        totalPrice: '399.000đ',
-        status: 'cancelled',
-    },
-];
-
 // --- CẤU HÌNH TAB ---
-const TABS: { key: OrderStatus | 'all'; label: string }[] = [
-    { key: 'all', label: 'Tất cả' },
-    { key: 'pending', label: 'Chờ thanh toán' },
-    { key: 'confirmed', label: 'Đã xác nhận' },
-    { key: 'attended', label: 'Đã tham gia' },
-    { key: 'cancelled', label: 'Đã hủy' },
+const TABS: { key: BookingStatus | 'ALL'; label: string }[] = [
+    { key: 'ALL', label: 'Tất cả' },
+    { key: 'PENDING_CONFIRMATION', label: 'Chờ duyệt' },
+    { key: 'CONFIRMED', label: 'Đã xác nhận' },
+    { key: 'ATTENDED', label: 'Đã tham gia' },
+    { key: 'CANCELLED', label: 'Đã hủy' },
 ];
 
-const STATUS_CONFIG: Record<OrderStatus, { label: string; className: string }> = {
-    pending: { label: 'Chờ thanh toán', className: 'status-pending' },
-    confirmed: { label: 'Đã xác nhận', className: 'status-confirmed' },
-    attended: { label: 'Đã tham gia', className: 'status-attended' },
-    cancelled: { label: 'Đã hủy', className: 'status-cancelled' },
+const STATUS_CONFIG: Record<BookingStatus, { label: string; className: string }> = {
+    PENDING: { label: 'Chờ thanh toán', className: 'status-pending' },
+    PENDING_CONFIRMATION: { label: '⏳ Đang chờ xác nhận', className: 'status-pending-confirm' },
+    PAID: { label: 'Đã thanh toán', className: 'status-paid' },
+    CONFIRMED: { label: 'Đã xác nhận', className: 'status-confirmed' },
+    ATTENDED: { label: 'Đã tham gia', className: 'status-attended' },
+    CANCELLED: { label: 'Đã hủy', className: 'status-cancelled' },
+    FAILED: { label: 'Thất bại', className: 'status-failed' },
 };
 
 // --- MODAL HỦY ĐƠN ---
 interface CancelModalProps {
-    order: Order;
+    order: Booking;
     onClose: () => void;
     onConfirm: (orderId: string, reason: string) => void;
 }
 
 const CancelModal: React.FC<CancelModalProps> = ({ order, onClose, onConfirm }) => {
     const [reason, setReason] = useState('');
-    const refundAmount = parseFloat(order.totalPrice.replace(/\./g, '').replace('đ', '')) * 0.8;
+    const refundAmount = order.totalPrice * 0.8;
 
     return (
         <div className="modal-overlay" onClick={onClose}>
@@ -143,23 +74,30 @@ const CancelModal: React.FC<CancelModalProps> = ({ order, onClose, onConfirm }) 
 
 // --- CARD ĐƠN HÀNG ---
 interface OrderCardProps {
-    order: Order;
-    onCancelClick: (order: Order) => void;
+    order: Booking;
+    onCancelClick: (order: Booking) => void;
 }
 
 const OrderCard: React.FC<OrderCardProps> = ({ order, onCancelClick }) => {
-    const status = STATUS_CONFIG[order.status];
+    // Ưu tiên hiển thị "Chờ duyệt" nếu bất kỳ trường nào báo hiệu trạng thái này
+    const isPendingConfirm = 
+        order.paymentStatus === 'PENDING_CONFIRMATION' || 
+        order.status === 'PENDING_CONFIRMATION' || 
+        order.bookingStatus === 'PENDING_CONFIRMATION';
+
+    const displayStatusKey = isPendingConfirm ? 'PENDING_CONFIRMATION' : (order.status || order.bookingStatus || 'PENDING');
+    const status = STATUS_CONFIG[displayStatusKey as BookingStatus] || STATUS_CONFIG['PENDING'];
 
     return (
-        <div className={`order-card ${order.status}`}>
+        <div className={`order-card ${(order.status || 'PENDING').toLowerCase()}`}>
             <div className="order-card-image">
-                <img src={order.workshopImage} alt={order.workshopTitle} />
+                <img src={order.workshopImage || '/images/ws1303.png'} alt={order.workshopTitle || 'Workshop'} />
             </div>
 
             <div className="order-card-body">
                 <div className="order-card-header">
-                    <Link to={`/workshop/${order.workshopId}`} className="order-title">
-                        {order.workshopTitle}
+                    <Link to={`/workshop/${order.workshopId || ''}`} className="order-title">
+                        {order.workshopTitle || 'Tên Workshop Chưa Rõ'}
                     </Link>
                     <span className={`order-status-badge ${status.className}`}>
                         {status.label}
@@ -169,7 +107,7 @@ const OrderCard: React.FC<OrderCardProps> = ({ order, onCancelClick }) => {
                 <div className="order-meta">
                     <div className="order-meta-item">
                         <span className="meta-icon">👤</span>
-                        <span>{order.host}</span>
+                        <span>{order.host || 'Ẩn danh'}</span>
                     </div>
                     <div className="order-meta-item">
                         <span className="meta-icon">📅</span>
@@ -177,30 +115,30 @@ const OrderCard: React.FC<OrderCardProps> = ({ order, onCancelClick }) => {
                     </div>
                     <div className="order-meta-item">
                         <span className="meta-icon">⏰</span>
-                        <span>{order.time}</span>
+                        <span>{order.time || 'Chưa cập nhật'}</span>
                     </div>
                     <div className="order-meta-item">
                         <span className="meta-icon">📍</span>
-                        <span>{order.location}</span>
+                        <span>{order.location || 'Chưa cập nhật'}</span>
                     </div>
                     <div className="order-meta-item">
                         <span className="meta-icon">🎟️</span>
-                        <span>{order.seats} chỗ &nbsp;•&nbsp; <strong>{order.totalPrice}</strong></span>
+                        <span>{order.quantity || order.seats} chỗ &nbsp;•&nbsp; <strong>{new Intl.NumberFormat('vi-VN').format(order.totalPrice)}đ</strong></span>
                     </div>
                 </div>
 
                 <div className="order-card-footer">
                     <span className="order-id">Mã đơn: #{order.id}</span>
                     <div className="order-actions">
-                        {order.status === 'confirmed' && (
+                        {order.status === 'CONFIRMED' && (
                             <button className="btn btn-secondary btn-sm">Xem E-Ticket</button>
                         )}
-                        {order.status === 'attended' && (
+                        {order.status === 'ATTENDED' && (
                             <Link to={`/workshop/${order.workshopId}`} className="btn btn-accent btn-sm">
                                 Đánh giá
                             </Link>
                         )}
-                        {(order.status === 'pending' || order.status === 'confirmed') && (
+                        {(order.status === 'PENDING' || order.status === 'CONFIRMED') && (
                             <button
                                 className="btn btn-outline-danger btn-sm"
                                 onClick={() => onCancelClick(order)}
@@ -217,17 +155,74 @@ const OrderCard: React.FC<OrderCardProps> = ({ order, onCancelClick }) => {
 
 // --- TRANG CHÍNH ---
 const MyOrdersPage: React.FC = () => {
-    const [activeTab, setActiveTab] = useState<OrderStatus | 'all'>('all');
-    const [orders, setOrders] = useState<Order[]>(mockOrders);
-    const [cancelTarget, setCancelTarget] = useState<Order | null>(null);
+    const [activeTab, setActiveTab] = useState<BookingStatus | 'ALL'>('ALL');
+    const [orders, setOrders] = useState<Booking[]>([]);
+    const [cancelTarget, setCancelTarget] = useState<Booking | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
-    const filteredOrders = activeTab === 'all'
-        ? orders
-        : orders.filter(o => o.status === activeTab);
+    useEffect(() => {
+        bookingApi.getMyList()
+            .then(async data => {
+                console.log("DEBUG: MyOrdersPage data received:", data);
+                // Handle both direct array and paginated response { content: [] }
+                let parsedOrders: Booking[] = [];
+                if (Array.isArray(data)) {
+                    parsedOrders = data;
+                } else if (data && Array.isArray(data.content)) {
+                    parsedOrders = data.content;
+                }
+
+                if (parsedOrders.length > 0) {
+                    const enrichedOrders = parsedOrders.map(order => {
+                        const ws = order.workshop || {};
+                        return {
+                            ...order,
+                            workshopId: order.workshopId || ws.workshopId,
+                            workshopTitle: order.workshopTitle || ws.title,
+                            workshopImage: order.workshopImage || ws.primaryImage,
+                            host: order.host || ws.hostName,
+                            location: order.location || ws.venueAddress,
+                            date: order.date || ws.startTime,
+                            time: order.time || (ws.startTime ? new Date(ws.startTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : undefined)
+                        };
+                    });
+                    setOrders(enrichedOrders);
+                } else {
+                    setOrders([]);
+                }
+            })
+            .catch(error => {
+                console.error("Lỗi tải đơn booking:", error);
+                setOrders([]);
+            })
+            .finally(() => setIsLoading(false));
+    }, []);
+
+    const filteredOrders = Array.isArray(orders) 
+        ? (activeTab === 'ALL' 
+            ? orders 
+            : orders.filter(o => {
+                const isPendingConfirm = 
+                    o.paymentStatus === 'PENDING_CONFIRMATION' || 
+                    o.status === 'PENDING_CONFIRMATION' || 
+                    o.bookingStatus === 'PENDING_CONFIRMATION';
+
+                if (activeTab === 'PENDING_CONFIRMATION') {
+                    return isPendingConfirm;
+                }
+                
+                if (activeTab === 'CONFIRMED') {
+                    return o.status === 'CONFIRMED' || o.bookingStatus === 'CONFIRMED' || 
+                           o.status === 'PAID' || o.bookingStatus === 'PAID' || o.paymentStatus === 'PAID';
+                }
+
+                return o.status === activeTab || o.bookingStatus === activeTab;
+            }))
+        : [];
 
     const handleCancelConfirm = (orderId: string, _reason: string) => {
-        // TODO: Gọi API hủy đơn với { orderId, reason }
-        setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: 'cancelled' as OrderStatus } : o));
+        // TODO: Gọi API hủy đơn và cập nhật status
+        setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: 'CANCELLED' } : o));
         setCancelTarget(null);
     };
 
@@ -247,9 +242,25 @@ const MyOrdersPage: React.FC = () => {
                         onClick={() => setActiveTab(tab.key)}
                     >
                         {tab.label}
-                        {tab.key !== 'all' && (
+                        {tab.key !== 'ALL' && Array.isArray(orders) && (
                             <span className="tab-count">
-                                {orders.filter(o => o.status === tab.key).length}
+                                {orders.filter(o => {
+                                    const isPendingConfirm = 
+                                        o.paymentStatus === 'PENDING_CONFIRMATION' || 
+                                        o.status === 'PENDING_CONFIRMATION' || 
+                                        o.bookingStatus === 'PENDING_CONFIRMATION';
+
+                                    if (tab.key === 'PENDING_CONFIRMATION') {
+                                        return isPendingConfirm;
+                                    }
+                                    
+                                    if (tab.key === 'CONFIRMED') {
+                                        return o.status === 'CONFIRMED' || o.bookingStatus === 'CONFIRMED' || 
+                                               o.status === 'PAID' || o.bookingStatus === 'PAID' || o.paymentStatus === 'PAID';
+                                    }
+
+                                    return o.status === tab.key || o.bookingStatus === tab.key;
+                                }).length}
                             </span>
                         )}
                     </button>
@@ -258,7 +269,9 @@ const MyOrdersPage: React.FC = () => {
 
             {/* --- DANH SÁCH ĐƠN HÀNG --- */}
             <div className="orders-list">
-                {filteredOrders.length === 0 ? (
+                {isLoading ? (
+                    <div className="orders-empty">Đang tải lịch trình...</div>
+                ) : filteredOrders.length === 0 ? (
                     <div className="orders-empty">
                         <p className="empty-icon">📭</p>
                         <p>Chưa có đơn đặt chỗ nào</p>

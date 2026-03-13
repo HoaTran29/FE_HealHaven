@@ -1,61 +1,12 @@
-import React, { useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
-import './WorkshopDetailsPage.css'
-
-// --- DỮ LIỆU GIẢ (sẽ thay bằng workshopApi.getById(id)) ---
-const mockData: Record<string, any> = {
-  'workshop-dan-len': {
-    id: 'workshop-dan-len',
-    title: 'Workshop Đan len cơ bản',
-    subtitle: 'Học cách đan mũ len và khăn choàng chỉ trong 2 giờ.',
-    author: 'Nghệ nhân: Trần Văn A',
-    authorLink: '/artisan/tran-van-a',
-    price: 399000,
-    originalPrice: 599000,
-    rating: 4.8,
-    reviewCount: 124,
-    availableSeats: 5,
-    maxSeats: 10,
-    date: '2026-03-15',
-    time: '09:00 – 11:00',
-    address: '45 Nguyễn Đình Chiểu, Quận 3, TP.HCM',
-    mapEmbedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.5177580672296!2d106.68264!3d10.774553!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTDCsDQ2JzM0LjQiTiAxMDbCsDQwJzU3LjUiRQ!5e0!3m2!1svi!2svn!4v1620000000000',
-    images: ['/images/dan-len.webp', '/images/mau-nuoc.webp', '/images/kem-nhung.webp'],
-    curriculum: [
-      { name: 'Chương 1: Giới thiệu Dụng cụ', time: '10 phút', active: false },
-      { name: 'Chương 2: Cách bắt mũi len đầu tiên', time: '15 phút', active: true },
-      { name: 'Chương 3: Kỹ thuật đan trơn (Knit)', time: '25 phút', active: false },
-      { name: 'Chương 4: Hoàn thành sản phẩm', time: '30 phút', active: false },
-    ],
-    materials: ['2 cuộn len 5mm (màu tùy chọn)', '1 cặp kim đan size 10', '1 cây kéo cắt len'],
-    included: ['Hướng dẫn trực tiếp từ nghệ nhân', 'Nguyên liệu được chuẩn bị sẵn', 'Không gian sáng tạo thoải mái', 'Chứng nhận hoàn thành'],
-  },
-  've-mau-nuoc': {
-    id: 've-mau-nuoc',
-    title: 'Vẽ màu nước: Thiên nhiên',
-    subtitle: 'Kỹ thuật vẽ lá, hoa và bầu trời bằng màu nước.',
-    author: 'Nghệ nhân: Lê Thị B',
-    authorLink: '/artisan/le-thi-b',
-    price: 599000, originalPrice: 799000,
-    rating: 4.9, reviewCount: 87,
-    availableSeats: 3, maxSeats: 8,
-    date: '2026-03-20', time: '14:00 – 16:30',
-    address: '10 Lê Lợi, Quận 1, TP.HCM',
-    mapEmbedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.4!2d106.700!3d10.775!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMQ!5e0!3m2!1svi!2svn!4v1',
-    images: ['/images/mau-nuoc.webp', '/images/dan-len.webp'],
-    curriculum: [
-      { name: 'Chương 1: Giới thiệu về màu nước và cọ', time: '12 phút', active: false },
-      { name: 'Chương 2: Kỹ thuật loang màu (Wet-on-Wet)', time: '20 phút', active: true },
-      { name: 'Chương 3: Vẽ lá cây và hoa đơn giản', time: '30 phút', active: false },
-    ],
-    materials: ['1 bộ màu nước (ít nhất 12 màu)', 'Giấy vẽ màu nước (300gsm)', 'Cọ vẽ (size 4, 8, 12)'],
-    included: ['Hướng dẫn từ nghệ nhân', 'Giấy vẽ và cọ cơ bản', 'Bộ màu nước nhỏ để mang về'],
-  },
-};
+import React, { useState, useEffect } from 'react';
+import { Link, useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import { workshopApi, reviewApi, type Workshop, type Review } from '../services/api';
+import './WorkshopDetailsPage.css';
 
 // ------------------------------------------------------------------
 
-const StarRating: React.FC<{ rating: number; count: number }> = ({ rating, count }) => (
+const StarRating: React.FC<{ rating?: number; count?: number }> = ({ rating = 0, count = 0 }) => (
   <div className="wd-rating">
     <span className="wd-stars">{'★'.repeat(Math.round(rating))}{'☆'.repeat(5 - Math.round(rating))}</span>
     <strong>{rating.toFixed(1)}</strong>
@@ -82,15 +33,89 @@ const SeatBar: React.FC<{ avail: number; total: number }> = ({ avail, total }) =
 
 const WorkshopDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const workshop = mockData[id || 'workshop-dan-len'] || mockData['workshop-dan-len'];
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { user, isLoading: authLoading } = useAuth();
 
+  const [workshop, setWorkshop] = useState<Workshop | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('curriculum');
   const [activeImg, setActiveImg] = useState(0);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [loadingReviews, setLoadingReviews] = useState(false);
+
+  useEffect(() => {
+    // Nếu hết trạng thái loading Auth mà vẫn không có user => đẩy ra login
+    if (!authLoading && !user) {
+      navigate(`/login?redirect=${encodeURIComponent(location.pathname + location.search)}`);
+      return;
+    }
+
+    if (id && user) {
+      setIsLoading(true);
+      workshopApi.getById(id)
+        .then(data => {
+          console.log("DEBUG: Workshop Data:", data); // Audit data source
+          setWorkshop(data);
+        })
+        .catch(err => console.error("Không tải được chi tiết:", err))
+        .finally(() => setIsLoading(false));
+
+      // Fetch reviews
+      setLoadingReviews(true);
+      reviewApi.getByWorkshop(id)
+        .then(res => setReviews(res.content))
+        .catch(err => console.error("Không tải được đánh giá:", err))
+        .finally(() => setLoadingReviews(false));
+    }
+  }, [id, user, authLoading, navigate, location]);
+
+  if (isLoading || authLoading) return <div className="container" style={{ padding: '100px 0', textAlign: 'center' }}>Đang tải dữ liệu...</div>;
+  if (!user) return null; // Wait for redirect
+  if (!workshop) return <div className="container" style={{ padding: '100px 0', textAlign: 'center' }}>Không tìm thấy Workshop! Đoán xem link có nhầm không?</div>;
 
   const formatted = new Intl.NumberFormat('vi-VN').format(workshop.price) + 'đ';
   const formattedOg = workshop.originalPrice
     ? new Intl.NumberFormat('vi-VN').format(workshop.originalPrice) + 'đ'
     : null;
+
+  // Robust parsing for Date/Time/Location/Seats
+  // Official flow uses startDate: "dd/MM/yyyy HH:mm"
+  const workshopDateStr = workshop.startDate || workshop.date || '';
+  const workshopTimeStr = workshop.time || workshop.startTime || '';
+
+  let displayDate = 'Chưa cập nhật';
+  let displayTime = 'Chưa cập nhật';
+
+  if (workshopDateStr.includes(' ')) {
+    const parts = workshopDateStr.split(' ');
+    displayDate = parts[0];
+    displayTime = parts[1];
+  } else {
+    // Fallback logic for legacy or ISO formats
+    const parsedDate = new Date(workshopDateStr);
+    const isValidDate = !isNaN(parsedDate.getTime());
+    displayDate = isValidDate
+      ? parsedDate.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })
+      : workshopDateStr.split('T')[0].split(' ')[0] || 'Chưa cập nhật';
+
+    displayTime = workshopTimeStr;
+    if (displayTime.includes('T')) {
+      displayTime = displayTime.split('T')[1].substring(0, 5);
+    } else if (displayTime.includes(' ') && displayTime.length > 10) {
+      displayTime = displayTime.split(' ')[1].substring(0, 5);
+    } else if (!displayTime && isValidDate) {
+      displayTime = parsedDate.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+    }
+  }
+
+  const displayLocation = workshop.address || workshop.venue?.address || workshop.location || workshop.area || 'Chưa cập nhật';
+  const displayShortLocation = displayLocation.includes(',')
+    ? displayLocation.split(',').slice(1).join(',').trim()
+    : displayLocation;
+
+  const totalSeats = workshop.capacity || workshop.maxSeats || workshop.totalSeats || workshop.seats || 20;
+  const availableSeats = workshop.availableSeats ?? totalSeats;
 
   return (
     <div className="workshop-details-page">
@@ -104,7 +129,7 @@ const WorkshopDetailsPage: React.FC = () => {
           <p className="workshop-subtitle">{workshop.subtitle}</p>
           <StarRating rating={workshop.rating} count={workshop.reviewCount} />
           <p className="workshop-author-header">
-            Tổ chức bởi <Link to={workshop.authorLink}>{workshop.author}</Link>
+            Tổ chức bởi <Link to={`/artisan/${workshop.host?.userId || '1'}`}>{workshop.host?.fullName || 'Nghệ nhân HealHaven'}</Link>
           </p>
         </div>
       </header>
@@ -116,27 +141,25 @@ const WorkshopDetailsPage: React.FC = () => {
           <div className="workshop-main-content">
 
             {/* --- Image Gallery --- */}
-            {workshop.images?.length > 0 && (
-              <div className="wd-gallery">
-                <div className="wd-gallery-main">
-                  <img src={workshop.images[activeImg]} alt={workshop.title} />
-                </div>
-                {workshop.images.length > 1 && (
-                  <div className="wd-gallery-thumbs">
-                    {workshop.images.map((img: string, i: number) => (
-                      <img
-                        key={i}
-                        src={img}
-                        alt={`Ảnh ${i + 1}`}
-                        className={i === activeImg ? 'active' : ''}
-                        onClick={() => setActiveImg(i)}
-                        loading="lazy"
-                      />
-                    ))}
-                  </div>
-                )}
+            <div className="wd-gallery">
+              <div className="wd-gallery-main">
+                <img src={(workshop.images && workshop.images[activeImg]) || workshop.image || '/images/ws1303.png'} alt={workshop.title} />
               </div>
-            )}
+              {workshop.images && workshop.images.length > 1 && (
+                <div className="wd-gallery-thumbs">
+                  {workshop.images.map((img: string, i: number) => (
+                    <img
+                      key={i}
+                      src={img}
+                      alt={`Ảnh ${i + 1}`}
+                      className={i === activeImg ? 'active' : ''}
+                      onClick={() => setActiveImg(i)}
+                      loading="lazy"
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
 
             {/* --- Tabs --- */}
             <div className="workshop-tabs">
@@ -160,55 +183,88 @@ const WorkshopDetailsPage: React.FC = () => {
               {/* Tab: Chương trình */}
               {activeTab === 'curriculum' && (
                 <div className="curriculum-list">
-                  {workshop.curriculum.map((item: any, i: number) => (
-                    <div key={i} className={`lecture-item ${item.active ? 'active' : ''}`}>
-                      <span>{item.name}</span>
-                      <span className="lecture-time">🕐 {item.time}</span>
+                  {workshop.itinerary ? (
+                    <div style={{ whiteSpace: 'pre-wrap', lineHeight: '1.6' }}>
+                      {workshop.itinerary}
                     </div>
-                  ))}
+                  ) : workshop.curriculum && workshop.curriculum.length > 0 ? (
+                    workshop.curriculum.map((item: any, i: number) => (
+                      <div key={i} className={`lecture-item ${item.active ? 'active' : ''}`}>
+                        <span>{item.name}</span>
+                        <span className="lecture-time">🕐 {item.time}</span>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-muted">Chưa cập nhật chương trình học cụ thể.</p>
+                  )}
                 </div>
               )}
 
               {/* Tab: Nguyên liệu */}
               {activeTab === 'materials' && (
                 <div className="materials-list">
-                  <p>Để tham gia workshop, bạn cần chuẩn bị:</p>
-                  <ul>
-                    {workshop.materials.map((m: string, i: number) => <li key={i}>{m}</li>)}
-                  </ul>
+                  <div style={{ whiteSpace: 'pre-wrap', paddingLeft: '1rem' }}>
+                    {typeof workshop.materials === 'string' ? (
+                      workshop.materials
+                    ) : Array.isArray(workshop.materials) && workshop.materials.length > 0 ? (
+                      <ul>
+                        {workshop.materials.map((m: string, i: number) => <li key={i}>{m}</li>)}
+                      </ul>
+                    ) : (
+                      <p>Mọi thứ đã được chuẩn bị sẵn hoặc host chưa cập nhật nguyên liệu tự mang.</p>
+                    )}
+                  </div>
                 </div>
               )}
 
               {/* Tab: Địa điểm + Google Maps */}
               {activeTab === 'location' && (
                 <div className="wd-location-tab">
-                  <p className="wd-address">📍 <strong>{workshop.address}</strong></p>
-                  <div className="wd-map-wrap">
-                    <iframe
-                      src={workshop.mapEmbedUrl}
-                      title="Bản đồ địa điểm"
-                      allowFullScreen
-                      loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                    />
-                  </div>
+                  <p className="wd-address">📍 <strong>{displayLocation}</strong></p>
+                  <iframe
+                    src={`https://www.google.com/maps?q=${encodeURIComponent(displayLocation)}&output=embed`}
+                    title="Bản đồ địa điểm"
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
                 </div>
               )}
 
               {/* Tab: Đánh giá */}
               {activeTab === 'reviews' && (
                 <div className="wd-reviews-tab">
-                  <div className="review-summary">
-                    <div className="review-score">{workshop.rating.toFixed(1)}</div>
-                    <div>
-                      <div className="review-stars">{'★'.repeat(Math.round(workshop.rating))}</div>
-                      <div className="review-count">Dựa trên {workshop.reviewCount} đánh giá</div>
+                  {loadingReviews ? (
+                    <p>Đang tải đánh giá...</p>
+                  ) : (reviews as Review[]).length > 0 ? (
+                    <div className="reviews-list">
+                      {(reviews as Review[]).map((r, i) => (
+                        <div key={i} className="review-item">
+                          <div className="review-header">
+                            <strong>{r.authorName || 'Người dùng'}</strong>
+                            <span className="review-stars">{'★'.repeat(r.rating)}</span>
+                          </div>
+                          <p>{r.comment}</p>
+                          {r.createdAt && <small className="text-muted">{new Date(r.createdAt).toLocaleDateString('vi-VN')}</small>}
+                        </div>
+                      ))}
                     </div>
-                  </div>
-                  <p className="text-muted" style={{ marginTop: '1rem' }}>Tính năng hiển thị đánh giá đang được phát triển.</p>
+                  ) : (
+                    <div className="review-summary">
+                      <div className="review-score">{workshop.rating.toFixed(1)}</div>
+                      <div>
+                        <div className="review-stars">{'★'.repeat(Math.round(workshop.rating))}</div>
+                        <div className="review-count">Dựa trên {workshop.reviewCount} đánh giá</div>
+                      </div>
+                    </div>
+                  )}
+                  {reviews.length === 0 && (
+                    <p className="text-muted" style={{ marginTop: '1rem' }}>Chưa có đánh giá chi tiết cho workshop này.</p>
+                  )}
                 </div>
               )}
             </div>
+
           </div>
 
           {/* === CỘT PHẢI: SIDEBAR === */}
@@ -222,18 +278,18 @@ const WorkshopDetailsPage: React.FC = () => {
 
               {/* Thông tin nhanh */}
               <ul className="wd-quick-info">
-                <li>📅 {new Date(workshop.date).toLocaleDateString('vi-VN', { weekday: 'long', day: 'numeric', month: 'long' })}</li>
-                <li>⏰ {workshop.time}</li>
-                <li>📍 {workshop.address.split(',').slice(1).join(',').trim()}</li>
+                <li>📅 {displayDate}</li>
+                <li>⏰ {displayTime}</li>
+                <li>📍 {displayShortLocation}</li>
               </ul>
 
               {/* Progress chỗ còn */}
-              <SeatBar avail={workshop.availableSeats} total={workshop.maxSeats} />
+              <SeatBar avail={availableSeats} total={totalSeats} />
 
               {/* Nút đăng ký */}
-              {workshop.availableSeats > 0 ? (
+              {availableSeats > 0 ? (
                 <Link
-                  to={`/checkout?workshopId=${workshop.id}`}
+                  to={`/checkout?workshopId=${workshop.workshopId || workshop.id}`}
                   className="btn btn-primary purchase-btn"
                 >
                   🎟️ Đăng ký ngay
@@ -247,11 +303,12 @@ const WorkshopDetailsPage: React.FC = () => {
               {/* Bao gồm */}
               <h4 style={{ marginTop: '1.25rem' }}>Workshop này bao gồm:</h4>
               <ul className="wd-included">
-                {workshop.included.map((item: string, i: number) => (
+                {['Hướng dẫn trực tiếp từ nghệ nhân', 'Không gian sáng tạo thoải mái'].map((item: string, i: number) => (
                   <li key={i}>✅ {item}</li>
                 ))}
               </ul>
             </div>
+
           </aside>
 
         </div>

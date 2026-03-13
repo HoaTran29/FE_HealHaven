@@ -11,6 +11,7 @@ import App from './App.tsx'
 import AdminLayout from './layouts/AdminLayout.tsx'
 import HostLayout from './layouts/HostLayout.tsx'
 import VenueLayout from './layouts/VenueLayout.tsx'
+import ProtectedRoute from './components/ProtectedRoute.tsx'
 
 // Attendee Pages (Lazy Load)
 const HomePage = React.lazy(() => import('./pages/HomePage.tsx'));
@@ -20,6 +21,8 @@ const ForgotPasswordPage = React.lazy(() => import('./pages/ForgotPasswordPage.t
 const ResetPasswordPage = React.lazy(() => import('./pages/ResetPasswordPage.tsx'));
 const WorkshopListPage = React.lazy(() => import('./pages/WorkshopListPage.tsx'));
 const WorkshopDetailsPage = React.lazy(() => import('./pages/WorkshopDetailsPage.tsx'));
+const VenueListPage = React.lazy(() => import('./pages/VenueListPage.tsx'));
+const VenueDetailsPage = React.lazy(() => import('./pages/VenueDetailsPage.tsx'));
 const CommunityPage = React.lazy(() => import('./pages/CommunityPage.tsx'));
 const PostDetailPage = React.lazy(() => import('./pages/PostDetailPage.tsx'));
 const UserProfilePage = React.lazy(() => import('./pages/UserProfilePage.tsx'));
@@ -28,7 +31,9 @@ const MyOrdersPage = React.lazy(() => import('./pages/MyOrdersPage.tsx'));
 const SettingsPage = React.lazy(() => import('./pages/SettingsPage.tsx'));
 const GalleryPage = React.lazy(() => import('./pages/GalleryPage.tsx'));
 const ReviewPage = React.lazy(() => import('./pages/ReviewPage.tsx'));
-
+const ArtisanProfilePage = React.lazy(() => import('./pages/ArtisanProfilePage.tsx'));
+const PaymentQrPage = React.lazy(() => import('./pages/PaymentQrPage.tsx'));
+const PaymentResultPage = React.lazy(() => import('./pages/PaymentResultPage.tsx'));
 
 // Admin Pages (Lazy Load)
 const AdminDashboardPage = React.lazy(() => import('./pages/admin/AdminDashboardPage.tsx'));
@@ -36,6 +41,8 @@ const AdminUserPage = React.lazy(() => import('./pages/admin/AdminUserPage.tsx')
 const AdminWorkshopPage = React.lazy(() => import('./pages/admin/AdminWorkshopPage.tsx'));
 const AdminVenuePage = React.lazy(() => import('./pages/admin/AdminVenuePage.tsx'));
 const AdminFinancePage = React.lazy(() => import('./pages/admin/AdminFinancePage.tsx'));
+
+const AdminPaymentPage = React.lazy(() => import('./pages/admin/AdminPaymentPage.tsx'));
 
 // Host Pages (Lazy Load)
 const HostDashboardPage = React.lazy(() => import('./pages/host/HostDashboardPage.tsx'));
@@ -70,7 +77,9 @@ const router = createBrowserRouter([
       { path: 'reset-password/:token', element: wrap(ResetPasswordPage) },   // F2.1
       { path: 'workshops', element: wrap(WorkshopListPage) },     // F2.2
       { path: 'workshop/:id', element: wrap(WorkshopDetailsPage) },  // F2.3
-      { path: 'checkout', element: wrap(CheckoutPage) },         // F2.4
+      { path: 'venues', element: wrap(VenueListPage) },              // F4.0
+      { path: 'venue/:id', element: wrap(VenueDetailsPage) },        // F4.0
+      { path: 'checkout', element: wrap(CheckoutPage) },             // F2.4
       { path: 'my-schedule', element: wrap(MyOrdersPage) },          // F2.6
       { path: 'community', element: wrap(CommunityPage) },
       { path: 'post/:postId', element: wrap(PostDetailPage) },       // Community detail
@@ -78,26 +87,38 @@ const router = createBrowserRouter([
       { path: 'settings', element: wrap(SettingsPage) },   // F1.2
       { path: 'gallery', element: wrap(GalleryPage) },     // F1.3
       { path: 'review', element: wrap(ReviewPage) },       // F2.7
+      { path: 'artisan/:slug', element: wrap(ArtisanProfilePage) }, // Artisan Profile
+      { path: 'payment/qr', element: wrap(PaymentQrPage) },         // VNPay QR (legacy)
+      { path: 'payment/result', element: wrap(PaymentResultPage) }, // VNPay callback
     ]
   },
 
   // ============ LAYOUT ADMIN ============
   {
     path: '/admin',
-    element: <AdminLayout />,
+    element: (
+      <ProtectedRoute allowedRoles={['admin']}>
+        <AdminLayout />
+      </ProtectedRoute>
+    ),
     children: [
       { index: true, element: wrap(AdminDashboardPage) },  // F5.4
       { path: 'workshops', element: wrap(AdminWorkshopPage) },   // F5.1
       { path: 'venues', element: wrap(AdminVenuePage) },      // F5.1
       { path: 'users', element: wrap(AdminUserPage) },       // F5.2
-      { path: 'finance', element: wrap(AdminFinancePage) },    // F5.3
+      { path: 'payments', element: wrap(AdminPaymentPage) }, // NEW PAYMENT VERIFY
+      { path: 'finance', element: wrap(AdminFinancePage) },    // F5.3 (host withdrawals)
     ]
   },
 
   // ============ LAYOUT HOST ============
   {
     path: '/host',
-    element: <HostLayout />,
+    element: (
+      <ProtectedRoute allowedRoles={['host']}>
+        <HostLayout />
+      </ProtectedRoute>
+    ),
     children: [
       { index: true, element: wrap(HostDashboardPage) },
       { path: 'workshops', element: wrap(HostWorkshopPage) },
@@ -110,7 +131,11 @@ const router = createBrowserRouter([
   // ============ LAYOUT VENUE ============
   {
     path: '/venue',
-    element: <VenueLayout />,
+    element: (
+      <ProtectedRoute allowedRoles={['venue']}>
+        <VenueLayout />
+      </ProtectedRoute>
+    ),
     children: [
       { index: true, element: wrap(VenueDashboardPage) },  // F4.1 overview
       { path: 'spaces', element: wrap(VenueSpacePage) },      // F4.1 CRUD

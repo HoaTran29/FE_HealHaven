@@ -169,6 +169,16 @@
   color: #856404;
 }
 
+.status-pending-confirm {
+  background: #e3f2fd;
+  color: #0d47a1;
+}
+
+.status-paid {
+  background: #d1e7dd;
+  color: #0f5132;
+}
+
 .status-confirmed {
   background: #d1e7dd;
   color: #0f5132;
@@ -182,6 +192,11 @@
 .status-cancelled {
   background: #f8d7da;
   color: #842029;
+}
+
+.status-failed {
+  background: #ffebee;
+  color: #c62828;
 }
 
 /* --- Meta thông tin --- */
@@ -449,6 +464,16 @@
   color: #ffd166;
 }
 
+[data-theme='dark'] .status-pending-confirm {
+  background: rgba(13, 71, 161, 0.3);
+  color: #90caf9;
+}
+
+[data-theme='dark'] .status-paid {
+  background: rgba(15, 81, 50, 0.3);
+  color: #86efac;
+}
+
 [data-theme='dark'] .status-confirmed {
   background: rgba(15, 81, 50, 0.3);
   color: #86efac;
@@ -462,6 +487,11 @@
 [data-theme='dark'] .status-cancelled {
   background: rgba(132, 32, 41, 0.3);
   color: #fca5a5;
+}
+
+[data-theme='dark'] .status-failed {
+  background: rgba(198, 40, 40, 0.3);
+  color: #ff8a80;
 }
 
 /* Buttons dark */

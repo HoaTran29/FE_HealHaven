@@ -1,0 +1,289 @@
+/* ===================================================
+   VENUE DETAILS PAGE (Đồng bộ với WorkshopDetailsPage)
+=================================================== */
+
+.venue-details-page {
+    padding-bottom: 3rem;
+    background-color: var(--background);
+}
+
+/* === Header === */
+.vd-header {
+    background: linear-gradient(135deg, #007BA2 0%, #00b4d8 60%, #00c9a7 100%);
+    color: white;
+    padding: 2.5rem 0;
+    margin-bottom: 2rem;
+}
+
+.vd-header h1 {
+    color: #ffffff;
+    font-size: 2.25rem;
+    text-shadow: 0 2px 8px rgba(0, 40, 60, 0.35);
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+}
+
+.vd-breadcrumb {
+    font-size: 0.88rem;
+    color: rgba(255, 255, 255, 0.90);
+    margin-bottom: 0.75rem;
+}
+
+.vd-breadcrumb a {
+    color: #ccf5ff;
+    text-decoration-color: rgba(255, 255, 255, 0.5);
+    font-weight: 600;
+}
+
+.vd-subtitle {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.95);
+    font-weight: 500;
+    text-shadow: 0 1px 4px rgba(0, 40, 60, 0.25);
+    max-width: 72%;
+    margin-bottom: 0.5rem;
+}
+
+.vd-badge-area {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    padding: 0.3rem 0.8rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-block;
+    backdrop-filter: blur(4px);
+    margin-bottom: 1rem;
+}
+
+/* === Cột chính (Giống Workshop) === */
+.vd-layout {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 2rem;
+    align-items: start;
+}
+
+.vd-main-content {
+    width: 100%;
+    min-width: 0;
+}
+
+/* Thư viện ảnh */
+.vd-gallery {
+    margin-bottom: 1.75rem;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.vd-gallery-main {
+    width: 100%;
+    height: 400px;
+    overflow: hidden;
+    border-radius: 12px;
+    background: #1a2a35;
+    margin-bottom: 0.6rem;
+}
+
+.vd-gallery-main img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.vd-gallery-main:hover img {
+    transform: scale(1.03);
+}
+
+.vd-gallery-thumbs {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    padding-bottom: 4px;
+}
+
+.vd-gallery-thumbs img {
+    width: 80px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 6px;
+    cursor: pointer;
+    opacity: 0.65;
+    flex-shrink: 0;
+    border: 2px solid transparent;
+    transition: opacity 0.2s, border-color 0.2s, transform 0.2s;
+}
+
+.vd-gallery-thumbs img:hover {
+    opacity: 0.9;
+    transform: scale(1.04);
+}
+
+.vd-gallery-thumbs img.active {
+    opacity: 1;
+    border-color: var(--primary);
+}
+
+/* Tabs */
+.vd-tabs {
+    display: flex;
+    border-bottom: 2px solid #eee;
+    margin-bottom: 1.25rem;
+    overflow-x: auto;
+}
+
+.tab-btn {
+    background: none;
+    border: none;
+    padding: 0.85rem 1.1rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--body-text);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transform: translateY(2px);
+    white-space: nowrap;
+    transition: color 0.2s;
+}
+
+.tab-btn.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+}
+
+.tab-content {
+    padding: 0.75rem 0;
+}
+
+/* Nội dung Tab Giới thiệu */
+.vd-desc {
+    color: #475569;
+    line-height: 1.8;
+    font-size: 1.05rem;
+    margin-bottom: 1.5rem;
+    white-space: pre-line;
+}
+
+.vd-amenities-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.vd-amenity-item {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    background: var(--light-surface);
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    color: var(--dark-text);
+    font-weight: 500;
+    font-size: 0.9rem;
+    border: 1px solid #e5f3f3;
+}
+
+/* Location Map */
+.vd-address-text {
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
+.vd-map-wrap {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #e5f3f3;
+    box-shadow: 0 2px 8px rgba(0, 64, 92, 0.08);
+    height: 300px;
+}
+
+.vd-map-wrap iframe {
+    display: block;
+    border: none;
+    width: 100%;
+    height: 100%;
+}
+
+/* === SIDEBAR === */
+.vd-sidebar {
+    width: 100%;
+}
+
+.vd-purchase-card {
+    background: white;
+    border: 1px solid #e5f3f3;
+    border-radius: 14px;
+    padding: 1.75rem;
+    box-shadow: 0 4px 20px rgba(0, 64, 92, 0.1);
+    position: sticky;
+    top: 90px;
+}
+
+.vd-price-row {
+    display: flex;
+    align-items: baseline;
+    margin-bottom: 1rem;
+}
+
+.vd-price {
+    font-size: 2rem;
+    color: var(--primary);
+    font-weight: 800;
+    margin: 0;
+}
+
+.vd-quick-info {
+    list-style: none;
+    background: var(--light-surface);
+    border-radius: 10px;
+    padding: 0.9rem 1rem;
+    margin-bottom: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.vd-quick-info li {
+    font-size: 0.88rem;
+    color: var(--dark-text);
+    margin: 0;
+}
+
+.vd-book-btn {
+    width: 100%;
+    padding: 0.9rem 1rem;
+    font-size: 1rem;
+    text-align: center;
+    display: block;
+    font-weight: 700;
+    border-radius: 8px;
+    margin-bottom: 1.25rem;
+}
+
+.vd-host-box {
+    border-top: 1px solid #eee;
+    padding-top: 1.25rem;
+    text-align: center;
+}
+
+.vd-host-box p {
+    color: #666;
+    font-size: 0.85rem;
+    margin-bottom: 0.4rem;
+}
+
+.vd-host-box strong {
+    display: block;
+    color: var(--dark-text);
+    font-size: 1.05rem;
+}
+
+@media (max-width: 900px) {
+    .vd-layout {
+        grid-template-columns: 1fr;
+    }
+}

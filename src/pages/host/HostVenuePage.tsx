@@ -1,28 +1,56 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { venueApi, venueBookingApi, type Venue } from '../../services/api';
 import './HostPage.css';
-
-const VENUES = [
-    { id: 1, name: 'Studio Sáng tạo Quận 1', area: 'Quận 1', price: 200000, capacity: 15, amenities: ['WiFi', 'Máy lạnh', 'Máy chiếu', 'Bếp'], image: '/images/dan-len.webp', rating: 4.9 },
-    { id: 2, name: 'Không gian Xanh Thủ Đức', area: 'Thủ Đức', price: 150000, capacity: 20, amenities: ['WiFi', 'Máy lạnh', 'Bãi đỗ xe'], image: '/images/mau-nuoc.webp', rating: 4.7 },
-    { id: 3, name: 'Workshop Hub Bình Thạnh', area: 'Bình Thạnh', price: 180000, capacity: 12, amenities: ['WiFi', 'Máy lạnh', 'Bếp', 'Lò nướng'], image: '/images/kem-nhung.webp', rating: 4.8 },
-    { id: 4, name: 'Art Space Quận 3', area: 'Quận 3', price: 250000, capacity: 10, amenities: ['WiFi', 'Máy lạnh', 'Máy chiếu'], image: '/images/dan-len.webp', rating: 5.0 },
-];
 
 const AREAS = ['Tất cả', 'Quận 1', 'Quận 3', 'Bình Thạnh', 'Thủ Đức'];
 
 const HostVenuePage: React.FC = () => {
+    const [venues, setVenues] = useState<Venue[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
     const [area, setArea] = useState('Tất cả');
-    const [bookingVenue, setBookingVenue] = useState<typeof VENUES[0] | null>(null);
+    const [bookingVenue, setBookingVenue] = useState<Venue | null>(null);
     const [bookForm, setBookForm] = useState({ date: '', startTime: '', hours: '2', notes: '' });
     const [booked, setBooked] = useState(false);
 
-    const filtered = area === 'Tất cả' ? VENUES : VENUES.filter(v => v.area === area);
-    const totalCost = bookingVenue ? bookingVenue.price * Number(bookForm.hours) : 0;
+    const filtered = area === 'Tất cả' ? venues : venues.filter(v => v.area === area);
+    const totalCost = bookingVenue ? bookingVenue.pricePerHour * Number(bookForm.hours) : 0;
 
-    const handleBook = () => {
-        if (!bookForm.date || !bookForm.startTime) return;
-        setBooked(true);
-        setTimeout(() => { setBookingVenue(null); setBooked(false); }, 2000);
+    useEffect(() => {
+        setIsLoading(true);
+        venueApi.getList()
+            .then(res => setVenues(Array.isArray(res) ? res : (res.content || [])))
+            .catch(err => console.error("Lỗi tải danh sách địa điểm:", err))
+            .finally(() => setIsLoading(false));
+    }, []);
+
+    const handleBook = async () => {
+        if (!bookForm.date || !bookForm.startTime || !bookingVenue) return;
+
+        try {
+            const bookingDate = bookForm.date;
+            const startTime = `${bookForm.startTime}:00`;
+
+            // Tính endTime
+            const [hh, mm] = bookForm.startTime.split(':');
+            const endHour = Number(hh) + Number(bookForm.hours);
+            const endTime = `${endHour.toString().padStart(2, '0')}:${mm}:00`;
+
+            const vId = bookingVenue.venueId || bookingVenue.id || '';
+
+            await venueBookingApi.create({
+                venueId: vId,
+                bookingDate: bookingDate,
+                startTime: startTime,
+                endTime: endTime,
+                note: bookForm.notes
+            });
+
+            setBooked(true);
+            setTimeout(() => { setBookingVenue(null); setBooked(false); }, 2000);
+        } catch (error) {
+            console.error("Lỗi đặt địa điểm:", error);
+            alert("Đặt địa điểm thất bại, vui lòng kiểm tra lại!");
+        }
     };
 
     return (
@@ -42,33 +70,44 @@ const HostVenuePage: React.FC = () => {
             </div>
 
             {/* Venue grid */}
-            <div className="venue-grid">
-                {filtered.map(v => (
-                    <div className="venue-card host-card" key={v.id}>
-                        <div className="venue-img-wrap">
-                            <img src={v.image} alt={v.name} />
-                            <span className="venue-rating">⭐ {v.rating}</span>
-                        </div>
-                        <div className="venue-body">
-                            <div className="venue-area-tag">{v.area}</div>
-                            <h3 className="venue-name">{v.name}</h3>
-                            <p className="venue-capacity">👥 Sức chứa: tối đa {v.capacity} người</p>
-                            <div className="venue-amenities">
-                                {v.amenities.map(a => <span key={a} className="amenity-chip">{a}</span>)}
-                            </div>
-                            <div className="venue-footer">
-                                <div className="venue-price">
-                                    <strong>{new Intl.NumberFormat('vi-VN').format(v.price)}đ</strong>
-                                    <span>/giờ</span>
+            {isLoading ? <p>Đang tải địa điểm...</p> : (
+                <div className="venue-grid">
+                    {filtered.map(v => {
+                        const displayArea = v.district || v.area || 'Chưa rõ';
+                        const displayImages = v.imageUrls || v.images || [];
+                        const vId = v.venueId || v.id || '';
+                        let parsedAminities: string[] = [];
+                        if (typeof v.amenities === 'string') parsedAminities = v.amenities.split(',').map(x => x.trim()).filter(Boolean);
+                        else if (Array.isArray(v.amenities)) parsedAminities = v.amenities;
+
+                        return (
+                            <div className="venue-card host-card" key={vId}>
+                                <div className="venue-img-wrap">
+                                    <img src={displayImages.length > 0 ? displayImages[0] : '/images/mau-nuoc.webp'} alt={v.name} />
+                                    <span className="venue-rating">⭐ {4.8}</span>
                                 </div>
-                                <button className="btn btn-primary" onClick={() => { setBookingVenue(v); setBooked(false); }}>
-                                    Đặt ngay
-                                </button>
+                                <div className="venue-body">
+                                    <div className="venue-area-tag">{displayArea}</div>
+                                    <h3 className="venue-name">{v.name}</h3>
+                                    <p className="venue-capacity">👥 Sức chứa: tối đa {v.capacity} người</p>
+                                    <div className="venue-amenities">
+                                        {parsedAminities.map(a => <span key={a} className="amenity-chip">{a}</span>)}
+                                    </div>
+                                    <div className="venue-footer">
+                                        <div className="venue-price">
+                                            <strong>{new Intl.NumberFormat('vi-VN').format(v.pricePerHour)}đ</strong>
+                                            <span>/giờ</span>
+                                        </div>
+                                        <button className="btn btn-primary" onClick={() => { setBookingVenue(v); setBooked(false); }}>
+                                            Đặt ngay
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                ))}
-            </div>
+                        );
+                    })}
+                </div>
+            )}
 
             {/* Booking modal */}
             {bookingVenue && (

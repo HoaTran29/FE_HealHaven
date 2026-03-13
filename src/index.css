@@ -1,22 +1,28 @@
 /* === GOOGLE FONTS === */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=Inter:wght@400;500;600;700&display=swap');
 
 /* === HỆ THỐNG THIẾT KẾ VÀ MÀU SẮC === */
 :root {
   --primary: #007E9F;
+  --primary-dark: #005f7a;
   --accent: #00b8b8;
-  --dark-text: #00405c;
-  --light-surface: #d8f6f6;
-  --subtle-accent-bg: #bde8d8;
-  --secondary: #006a6e;
+  --dark-text: #1a2535;
+  --light-surface: #f0f8fa;
+  --subtle-accent-bg: #e8f5f5;
   --background: #FFFFFF;
-  --body-text: #5a5a5a;
-  --secondary: #f4f1ea;
-  --text-main: #333;
+  --body-text: #5a6a75;
+  --border-color: #e2eaed;
+  --text-main: #1a2535;
   --bg-app: #ffffff;
+  --bg-section: #f7fafc;
 
+  --font-body: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-heading: 'Playfair Display', Georgia, serif;
   --font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   --border-radius: 8px;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.10);
 }
 
 [data-theme='dark'] {

@@ -1,54 +1,74 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { workshopApi, bookingApi, type Workshop, type Booking } from '../../services/api';
 import './HostPage.css';
 
-// Mock data
-const WORKSHOPS = [
-    { id: 1, title: 'Workshop Đan len cơ bản' },
-    { id: 2, title: 'Vẽ màu nước: Thiên nhiên' },
-];
-
-const ATTENDEES = [
-    { id: 1, name: 'Khánh Hòa', email: 'khanh@gmail.com', ticketId: 'TK-001', checkedIn: false, seat: 1 },
-    { id: 2, name: 'Minh Anh', email: 'minh@gmail.com', ticketId: 'TK-002', checkedIn: true, seat: 2 },
-    { id: 3, name: 'Gia Bảo', email: 'bao@gmail.com', ticketId: 'TK-003', checkedIn: false, seat: 3 },
-    { id: 4, name: 'An Nhiên', email: 'annhien@gmail.com', ticketId: 'TK-004', checkedIn: true, seat: 4 },
-    { id: 5, name: 'Tuấn Kiệt', email: 'tuan@gmail.com', ticketId: 'TK-005', checkedIn: false, seat: 5 },
-];
-
 const HostAttendeePage: React.FC = () => {
-    const [selectedWs, setSelectedWs] = useState<number>(1);
-    const [attendees, setAttendees] = useState(ATTENDEES);
+    const [workshops, setWorkshops] = useState<Workshop[]>([]);
+    const [selectedWs, setSelectedWs] = useState<string>('');
+    const [attendees, setAttendees] = useState<Booking[]>([]);
+
     const [scanMode, setScanMode] = useState(false);
     const [manualCode, setManualCode] = useState('');
     const [scanResult, setScanResult] = useState<{ type: 'success' | 'error'; msg: string } | null>(null);
     const [search, setSearch] = useState('');
 
+    useEffect(() => {
+        workshopApi.getMyWorkshops().then(res => {
+            if (res.content && res.content.length > 0) {
+                setWorkshops(res.content);
+                setSelectedWs(res.content[0].id);
+            }
+        });
+    }, []);
+
+    useEffect(() => {
+        if (selectedWs) {
+            bookingApi.getByWorkshop(selectedWs)
+                .then(res => setAttendees(res))
+                .catch(err => console.error(err));
+        }
+    }, [selectedWs]);
+
     const filtered = attendees.filter(a =>
-        a.name.toLowerCase().includes(search.toLowerCase()) ||
-        a.email.toLowerCase().includes(search.toLowerCase()) ||
-        a.ticketId.toLowerCase().includes(search.toLowerCase())
+        (a.id || '').toLowerCase().includes(search.toLowerCase()) ||
+        (a.ticketCode || '').toLowerCase().includes(search.toLowerCase())
     );
 
-    const checkedCount = attendees.filter(a => a.checkedIn).length;
+    const checkedCount = attendees.filter(a => a.status === 'ATTENDED').length;
 
-    const checkIn = (ticketId: string) => {
-        const attendee = attendees.find(a => a.ticketId === ticketId.toUpperCase());
-        if (!attendee) {
-            setScanResult({ type: 'error', msg: `❌ Không tìm thấy vé "${ticketId}"` });
-            return;
-        }
-        if (attendee.checkedIn) {
-            setScanResult({ type: 'error', msg: `⚠️ Vé ${ticketId} đã được check-in rồi!` });
-            return;
-        }
-        setAttendees(prev => prev.map(a => a.ticketId === attendee.ticketId ? { ...a, checkedIn: true } : a));
-        setScanResult({ type: 'success', msg: `✅ Check-in thành công: ${attendee.name}` });
-        setManualCode('');
-        setTimeout(() => setScanResult(null), 3000);
+    const exportCsv = () => {
+        const headers = ['Mã Hệ Thống', 'Mã Vé', 'Số Lượng Ghế', 'Trạng Thái', 'Ngày Check-in'];
+        const rows = attendees.map(a => [
+            a.id, a.ticketCode || 'N/A', String(a.seats),
+            a.status === 'ATTENDED' ? 'Đã check-in' : 'Chưa đến',
+            a.date || ''
+        ]);
+
+        const csvContent = "data:text/csv;charset=utf-8,\uFEFF"
+            + headers.join(",") + "\n"
+            + rows.map(e => e.join(",")).join("\n");
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `Attendees_${selectedWs}_${new Date().getTime()}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     };
 
-    const toggleCheckIn = (id: number) => {
-        setAttendees(prev => prev.map(a => a.id === id ? { ...a, checkedIn: !a.checkedIn } : a));
+    const checkIn = async (code: string) => {
+        if (!code) return;
+        try {
+            const result = await bookingApi.checkIn(code.toUpperCase());
+            // Update UI list
+            setAttendees(prev => prev.map(a => a.id === result.id ? result : a));
+            setScanResult({ type: 'success', msg: `✅ Check-in thành công mã vé: ${code}` });
+            setManualCode('');
+        } catch (err: any) {
+            setScanResult({ type: 'error', msg: `❌ Lỗi: ${err.message || 'Mã vé không hợp lệ hoặc đã dùng'}` });
+        }
+        setTimeout(() => setScanResult(null), 3000);
     };
 
     return (
@@ -67,8 +87,8 @@ const HostAttendeePage: React.FC = () => {
             <div className="host-card" style={{ marginBottom: '1.25rem' }}>
                 <div className="form-row" style={{ alignItems: 'center', gap: '1rem', marginBottom: 0 }}>
                     <label style={{ fontWeight: 600, whiteSpace: 'nowrap' }}>Workshop:</label>
-                    <select className="form-select" value={selectedWs} onChange={e => setSelectedWs(Number(e.target.value))}>
-                        {WORKSHOPS.map(w => <option key={w.id} value={w.id}>{w.title}</option>)}
+                    <select className="form-select" value={selectedWs} onChange={e => setSelectedWs(e.target.value)}>
+                        {workshops.map(w => <option key={w.id} value={w.id}>{w.title}</option>)}
                     </select>
                     <div className="attendee-stat-mini">
                         <span className="check-count">{checkedCount}/{attendees.length}</span>
@@ -114,41 +134,54 @@ const HostAttendeePage: React.FC = () => {
             <div className="host-card">
                 <div className="host-card-header">
                     <h3>Danh sách attendee</h3>
-                    <input
-                        className="search-mini"
-                        placeholder="Tìm tên, email, mã vé…"
-                        value={search}
-                        onChange={e => setSearch(e.target.value)}
-                    />
+                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                        <input
+                            className="search-mini"
+                            placeholder="Tìm mã vé…"
+                            value={search}
+                            onChange={e => setSearch(e.target.value)}
+                        />
+                        <button className="btn btn-secondary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.9rem' }} onClick={exportCsv}>
+                            📥 Xuất Excel
+                        </button>
+                    </div>
                 </div>
                 <div className="table-wrap">
                     <table className="host-table">
                         <thead>
-                            <tr><th>#</th><th>Tên</th><th>Email</th><th>Mã vé</th><th>Check-in</th><th>Hành động</th></tr>
+                            <tr><th>Mã GD</th><th>Số Ghế</th><th>Tổng Tiền</th><th>Mã vé</th><th>Check-in</th><th>Hành động</th></tr>
                         </thead>
                         <tbody>
-                            {filtered.map(a => (
-                                <tr key={a.id} className={a.checkedIn ? 'row-checked' : ''}>
-                                    <td className="td-muted">{a.seat}</td>
-                                    <td className="td-title">{a.name}</td>
-                                    <td className="td-muted">{a.email}</td>
-                                    <td><code className="ticket-code">{a.ticketId}</code></td>
-                                    <td>
-                                        <span className={`badge-status ${a.checkedIn ? 'confirmed' : 'draft'}`}>
-                                            {a.checkedIn ? '✅ Đã check-in' : '⏳ Chưa'}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <button
-                                            className={`btn-sm ${a.checkedIn ? 'btn-ghost' : 'btn-primary'}`}
-                                            onClick={() => toggleCheckIn(a.id)}
-                                            style={{ padding: '0.35rem 0.8rem', fontSize: '0.82rem', borderRadius: '8px', border: 'none', cursor: 'pointer' }}
-                                        >
-                                            {a.checkedIn ? 'Hủy check-in' : 'Check-in'}
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
+                            {filtered.map(a => {
+                                const isChecked = a.status === 'ATTENDED';
+                                return (
+                                    <tr key={a.id} className={isChecked ? 'row-checked' : ''}>
+                                        <td className="td-muted" title={a.id}>{a.id.substring(0, 8)}...</td>
+                                        <td className="td-title">{a.seats}</td>
+                                        <td className="td-muted">{new Intl.NumberFormat('vi-VN').format(a.totalPrice)}đ</td>
+                                        <td><code className="ticket-code">{a.ticketCode || 'N/A'}</code></td>
+                                        <td>
+                                            <span className={`badge-status ${isChecked ? 'confirmed' : 'draft'}`}>
+                                                {isChecked ? '✅ Đã check-in' : '⏳ Chưa'}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {!isChecked ? (
+                                                <button
+                                                    className="btn-sm btn-primary"
+                                                    onClick={() => checkIn(a.ticketCode || '')}
+                                                    style={{ padding: '0.35rem 0.8rem', fontSize: '0.82rem', borderRadius: '8px', border: 'none', cursor: 'pointer' }}
+                                                    disabled={!a.ticketCode}
+                                                >
+                                                    Check-in
+                                                </button>
+                                            ) : (
+                                                <span style={{ color: '#94a3b8', fontSize: '0.85rem' }}>Hoàn tất</span>
+                                            )}
+                                        </td>
+                                    </tr>
+                                )
+                            })}
                         </tbody>
                     </table>
                 </div>

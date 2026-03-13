@@ -1,35 +1,69 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { adminApi, type Venue } from '../../services/api';
 import './AdminPage.css';
 
-type VenueStatus = 'pending' | 'approved' | 'rejected';
+const STATUS_LABEL: Record<string, string> = {
+    PENDING: 'Chờ duyệt',
+    AVAILABLE: 'Đã duyệt',
+    REJECTED: 'Từ chối'
+};
 
-interface Venue {
-    id: string; name: string; owner: string; area: string;
-    capacity: number; pricePerHour: number; submittedDate: string; status: VenueStatus;
-}
-
-const INIT_VENUES: Venue[] = [
-    { id: 'v001', name: 'Studio Sáng tạo Q1', owner: 'Phạm Thị Lan', area: 'Quận 1', capacity: 15, pricePerHour: 200000, submittedDate: '28/02/2026', status: 'pending' },
-    { id: 'v002', name: 'Không gian Xanh Thủ Đức', owner: 'Trần Minh H', area: 'Thủ Đức', capacity: 20, pricePerHour: 150000, submittedDate: '27/02/2026', status: 'pending' },
-    { id: 'v003', name: 'Workshop Hub Bình Thạnh', owner: 'Lê Văn K', area: 'Bình Thạnh', capacity: 12, pricePerHour: 180000, submittedDate: '25/02/2026', status: 'pending' },
-    { id: 'v004', name: 'Art Space Q3', owner: 'Hà Thu N', area: 'Quận 3', capacity: 10, pricePerHour: 250000, submittedDate: '20/02/2026', status: 'approved' },
-    { id: 'v005', name: 'Rooftop Event Space', owner: 'Hoàng P', area: 'Quận 7', capacity: 50, pricePerHour: 500000, submittedDate: '15/02/2026', status: 'rejected' },
+const FILTERS: { key: string; label: string }[] = [
+    { key: 'PENDING', label: 'Chờ duyệt' },
+    { key: 'AVAILABLE', label: 'Đã duyệt' },
+    { key: 'REJECTED', label: 'Từ chối' }
 ];
 
-const STATUS_LABEL: Record<VenueStatus, string> = { pending: '⏳ Chờ duyệt', approved: '✅ Đã duyệt', rejected: '🔴 Từ chối' };
-
 const AdminVenuePage: React.FC = () => {
-    const [venues, setVenues] = useState<Venue[]>(INIT_VENUES);
-    const [filter, setFilter] = useState<VenueStatus | 'all'>('all');
-    const [detailId, setDetailId] = useState<string | null>(null);
+    const [venues, setVenues] = useState<Venue[]>([]);
+    const [filter, setFilter] = useState<string>('PENDING');
+    const [detailId, setDetailId] = useState<string | number | null>(null);
     const [rejectNote, setRejectNote] = useState('');
-    const [rejectId, setRejectId] = useState<string | null>(null);
+    const [rejectId, setRejectId] = useState<string | number | null>(null);
 
-    const filtered = filter === 'all' ? venues : venues.filter(v => v.status === filter);
-    const detail = venues.find(v => v.id === detailId);
+    // Pagination
+    const [page, setPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
+    const [isLoading, setIsLoading] = useState(false);
 
-    const approve = (id: string) => { setVenues(vs => vs.map(v => v.id === id ? { ...v, status: 'approved' } : v)); setDetailId(null); };
-    const reject = (id: string) => { setVenues(vs => vs.map(v => v.id === id ? { ...v, status: 'rejected' } : v)); setRejectId(null); setDetailId(null); setRejectNote(''); };
+    const fetchVenues = async () => {
+        try {
+            setIsLoading(true);
+            const res = await adminApi.getVenues(filter, page, 10);
+            setVenues(res.content || []);
+            setTotalPages(res.totalPages || 0);
+        } catch (error) {
+            console.error('Lỗi tải danh sách địa điểm:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchVenues();
+    }, [filter, page]);
+
+    const detail = venues.find(v => (v.venueId || v.id) === detailId);
+
+    const approve = async (id: string | number) => {
+        try {
+            await adminApi.approveVenue(id);
+            fetchVenues();
+            setDetailId(null);
+        } catch (error) {
+            alert('Lỗi phê duyệt địa điểm.');
+        }
+    };
+
+    const reject = async (id: string | number) => {
+        try {
+            await adminApi.rejectVenue(id, rejectNote);
+            fetchVenues();
+            setRejectId(null); setDetailId(null); setRejectNote('');
+        } catch (error) {
+            alert('Lỗi từ chối địa điểm.');
+        }
+    };
 
     return (
         <div className="admin-page">
@@ -38,16 +72,15 @@ const AdminVenuePage: React.FC = () => {
                     <h1 className="admin-page-title">Kiểm duyệt Địa điểm</h1>
                     <p className="admin-page-subtitle">Xét duyệt các địa điểm đăng ký trở thành Venue Provider.</p>
                 </div>
-                <div className="admin-pending-badge">{venues.filter(v => v.status === 'pending').length} chờ duyệt</div>
+                <div className="admin-pending-badge">{filter === 'PENDING' ? venues.length : ''} chờ duyệt</div>
             </div>
 
             {/* Tabs */}
             <div className="admin-toolbar">
                 <div className="admin-tabs">
-                    {(['all', 'pending', 'approved', 'rejected'] as const).map(f => (
-                        <button key={f} className={`admin-tab ${filter === f ? 'active' : ''}`} onClick={() => setFilter(f)}>
-                            {f === 'all' ? 'Tất cả' : STATUS_LABEL[f as VenueStatus]}
-                            <span className="tab-cnt">{f === 'all' ? venues.length : venues.filter(v => v.status === f).length}</span>
+                    {FILTERS.map(f => (
+                        <button key={f.key} className={`admin-tab ${filter === f.key ? 'active' : ''}`} onClick={() => { setFilter(f.key); setPage(0); }}>
+                            {f.label}
                         </button>
                     ))}
                 </div>
@@ -60,29 +93,47 @@ const AdminVenuePage: React.FC = () => {
                             <tr><th>Tên Địa điểm</th><th>Chủ sở hữu</th><th>Khu vực</th><th>Sức chứa</th><th>Giá/giờ</th><th>Ngày đăng ký</th><th>Trạng thái</th><th>Hành động</th></tr>
                         </thead>
                         <tbody>
-                            {filtered.map(v => (
-                                <tr key={v.id}>
-                                    <td className="td-title">{v.name}</td>
-                                    <td className="td-muted">{v.owner}</td>
-                                    <td><span className="admin-chip">{v.area}</span></td>
-                                    <td>{v.capacity} người</td>
-                                    <td className="td-amount">{new Intl.NumberFormat('vi').format(v.pricePerHour)}đ</td>
-                                    <td className="td-muted">{v.submittedDate}</td>
-                                    <td><span className={`admin-badge ${v.status}`}>{STATUS_LABEL[v.status]}</span></td>
-                                    <td>
-                                        <div className="action-row">
-                                            <button className="adm-btn info" onClick={() => { setDetailId(v.id); setRejectId(null); }}>👁️</button>
-                                            {v.status === 'pending' && <>
-                                                <button className="adm-btn approve" onClick={() => approve(v.id)}>✅</button>
-                                                <button className="adm-btn reject" onClick={() => { setDetailId(v.id); setRejectId(v.id); }}>🔴</button>
-                                            </>}
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
+                            {isLoading ? (
+                                <tr><td colSpan={8} style={{ textAlign: 'center', padding: '2rem' }}>Đang tải dữ liệu...</td></tr>
+                            ) : venues.length === 0 ? (
+                                <tr><td colSpan={8} style={{ textAlign: 'center', padding: '2rem' }}>Không có địa điểm nào trong danh sách.</td></tr>
+                            ) : (
+                                venues.map(v => {
+                                    const vId = v.venueId || v.id;
+                                    const st = v.status || 'PENDING';
+                                    return (
+                                        <tr key={vId}>
+                                            <td className="td-title">{v.name}</td>
+                                            <td className="td-muted">{v.ownerName || v.providerName || 'N/A'}</td>
+                                            <td><span className="admin-chip">{v.area || v.district || 'N/A'}</span></td>
+                                            <td>{v.capacity} người</td>
+                                            <td className="td-amount">{new Intl.NumberFormat('vi').format(v.pricePerHour)}đ</td>
+                                            <td className="td-muted">N/A</td>
+                                            <td><span className={`admin-badge ${st.toLowerCase()}`}>{STATUS_LABEL[st] || st}</span></td>
+                                            <td>
+                                                <div className="action-row">
+                                                    <button className="adm-btn info" onClick={() => { setDetailId(vId!); setRejectId(null); }}>Xem</button>
+                                                    {st === 'PENDING' && <>
+                                                        <button className="adm-btn approve" onClick={() => approve(vId!)}>Duyệt</button>
+                                                        <button className="adm-btn reject" onClick={() => { setDetailId(vId!); setRejectId(vId!); }}>Từ chối</button>
+                                                    </>}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    )
+                                }
+                                ))}
                         </tbody>
                     </table>
                 </div>
+                {/* Pagination */}
+                {!isLoading && totalPages > 1 && (
+                    <div className="admin-pagination">
+                        <button disabled={page === 0} onClick={() => setPage(page - 1)}>Trang trước</button>
+                        <span>{page + 1} / {totalPages}</span>
+                        <button disabled={page === totalPages - 1} onClick={() => setPage(page + 1)}>Trang sau</button>
+                    </div>
+                )}
             </div>
 
             {detail && (
@@ -94,14 +145,13 @@ const AdminVenuePage: React.FC = () => {
                         </div>
                         <div className="admin-modal-body">
                             <div className="detail-grid2">
-                                <div className="d-row"><span>Chủ sở hữu:</span><strong>{detail.owner}</strong></div>
-                                <div className="d-row"><span>Khu vực:</span><strong>{detail.area}</strong></div>
+                                <div className="d-row"><span>Chủ sở hữu:</span><strong>{detail.ownerName || detail.providerName || 'N/A'}</strong></div>
+                                <div className="d-row"><span>Khu vực:</span><strong>{detail.area || detail.district}</strong></div>
                                 <div className="d-row"><span>Sức chứa:</span><strong>{detail.capacity} người</strong></div>
                                 <div className="d-row"><span>Giá/giờ:</span><strong className="td-amount">{new Intl.NumberFormat('vi').format(detail.pricePerHour)}đ</strong></div>
-                                <div className="d-row"><span>Ngày đăng ký:</span><strong>{detail.submittedDate}</strong></div>
-                                <div className="d-row"><span>Trạng thái:</span><span className={`admin-badge ${detail.status}`}>{STATUS_LABEL[detail.status]}</span></div>
+                                <div className="d-row"><span>Trạng thái:</span><span className={`admin-badge ${(detail.status || 'PENDING').toLowerCase()}`}>{STATUS_LABEL[detail.status || 'PENDING'] || detail.status}</span></div>
                             </div>
-                            {rejectId === detail.id && detail.status === 'pending' && (
+                            {rejectId === (detail.venueId || detail.id) && detail.status === 'PENDING' && (
                                 <div className="reject-section">
                                     <label>Lý do từ chối *</label>
                                     <textarea rows={3} value={rejectNote} onChange={e => setRejectNote(e.target.value)} placeholder="VD: Ảnh địa điểm chưa đủ tiêu chuẩn..." />
@@ -109,19 +159,19 @@ const AdminVenuePage: React.FC = () => {
                             )}
                         </div>
                         <div className="admin-modal-footer">
-                            {detail.status === 'pending' && rejectId !== detail.id && (
+                            {detail.status === 'PENDING' && rejectId !== (detail.venueId || detail.id) && (
                                 <>
-                                    <button className="btn btn-ghost" onClick={() => setRejectId(detail.id)}>🔴 Từ chối</button>
-                                    <button className="btn btn-admin-primary" onClick={() => approve(detail.id)}>✅ Phê duyệt</button>
+                                    <button className="btn btn-ghost" onClick={() => setRejectId(detail.venueId || detail.id!)}>Từ chối</button>
+                                    <button className="btn btn-admin-primary" onClick={() => approve(detail.venueId || detail.id!)}>Phê duyệt</button>
                                 </>
                             )}
-                            {detail.status === 'pending' && rejectId === detail.id && (
+                            {detail.status === 'PENDING' && rejectId === (detail.venueId || detail.id) && (
                                 <>
-                                    <button className="btn btn-ghost" onClick={() => setRejectId(null)}>← Quay lại</button>
-                                    <button className="btn btn-danger" onClick={() => reject(detail.id)} disabled={!rejectNote.trim()}>Gửi từ chối</button>
+                                    <button className="btn btn-ghost" onClick={() => setRejectId(null)}>Quay lại</button>
+                                    <button className="btn btn-danger" onClick={() => reject(detail.venueId || detail.id!)} disabled={!rejectNote.trim()}>Gửi từ chối</button>
                                 </>
                             )}
-                            {detail.status !== 'pending' && <button className="btn btn-ghost" onClick={() => setDetailId(null)}>Đóng</button>}
+                            {detail.status !== 'PENDING' && <button className="btn btn-ghost" onClick={() => setDetailId(null)}>Đóng</button>}
                         </div>
                     </div>
                 </div>

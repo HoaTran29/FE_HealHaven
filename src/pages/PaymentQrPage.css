@@ -1,0 +1,311 @@
+/* ===================================================
+   PAYMENT QR PAGE
+=================================================== */
+
+.pqr-container {
+    padding-top: 2rem;
+    padding-bottom: 4rem;
+}
+
+.pqr-breadcrumb {
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+}
+
+.pqr-breadcrumb a {
+    color: var(--primary);
+}
+
+/* === Main card === */
+.pqr-card {
+    max-width: 860px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 8px 40px rgba(0, 64, 92, 0.1);
+    overflow: hidden;
+    border: 1px solid #e5f3f3;
+}
+
+/* Header */
+.pqr-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem 2rem;
+    background: linear-gradient(135deg, #007BA2 0%, #00b4d8 60%, #00c9a7 100%);
+    color: white;
+}
+
+.pqr-header-icon {
+    font-size: 2.2rem;
+    background: rgba(255, 255, 255, 0.2);
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.pqr-title {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 0.15rem;
+}
+
+.pqr-subtitle {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.88);
+    margin: 0;
+}
+
+/* Body 2 cột */
+.pqr-body {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 0;
+}
+
+/* === QR Section (cột trái) === */
+.pqr-qr-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1.5rem;
+    background: #f7fcfd;
+    border-right: 1px solid #e5f3f3;
+    min-height: 380px;
+}
+
+.pqr-qr-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.pqr-qr-img {
+    width: 220px;
+    height: 220px;
+    object-fit: contain;
+    border-radius: 12px;
+    border: 4px solid white;
+    box-shadow: 0 4px 20px rgba(0, 64, 92, 0.12);
+}
+
+.qr-svg {
+    border-radius: 12px;
+    border: 4px solid white;
+    box-shadow: 0 4px 20px rgba(0, 64, 92, 0.12);
+}
+
+.pqr-countdown {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--primary);
+    background: #e8f8f5;
+    padding: 0.4rem 1.2rem;
+    border-radius: 30px;
+    letter-spacing: 2px;
+    transition: color 0.3s, background 0.3s;
+}
+
+.pqr-countdown[data-warning='true'] {
+    color: #e53e3e;
+    background: #fff5f5;
+    animation: pulse-warn 1s infinite;
+}
+
+@keyframes pulse-warn {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.6;
+    }
+}
+
+.pqr-expired {
+    text-align: center;
+    color: #e53e3e;
+    font-weight: 700;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* === Info Section (cột phải) === */
+.pqr-info-section {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.pqr-info-card {
+    background: #f7fcfd;
+    border: 1px solid #e5f3f3;
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+}
+
+.pqr-info-card h3 {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--body-text);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.75rem;
+}
+
+.pqr-info-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.pqr-info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+}
+
+.pqr-info-row span {
+    color: var(--body-text);
+}
+
+.pqr-info-row strong {
+    color: var(--dark-text);
+}
+
+.pqr-info-row.highlight {
+    padding-top: 0.6rem;
+    border-top: 1px solid #e5f3f3;
+    margin-top: 0.3rem;
+}
+
+.pqr-amount {
+    color: var(--primary) !important;
+    font-size: 1.2rem;
+}
+
+.pqr-booking-id {
+    font-family: monospace;
+    background: #e8f5ff;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.82rem;
+    color: #0066cc;
+}
+
+/* Steps */
+.pqr-steps h4 {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--dark-text);
+    margin-bottom: 0.5rem;
+}
+
+.pqr-steps ol {
+    margin: 0;
+    padding-left: 1.3rem;
+    font-size: 0.88rem;
+    color: var(--body-text);
+    line-height: 1.9;
+}
+
+/* Actions */
+.pqr-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: stretch;
+}
+
+.pqr-check-btn {
+    width: 100%;
+    padding: 0.85rem;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.pqr-cancel-link {
+    text-align: center;
+    font-size: 0.88rem;
+    color: var(--body-text);
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.pqr-cancel-link:hover {
+    color: var(--primary);
+}
+
+.pqr-secure-note {
+    font-size: 0.78rem;
+    color: var(--body-text);
+    text-align: center;
+    margin: 0;
+}
+
+/* Success state */
+.pqr-success-card {
+    max-width: 440px;
+    margin: 4rem auto;
+    text-align: center;
+    padding: 3rem;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 8px 40px rgba(0, 64, 92, 0.1);
+}
+
+.pqr-success-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 680px) {
+    .pqr-body {
+        grid-template-columns: 1fr;
+    }
+
+    .pqr-qr-section {
+        border-right: none;
+        border-bottom: 1px solid #e5f3f3;
+        padding: 1.5rem;
+    }
+}
+
+/* Dark mode */
+[data-theme='dark'] .pqr-card {
+    background: #1e3040;
+    border-color: #2a4050;
+}
+
+[data-theme='dark'] .pqr-qr-section {
+    background: #162535;
+    border-color: #2a4050;
+}
+
+[data-theme='dark'] .pqr-info-card {
+    background: #162535;
+    border-color: #2a4050;
+}
+
+[data-theme='dark'] .pqr-info-row.highlight {
+    border-top-color: #2a4050;
+}
+
+[data-theme='dark'] .pqr-info-row strong {
+    color: #c0d8e8;
+}

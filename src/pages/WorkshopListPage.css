@@ -82,6 +82,7 @@
   grid-template-columns: 260px 1fr;
   gap: 2rem;
   align-items: start;
+  min-height: 80vh;
 }
 
 /* === Mobile filter toggle === */
@@ -98,6 +99,18 @@
   box-shadow: 0 2px 8px rgba(0, 64, 92, 0.05);
   position: sticky;
   top: 90px;
+  max-height: calc(100vh - 110px);
+  overflow-y: auto;
+}
+
+/* Ẩn scrollbar phụ cho sidebar gọn hơn */
+.wl-filter-sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.wl-filter-sidebar::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 10px;
 }
 
 .filter-header {

@@ -1,7 +1,16 @@
 import React, { useState } from 'react';
 import { NavLink, Outlet, Navigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { LayoutDashboard, BookOpen, Users, MapPin, DollarSign, ArrowLeft, Menu, X } from 'lucide-react';
 import './HostLayout.css';
+
+const NAV_ITEMS = [
+    { to: '/host', label: 'Dashboard', Icon: LayoutDashboard, end: true },
+    { to: '/host/workshops', label: 'Workshop', Icon: BookOpen, end: false },
+    { to: '/host/attendees', label: 'Attendee', Icon: Users, end: false },
+    { to: '/host/venues', label: 'Địa điểm', Icon: MapPin, end: false },
+    { to: '/host/finance', label: 'Tài chính', Icon: DollarSign, end: false },
+];
 
 const HostLayout: React.FC = () => {
     const { user, isLoading } = useAuth();
@@ -9,27 +18,17 @@ const HostLayout: React.FC = () => {
 
     if (isLoading) return <div className="page-loader">Đang tải...</div>;
     if (!user) return <Navigate to="/login" replace />;
-    // Bỏ comment dòng dưới khi BE phân quyền role sẵn sàng
-    // if (user.role !== 'HOST') return <Navigate to="/" replace />;
-
-
-    const navItems = [
-        { to: '/host', label: '📊 Dashboard', end: true },
-        { to: '/host/workshops', label: '🎨 Workshop', end: false },
-        { to: '/host/attendees', label: '👥 Attendee', end: false },
-        { to: '/host/venues', label: '📍 Địa điểm', end: false },
-        { to: '/host/finance', label: '💰 Tài chính', end: false },
-    ];
 
     return (
         <div className="host-shell">
-            {/* === Sidebar === */}
             <aside className={`host-sidebar ${sidebarOpen ? 'open' : ''}`}>
                 <div className="host-sidebar-brand">
                     <Link to="/" className="brand-link">
                         <img src="/logo.png" alt="Heal Haven" className="sidebar-logo" />
                     </Link>
-                    <button className="sidebar-close-btn" onClick={() => setSidebarOpen(false)}>✕</button>
+                    <button className="sidebar-close-btn" onClick={() => setSidebarOpen(false)}>
+                        <X size={18} />
+                    </button>
                 </div>
 
                 <div className="host-sidebar-user">
@@ -41,35 +40,34 @@ const HostLayout: React.FC = () => {
                 </div>
 
                 <nav className="host-nav">
-                    {navItems.map(item => (
+                    {NAV_ITEMS.map(({ to, label, Icon, end }) => (
                         <NavLink
-                            key={item.to}
-                            to={item.to}
-                            end={item.end}
+                            key={to} to={to} end={end}
                             className={({ isActive }) => `host-nav-link ${isActive ? 'active' : ''}`}
                             onClick={() => setSidebarOpen(false)}
                         >
-                            {item.label}
+                            <Icon size={17} strokeWidth={1.8} />
+                            {label}
                         </NavLink>
                     ))}
                 </nav>
 
                 <div className="host-sidebar-footer">
-                    <Link to="/" className="host-nav-link back-link">← Về trang chủ</Link>
+                    <Link to="/" className="host-nav-link back-link">
+                        <ArrowLeft size={15} /> Về trang chủ
+                    </Link>
                 </div>
             </aside>
 
-            {/* Overlay mobile */}
             {sidebarOpen && <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />}
 
-            {/* === Main === */}
             <div className="host-main">
-                {/* Mobile topbar */}
                 <div className="host-topbar">
-                    <button className="topbar-menu-btn" onClick={() => setSidebarOpen(true)}>☰</button>
-                    <span className="topbar-title">Host Dashboard</span>
+                    <button className="topbar-menu-btn" onClick={() => setSidebarOpen(true)}>
+                        <Menu size={20} />
+                    </button>
+                    <span className="topbar-title">Host</span>
                 </div>
-
                 <div className="host-content">
                     <Outlet />
                 </div>

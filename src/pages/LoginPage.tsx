@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
-import { useAuth } from '../contexts/AuthContext'
+import { useAuth, type User } from '../contexts/AuthContext'
 import { authApi } from '../services/api'
 import './LoginPage.css'
 
@@ -25,8 +25,35 @@ const LoginPage: React.FC = () => {
 
     try {
       const res = await authApi.login({ email, password })
-      login(res.user, res.token)
-      navigate(from, { replace: true })
+      const beUser = res.user
+
+      // Chuẩn hoá role về lowercase (BE trả 'ADMIN', FE dùng 'admin')
+      const roleRaw = beUser.role?.toLowerCase() ?? 'attendee'
+      // BE dùng 'PROVIDER', FE dùng 'venue'
+      const roleMapped = roleRaw === 'provider' ? 'venue' : roleRaw
+
+      const userData: User = {
+        id: String(beUser.userId),
+        name: [beUser.firstName, beUser.lastName].filter(Boolean).join(' ') || beUser.email,
+        email: beUser.email,
+        role: roleMapped as User['role'],
+        avatar: beUser.avatar,
+      }
+
+      login(userData, res.accessToken)
+
+      // Redirect theo role (ưu tiên trang trước nếu không phải '/')
+      if (from !== '/') {
+        navigate(from, { replace: true })
+      } else if (roleMapped === 'admin') {
+        navigate('/admin', { replace: true })
+      } else if (roleMapped === 'host') {
+        navigate('/host', { replace: true })
+      } else if (roleMapped === 'venue') {
+        navigate('/venue', { replace: true })
+      } else {
+        navigate('/', { replace: true })
+      }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Đăng nhập thất bại. Vui lòng thử lại.')
     } finally {
@@ -42,7 +69,7 @@ const LoginPage: React.FC = () => {
           <img src="/logo.png" alt="HealHaven" />
         </div>
 
-        <h2>Chào mừng trở lại 👋</h2>
+        <h2>Chào mừng trở lại</h2>
         <p className="auth-subtitle">Đăng nhập để tiếp tục hành trình sáng tạo của bạn.</p>
 
         {error && <div className="auth-error">{error}</div>}

@@ -1,0 +1,51 @@
+=== TỔNG CỘNG 41 ENDPOINTS ===
+
+GET    /workshops/{workshopId}                            [Workshops] - Get workshop details
+PUT    /workshops/{workshopId}                            [Workshops] - Update workshop
+DELETE /workshops/{workshopId}                            [Workshops] - Delete workshop
+GET    /venues/{id}                                       [Venues] - Lấy venue theo ID
+PUT    /venues/{id}                                       [Venues] - Cập nhật venue
+DELETE /venues/{id}                                       [Venues] - Xóa venue
+PUT    /venue-bookings/{bookingId}/reject                 [Venue Bookings] - Từ chối đơn thuê
+PUT    /venue-bookings/{bookingId}/approve                [Venue Bookings] - Phê duyệt đơn thuê
+PUT    /notifications/{notificationId}/read               [Notifications] - Đánh dấu đã đọc
+PUT    /notifications/read-all                            [Notifications] - Đọc tất cả
+GET    /workshops                                         [Workshops] - Search workshops
+POST   /workshops                                         [Workshops] - Create workshop
+POST   /workshops/{workshopId}/submit                     [Workshops] - Submit workshop for review
+GET    /venues                                            [Venues] - Lấy tất cả venue
+POST   /venues                                            [Venues] - Tạo venue mới
+POST   /venue-bookings                                    [Venue Bookings] - Đặt venue
+POST   /reviews                                           [Reviews] - Submit review
+GET    /refunds                                           [Refunds] - Get my refund requests
+POST   /refunds                                           [Refunds] - Request refund
+POST   /payments/mock/{bookingId}                         [Payments] - Mock Payment (Test Only)
+POST   /payments/create/{bookingId}                       [Payments] - Tạo URL thanh toán VNPay
+POST   /media/upload                                      [Media] - Upload media
+GET    /bookings                                          [Bookings] - Get my bookings
+POST   /bookings                                          [Bookings] - Create booking
+POST   /bookings/check-in                                 [Bookings] - Check-in attendee
+POST   /auth/register                                     [Authentication] - Register new user
+POST   /auth/refresh                                      [Authentication] - Refresh token
+POST   /auth/login                                        [Authentication] - Login
+POST   /auth/google                                       [Authentication] - Google Login
+GET    /workshops/my-workshops                            [Workshops] - Get my workshops
+GET    /workshops/featured                                [Workshops] - Get featured workshops
+GET    /venues/my-venues                                  [Venues] - Lấy venue của tôi
+GET    /venue-bookings/venue/{venueId}                    [Venue Bookings] - Booking của venue
+GET    /venue-bookings/venue/{venueId}/schedule           [Venue Bookings] - Lịch trống venue
+GET    /venue-bookings/provider/pending                   [Venue Bookings] - Đơn chờ duyệt
+GET    /venue-bookings/provider/by-status                 [Venue Bookings] - Lọc theo trạng thái
+GET    /venue-bookings/provider/all                       [Venue Bookings] - Tất cả đơn thuê
+GET    /venue-bookings/my-bookings                        [Venue Bookings] - Đơn đặt của tôi
+GET    /reviews/workshop/{workshopId}                     [Reviews] - Get workshop reviews
+GET    /payments/vnpay-return                             [Payments] - VNPay Return URL
+GET    /payments/vnpay-ipn                                [Payments] - VNPay IPN Callback (server-to-server)
+GET    /notifications                                     [Notifications] - Lấy thông báo
+GET    /notifications/unread                              [Notifications] - Thông báo chưa đọc
+GET    /notifications/unread-count                        [Notifications] - Đếm chưa đọc
+GET    /financials/stats                                  [Financials] - Get financial stats
+GET    /bookings/{bookingId}                              [Bookings] - Get booking details
+GET    /bookings/workshop/{workshopId}                    [Bookings] - Get workshop attendees
+GET    /bookings/calendar                                 [Bookings] - Get upcoming bookings
+DELETE /media/{mediaId}                                   [Media] - Delete media

@@ -1,14 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
+import { financialApi, type FinancialStats } from '../../services/api';
 import './HostPage.css';
 
-const monthlyData = [
-    { month: 'T9/25', revenue: 3200000, orders: 8 },
-    { month: 'T10/25', revenue: 5100000, orders: 13 },
-    { month: 'T11/25', revenue: 4800000, orders: 12 },
-    { month: 'T12/25', revenue: 7600000, orders: 19 },
-    { month: 'T1/26', revenue: 6900000, orders: 17 },
-    { month: 'T2/26', revenue: 12400000, orders: 31 },
+const DEFAULT_MONTHLY_DATA = [
+    { month: 'T9/25', revenue: 0, orders: 0 },
+    { month: 'T10/25', revenue: 0, orders: 0 },
 ];
 
 const transactions = [
@@ -22,9 +19,16 @@ const transactions = [
 const fmtMoney = (n: number) => new Intl.NumberFormat('vi-VN').format(Math.abs(n)) + 'đ';
 
 const HostFinancePage: React.FC = () => {
+    const [stats, setStats] = useState<FinancialStats | null>(null);
     const [withdrawModal, setWithdrawModal] = useState(false);
     const [withdrawForm, setWithdrawForm] = useState({ amount: '', bank: '', account: '', name: '' });
     const [withdrawSuccess, setWithdrawSuccess] = useState(false);
+
+    useEffect(() => {
+        financialApi.getStats()
+            .then(res => setStats(res))
+            .catch(err => console.error("Lỗi lấy t.tin tài chính", err));
+    }, []);
 
     const handleWithdraw = () => {
         if (!withdrawForm.amount || !withdrawForm.bank || !withdrawForm.account) return;
@@ -47,29 +51,29 @@ const HostFinancePage: React.FC = () => {
                 <div className="stat-card" style={{ '--stat-color': '#16a34a' } as React.CSSProperties}>
                     <div className="stat-icon">💰</div>
                     <div>
-                        <div className="stat-value">12.400.000đ</div>
-                        <div className="stat-label">Doanh thu tháng này</div>
+                        <div className="stat-value">{fmtMoney(stats?.totalRevenue || 0)}</div>
+                        <div className="stat-label">Tổng doanh thu</div>
                     </div>
                 </div>
                 <div className="stat-card" style={{ '--stat-color': '#007BA2' } as React.CSSProperties}>
                     <div className="stat-icon">💳</div>
                     <div>
-                        <div className="stat-value">8.750.000đ</div>
+                        <div className="stat-value">{fmtMoney(stats?.profit || 0)}</div>
                         <div className="stat-label">Khả dụng để rút</div>
                     </div>
                 </div>
                 <div className="stat-card" style={{ '--stat-color': '#d97706' } as React.CSSProperties}>
                     <div className="stat-icon">⏳</div>
                     <div>
-                        <div className="stat-value">3.650.000đ</div>
-                        <div className="stat-label">Đang chờ thanh toán</div>
+                        <div className="stat-value">{fmtMoney(stats?.totalCost || 0)}</div>
+                        <div className="stat-label">Chi phí / Hệ thống thu</div>
                     </div>
                 </div>
                 <div className="stat-card" style={{ '--stat-color': '#7c3aed' } as React.CSSProperties}>
                     <div className="stat-icon">📊</div>
                     <div>
-                        <div className="stat-value">40.000.000đ</div>
-                        <div className="stat-label">Tổng doanh thu (6 tháng)</div>
+                        <div className="stat-value">{stats?.monthlyData?.length || 0} kỳ</div>
+                        <div className="stat-label">Thông kê hoạt động</div>
                     </div>
                 </div>
             </div>
@@ -77,9 +81,9 @@ const HostFinancePage: React.FC = () => {
             {/* Charts */}
             <div className="dashboard-grid">
                 <div className="host-card">
-                    <h3 className="chart-title">📊 Doanh thu 6 tháng gần đây</h3>
+                    <h3 className="chart-title">📊 Doanh thu theo tháng</h3>
                     <ResponsiveContainer width="100%" height={220}>
-                        <BarChart data={monthlyData} margin={{ top: 5, right: 10, left: 10, bottom: 5 }}>
+                        <BarChart data={stats?.monthlyData || DEFAULT_MONTHLY_DATA} margin={{ top: 5, right: 10, left: 10, bottom: 5 }}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#e5f3f3" />
                             <XAxis dataKey="month" tick={{ fontSize: 12 }} />
                             <YAxis tickFormatter={v => (v / 1000000).toFixed(1) + 'M'} tick={{ fontSize: 11 }} />
@@ -90,14 +94,14 @@ const HostFinancePage: React.FC = () => {
                 </div>
 
                 <div className="host-card">
-                    <h3 className="chart-title">📈 Số đơn hàng theo tháng</h3>
+                    <h3 className="chart-title">📉 Chi phí</h3>
                     <ResponsiveContainer width="100%" height={220}>
-                        <LineChart data={monthlyData} margin={{ top: 5, right: 10, left: 10, bottom: 5 }}>
+                        <LineChart data={stats?.monthlyData || DEFAULT_MONTHLY_DATA} margin={{ top: 5, right: 10, left: 10, bottom: 5 }}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#e5f3f3" />
                             <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-                            <YAxis tick={{ fontSize: 11 }} />
-                            <Tooltip />
-                            <Line type="monotone" dataKey="orders" name="Đơn hàng" stroke="#00c9a7" strokeWidth={2} dot={{ r: 4 }} />
+                            <YAxis tickFormatter={v => (v / 1000000).toFixed(1) + 'M'} tick={{ fontSize: 11 }} />
+                            <Tooltip formatter={(v: number) => fmtMoney(v)} />
+                            <Line type="monotone" dataKey="cost" name="Chi phí" stroke="#d97706" strokeWidth={2} dot={{ r: 4 }} />
                         </LineChart>
                     </ResponsiveContainer>
                 </div>
@@ -142,7 +146,7 @@ const HostFinancePage: React.FC = () => {
                                 <div className="host-modal-body">
                                     <div className="balance-info">
                                         <span>Số dư khả dụng:</span>
-                                        <strong className="balance-available">8.750.000đ</strong>
+                                        <strong className="balance-available">{fmtMoney(stats?.profit || 0)}</strong>
                                     </div>
                                     <div className="form-group">
                                         <label>Số tiền rút (đ) *</label>

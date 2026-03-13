@@ -32,7 +32,7 @@ const HostDashboardPage: React.FC = () => {
                     <h1 className="host-page-title">Dashboard</h1>
                     <p className="host-page-subtitle">Xin chào! Đây là tổng quan hoạt động của bạn.</p>
                 </div>
-                <Link to="/host/workshops" className="btn btn-primary">+ Tạo Workshop mới</Link>
+                <Link to="/host/workshops?create=true" className="btn btn-primary">+ Tạo Workshop mới</Link>
             </div>
 
             {/* Stats Grid */}

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '../contexts/AuthContext'
+import { useAuth, type User } from '../contexts/AuthContext'
 import { authApi } from '../services/api'
 import './SignupPage.css'
 
@@ -33,8 +33,23 @@ const SignupPage: React.FC = () => {
     setIsLoading(true)
     try {
       const res = await authApi.signup({ fullName, email, password, role })
-      login(res.user, res.token)
-      navigate('/', { replace: true })
+      const beUser = res.user
+      const roleRaw = beUser.role?.toLowerCase() ?? role
+      const roleMapped = roleRaw === 'provider' ? 'venue' : roleRaw
+      login(
+        {
+          id: String(beUser.userId),
+          name: [beUser.firstName, beUser.lastName].filter(Boolean).join(' ') || fullName,
+          email: beUser.email,
+          role: roleMapped as User['role'],
+          avatar: beUser.avatar,
+        },
+        res.accessToken
+      )
+      // Redirect theo role
+      if (roleMapped === 'host') navigate('/host', { replace: true })
+      else if (roleMapped === 'venue') navigate('/venue', { replace: true })
+      else navigate('/', { replace: true })
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Đăng ký thất bại. Vui lòng thử lại.')
     } finally {
@@ -49,7 +64,7 @@ const SignupPage: React.FC = () => {
           <img src="/logo.png" alt="HealHaven" />
         </div>
 
-        <h2>Tạo tài khoản 🌿</h2>
+        <h2>Tạo tài khoản</h2>
         <p className="auth-subtitle">Bắt đầu hành trình sáng tạo của bạn ngay hôm nay.</p>
 
         {error && <div className="auth-error">{error}</div>}
