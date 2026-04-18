@@ -22,6 +22,33 @@ const StarRating: React.FC<{ rating?: number }> = ({ rating = 0 }) => (
   </span>
 );
 
+// --- Helper: Format Date ---
+const formatWorkshopDate = (dateVal: any) => {
+  if (!dateVal) return 'Chưa rõ';
+  let d;
+  if (Array.isArray(dateVal) && dateVal.length >= 3) {
+    d = new Date(dateVal[0], dateVal[1] - 1, dateVal[2]);
+  } else {
+    d = new Date(dateVal);
+  }
+  if (!isNaN(d.getTime())) {
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
+  }
+  return 'Chưa rõ';
+};
+
+// --- Helper: Get Display Image ---
+const getDisplayImage = (ws: any) => {
+  // Hardcode fallback only for the specific test workshop that had the penguin image uploaded
+  if (ws.title === 'Vẽ Healing Canvas Creative') {
+    return '/images/ws1303.png';
+  }
+  return ws.image || (ws.images && ws.images.length > 0 ? ws.images[0] : null) || '/images/ws1303.png';
+};
+
 const WorkshopListPage: React.FC = () => {
   const [workshops, setWorkshops] = useState<Workshop[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -215,9 +242,13 @@ const WorkshopListPage: React.FC = () => {
                   return (
                     <Link to={`/workshop/${wId}`} key={wId} className="wl-card-link">
                       <div className="wl-card">
-                        {/* Ảnh */}
                         <div className="wl-card-img-wrap">
-                          <img src={ws.image || '/images/ws1303.png'} alt={ws.title} loading="lazy" onError={(e) => { e.currentTarget.src = '/images/ws1303.png'; }} />
+                          <img 
+                            src={getDisplayImage(ws)} 
+                            alt={ws.title} 
+                            loading="lazy" 
+                            onError={(e) => { e.currentTarget.src = '/images/ws1303.png'; }} 
+                          />
                           {ws.availableSeats === 0 && (
                             <span className="badge-soldout">Hết chỗ</span>
                           )}
@@ -238,7 +269,7 @@ const WorkshopListPage: React.FC = () => {
                           <p className="wl-card-host">{ws.host?.fullName || 'Nghệ nhân HealHaven'}</p>
 
                           <div className="wl-card-meta">
-                            <span>{new Date(ws.startDate || ws.date || '').toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' })}</span>
+                            <span>{formatWorkshopDate(ws.startTime || ws.startDate || ws.date)}</span>
                             <span>•</span>
                             <span>{ws.address || ws.venue?.address || ws.area || ws.location || 'TP.HCM'}</span>
                           </div>

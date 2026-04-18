@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Link, NavLink, Outlet, Navigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import { LayoutDashboard, BookOpen, MapPin, Users, DollarSign, CreditCard, ArrowLeft, Menu, X } from 'lucide-react'
+import { LayoutDashboard, BookOpen, MapPin, Users, DollarSign, ArrowLeft, Menu, X } from 'lucide-react'
 import './AdminLayout.css'
 
 const NAV_ITEMS = [
@@ -9,7 +9,6 @@ const NAV_ITEMS = [
   { to: '/admin/workshops', label: 'Kiểm duyệt Workshop', Icon: BookOpen, end: false },
   { to: '/admin/venues', label: 'Kiểm duyệt Địa điểm', Icon: MapPin, end: false },
   { to: '/admin/users', label: 'Quản lý Người dùng', Icon: Users, end: false },
-  { to: '/admin/payments', label: 'Duyệt thanh toán', Icon: CreditCard, end: false },
   { to: '/admin/finance', label: 'Đối soát Tài chính', Icon: DollarSign, end: false },
 ];
 

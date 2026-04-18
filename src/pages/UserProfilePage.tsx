@@ -187,10 +187,6 @@ const UserProfilePage: React.FC = () => {
                         <p>Bạn chưa đặt vé nào cả. <Link to="/workshops">Khám phá ngay!</Link></p>
                       ) : (
                         attendeeBookings.map(b => {
-                          const isPendingConfirm = 
-                            b.paymentStatus === 'PENDING_CONFIRMATION' || 
-                            b.status === 'PENDING_CONFIRMATION' || 
-                            b.bookingStatus === 'PENDING_CONFIRMATION';
                           const isPaid = b.status === 'PAID' || b.bookingStatus === 'PAID' || b.paymentStatus === 'PAID';
                           const isConfirmed = b.status === 'CONFIRMED' || b.bookingStatus === 'CONFIRMED';
                           
@@ -206,9 +202,9 @@ const UserProfilePage: React.FC = () => {
                                   <span>Số vé: {b.quantity || b.seats}</span>
                                   <span style={{
                                     fontWeight: 'bold',
-                                    color: (isConfirmed || isPaid) ? 'green' : isPendingConfirm ? '#0d47a1' : (b.status === 'PENDING' || b.bookingStatus === 'PENDING') ? 'orange' : 'gray'
+                                    color: (isConfirmed || isPaid) ? 'green' : (b.status === 'PENDING' || b.bookingStatus === 'PENDING') ? 'orange' : 'gray'
                                   }}>
-                                    {isPendingConfirm ? '⏳ Đang chờ xác nhận' : (b.status || b.bookingStatus || 'PENDING')}
+                                    {b.status || b.bookingStatus || 'PENDING'}
                                   </span>
                                 </div>
                               </div>

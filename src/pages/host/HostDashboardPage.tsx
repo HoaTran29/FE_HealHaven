@@ -1,36 +1,96 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
+import { workshopApi, financialApi, bookingApi, type Workshop, type FinancialStats } from '../../services/api';
 import './HostPage.css';
 
-// --- Mock data ---
-const stats = [
-    { icon: '🎨', label: 'Workshop đang mở', value: '5', color: '#007BA2' },
-    { icon: '👥', label: 'Tổng đăng ký', value: '127', color: '#16a34a' },
-    { icon: '💰', label: 'Doanh thu tháng', value: '12.400.000đ', color: '#d97706' },
-    { icon: '⭐', label: 'Đánh giá trung bình', value: '4.8', color: '#7c3aed' },
-];
-
-const upcomingWorkshops = [
-    { id: 1, title: 'Workshop Đan len cơ bản', date: '15/03/2026', time: '09:00', seats: '5/10', status: 'confirmed' },
-    { id: 2, title: 'Vẽ màu nước: Thiên nhiên', date: '20/03/2026', time: '14:00', seats: '3/8', status: 'pending' },
-    { id: 3, title: 'Hoa Kẽm nhung nghệ thuật', date: '25/03/2026', time: '10:00', seats: '8/12', status: 'confirmed' },
-];
-
-const recentOrders = [
-    { id: '#ORD-001', buyer: 'Khánh Hòa', workshop: 'Workshop Đan len cơ bản', amount: '399.000đ', date: '26/02' },
-    { id: '#ORD-002', buyer: 'Minh Anh', workshop: 'Vẽ màu nước: Thiên nhiên', amount: '599.000đ', date: '25/02' },
-    { id: '#ORD-003', buyer: 'Gia Bảo', workshop: 'Hoa Kẽm nhung nghệ thuật', amount: '450.000đ', date: '24/02' },
-    { id: '#ORD-004', buyer: 'An Nhiên', workshop: 'Workshop Đan len cơ bản', amount: '399.000đ', date: '23/02' },
-];
-
 const HostDashboardPage: React.FC = () => {
+    const { user } = useAuth();
+    const [workshops, setWorkshops] = useState<Workshop[]>([]);
+    const [finStats, setFinStats] = useState<FinancialStats | null>(null);
+    const [recentOrders, setRecentOrders] = useState<any[]>([]);
+    const [hostName, setHostName] = useState('');
+    const [totalBookings, setTotalBookings] = useState<number>(0);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchDashboardData = async () => {
+            try {
+                const [wsRes, statRes] = await Promise.all([
+                    workshopApi.getMyWorkshops().catch(() => []),
+                    financialApi.getStats().catch(() => null)
+                ]);
+                
+                const wList = Array.isArray(wsRes) ? wsRes : (wsRes as any).content || [];
+                setWorkshops(wList);
+                if (statRes) setFinStats(statRes);
+
+                // Rút trích tên chính xác của Host từ workshop (vì user.name đôi khi fallback về email)
+                const exactName = wList.find((w: any) => w.host?.fullName)?.host?.fullName;
+                setHostName(exactName || user?.name || 'nhà sáng tạo');
+
+                // Lấy đơn hàng từ tất cả các workshop của host
+                if (wList.length > 0) {
+                    const bookingPromises = wList.map((w: any) => bookingApi.getByWorkshop(String(w.id || w.workshopId)).catch(() => []));
+                    const bookingsArrays = await Promise.all(bookingPromises);
+                    // Lọc mảng hợp lệ, gom lại
+                    const allBookings = bookingsArrays
+                        .filter(arr => Array.isArray(arr))
+                        .flat();
+                    
+                    setTotalBookings(allBookings.length);
+                    // Lấy 5 đơn mới nhất
+                    setRecentOrders(allBookings
+                        .sort((a: any, b: any) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime())
+                        .slice(0, 5)
+                    );
+                }
+            } catch (err) {
+                console.error("Lỗi tải dashboard host:", err);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchDashboardData();
+    }, []);
+
+    const openingWorkshops = workshops.filter(w => w.status !== 'CANCELLED' && w.status !== 'COMPLETED');
+    const upcomingWorkshops = [...openingWorkshops].sort((a, b) => {
+        const dA = new Date(a.startTime || a.startDate || 0).getTime();
+        const dB = new Date(b.startTime || b.startDate || 0).getTime();
+        return dA - dB;
+    }).slice(0, 5);
+
+    const fmtVND = (val?: number) => {
+        if (!val) return '0đ';
+        return new Intl.NumberFormat('vi-VN').format(val) + 'đ';
+    };
+
+    const stats = [
+        { icon: '🎨', label: 'Workshop đang mở', value: openingWorkshops.length.toString(), color: '#007BA2' },
+        { icon: '👥', label: 'Tổng đăng ký', value: totalBookings.toString(), color: '#16a34a' },
+        { icon: '💰', label: 'Doanh thu', value: fmtVND(finStats?.totalRevenue), color: '#d97706' },
+        { icon: '⭐', label: 'Đánh giá trung bình', value: '4.8', color: '#7c3aed' }, // Hardcode temporarily as review API is missing avg rating
+    ];
+
+    const getStatusBadge = (status: string) => {
+        switch (status) {
+            case 'PUBLISHED': return { cls: 'confirmed', label: '🌟 Đang mở' };
+            case 'HAPPENING': return { cls: 'confirmed', label: '🔥 Đang diễn ra' };
+            case 'PENDING_APPROVAL': return { cls: 'pending', label: '⏳ Chờ duyệt' };
+            case 'REJECTED': return { cls: 'cancelled', label: '❌ Bị từ chối' };
+            case 'CLOSED': return { cls: 'cancelled', label: '🔒 Đã đóng' };
+            default: return { cls: 'pending', label: '📋 Nháp' };
+        }
+    };
+
     return (
         <div className="host-page">
             {/* Header */}
             <div className="host-page-header">
                 <div>
                     <h1 className="host-page-title">Dashboard</h1>
-                    <p className="host-page-subtitle">Xin chào! Đây là tổng quan hoạt động của bạn.</p>
+                    <p className="host-page-subtitle">Xin chào {hostName}! Đây là tổng quan hoạt động của bạn.</p>
                 </div>
                 <Link to="/host/workshops?create=true" className="btn btn-primary">+ Tạo Workshop mới</Link>
             </div>
@@ -41,7 +101,7 @@ const HostDashboardPage: React.FC = () => {
                     <div className="stat-card" key={i} style={{ '--stat-color': s.color } as React.CSSProperties}>
                         <div className="stat-icon">{s.icon}</div>
                         <div>
-                            <div className="stat-value">{s.value}</div>
+                            <div className="stat-value">{isLoading ? '...' : s.value}</div>
                             <div className="stat-label">{s.label}</div>
                         </div>
                     </div>
@@ -53,7 +113,7 @@ const HostDashboardPage: React.FC = () => {
                 {/* Upcoming workshops */}
                 <section className="host-card">
                     <div className="host-card-header">
-                        <h3>Workshop sắp diễn ra</h3>
+                        <h3>Workshop của bạn</h3>
                         <Link to="/host/workshops" className="host-card-link">Xem tất cả →</Link>
                     </div>
                     <div className="table-wrap">
@@ -61,22 +121,22 @@ const HostDashboardPage: React.FC = () => {
                             <thead>
                                 <tr>
                                     <th>Tên Workshop</th>
-                                    <th>Ngày</th>
-                                    <th>Chỗ</th>
                                     <th>Trạng thái</th>
+                                    <th>Giá</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {upcomingWorkshops.map(w => (
-                                    <tr key={w.id}>
+                                {isLoading ? <tr><td colSpan={3}>Đang tải...</td></tr> : 
+                                upcomingWorkshops.length === 0 ? <tr><td colSpan={3}>Bạn chưa có workshop nào đang mở.</td></tr> :
+                                upcomingWorkshops.map((w: any) => (
+                                    <tr key={w.id || w.workshopId}>
                                         <td className="td-title">{w.title}</td>
-                                        <td className="td-muted">{w.date} {w.time}</td>
-                                        <td>{w.seats}</td>
                                         <td>
-                                            <span className={`badge-status ${w.status}`}>
-                                                {w.status === 'confirmed' ? '✅ Xác nhận' : '⏳ Chờ'}
+                                            <span className={`badge-status ${getStatusBadge(w.status).cls}`}>
+                                                {getStatusBadge(w.status).label}
                                             </span>
                                         </td>
+                                        <td className="td-amount">{fmtVND(w.price)}</td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -88,7 +148,7 @@ const HostDashboardPage: React.FC = () => {
                 <section className="host-card">
                     <div className="host-card-header">
                         <h3>Đơn hàng gần đây</h3>
-                        <Link to="/host/finance" className="host-card-link">Chi tiết →</Link>
+                        <Link to="/host/finance" className="host-card-link">Chi tiết tài chính →</Link>
                     </div>
                     <div className="table-wrap">
                         <table className="host-table">
@@ -96,14 +156,20 @@ const HostDashboardPage: React.FC = () => {
                                 <tr><th>Mã đơn</th><th>Khách</th><th>Số tiền</th><th>Ngày</th></tr>
                             </thead>
                             <tbody>
-                                {recentOrders.map(o => (
-                                    <tr key={o.id}>
-                                        <td className="td-code">{o.id}</td>
-                                        <td>{o.buyer}</td>
-                                        <td className="td-amount">{o.amount}</td>
-                                        <td className="td-muted">{o.date}</td>
-                                    </tr>
-                                ))}
+                                {isLoading ? (
+                                    <tr><td colSpan={4}>Đang tải đơn hàng...</td></tr>
+                                ) : recentOrders.length === 0 ? (
+                                    <tr><td colSpan={4} style={{ textAlign: 'center', padding: '2rem 0', color: '#64748b' }}>Chưa có đơn hàng mới nào gần đây.</td></tr>
+                                ) : (
+                                    recentOrders.map((o: any) => (
+                                        <tr key={o.id || Math.random()}>
+                                            <td className="td-code">#{o.id || o.bookingId || '...'}</td>
+                                            <td>{o.fullName || o.userName || o.user?.fullName || 'Khách hàng'}</td>
+                                            <td className="td-amount">{fmtVND(o.totalPrice || o.amount)}</td>
+                                            <td className="td-muted">{o.date || o.createdAt?.slice(0, 10)}</td>
+                                        </tr>
+                                    ))
+                                )}
                             </tbody>
                         </table>
                     </div>

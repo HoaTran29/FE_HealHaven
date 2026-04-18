@@ -4,6 +4,14 @@ import { useChat } from "../contexts/ChatContext";
 import { workshopApi, type Workshop } from "../services/api";
 import "./HomePage.css"; // CSS riêng cho Trang chủ
 
+// --- Helper: Get Display Image ---
+const getDisplayImage = (ws: any) => {
+  if (ws.title === 'Vẽ Healing Canvas Creative') {
+    return '/images/ws1303.png';
+  }
+  return ws.image || (ws.images && ws.images.length > 0 ? ws.images[0] : null) || '/images/ws1303.png';
+};
+
 const HomePage: React.FC = () => {
   const { openChat } = useChat();
   const [featuredWorkshops, setFeaturedWorkshops] = useState<Workshop[]>([]);
@@ -74,7 +82,7 @@ const HomePage: React.FC = () => {
                   <Link to={`/workshop/${wId}`} key={wId} className="card-link">
                     <div className="card">
                       <img
-                        src={ws.image || "/images/ws1303.png"}
+                        src={getDisplayImage(ws)}
                         alt={ws.title}
                         className="card-img-real"
                         onError={(e) => { e.currentTarget.src = "/images/ws1303.png"; }}

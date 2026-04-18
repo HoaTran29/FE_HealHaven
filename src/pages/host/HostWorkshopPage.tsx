@@ -4,15 +4,38 @@ import { workshopApi, mediaApi, type Workshop } from '../../services/api';
 import './HostPage.css';
 
 const EMPTY_FORM = {
-    title: '', category: '', date: '', time: '', price: '',
+    title: '', category: '', date: '', time: '', endTime: '', price: '',
     seats: '', description: '', address: '', materials: '',
 };
 
-const STATUS_LABEL: Record<string, string> = {
-    APPROVED: '🟢 Đã duyệt',
-    PENDING_APPROVAL: '🟡 Chờ duyệt',
-    DRAFT: '⚪ Nháp',
-    REJECTED: '🔴 Từ chối',
+const getStatusBadge = (status: string) => {
+    switch (status) {
+        case 'PUBLISHED': return { cls: 'confirmed', label: '🌟 Đã duyệt' };
+        case 'HAPPENING': return { cls: 'confirmed', label: '🔥 Đang diễn ra' };
+        case 'PENDING_APPROVAL': return { cls: 'pending', label: '⏳ Chờ duyệt' };
+        case 'REJECTED': return { cls: 'cancelled', label: '❌ Bị từ chối' };
+        case 'CLOSED': return { cls: 'cancelled', label: '🔒 Đã đóng' };
+        default: return { cls: 'pending', label: '📋 Nháp' };
+    }
+};
+
+const formatWorkshopDate = (dateVal: any) => {
+    if (!dateVal) return 'Chưa rõ';
+    let d;
+    if (Array.isArray(dateVal) && dateVal.length >= 3) {
+        d = new Date(dateVal[0], dateVal[1] - 1, dateVal[2], dateVal[3] || 0, dateVal[4] || 0);
+    } else {
+        d = new Date(dateVal);
+    }
+    if (!isNaN(d.getTime())) {
+        const day = String(d.getDate()).padStart(2, '0');
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const year = d.getFullYear();
+        const hrs = String(d.getHours()).padStart(2, '0');
+        const mins = String(d.getMinutes()).padStart(2, '0');
+        return `${day}/${month}/${year} ${hrs}:${mins}`;
+    }
+    return 'Chưa rõ';
 };
 
 const HostWorkshopPage: React.FC = () => {
@@ -39,7 +62,7 @@ const HostWorkshopPage: React.FC = () => {
     const fetchWorkshops = () => {
         setIsLoading(true);
         workshopApi.getMyWorkshops()
-            .then(res => setWorkshops(res.content || []))
+            .then(res => setWorkshops(Array.isArray(res) ? res : (res as any).content || []))
             .catch(err => console.error("Lỗi tải workshop:", err))
             .finally(() => setIsLoading(false));
     };
@@ -66,7 +89,8 @@ const HostWorkshopPage: React.FC = () => {
         setEditing(w);
         setForm({
             title: w.title, category: w.category, date: w.date || '', time: w.time || '',
-            price: String(w.price), seats: String(w.maxSeats),
+            endTime: '', // Handle mapping if needed
+            price: String(w.price), seats: String(w.maxSeats || w.capacity || ''),
             description: w.subtitle || '', address: w.address || '', materials: Array.isArray(w.materials) ? w.materials.join('\n') : (w.materials || ''),
         });
         setImageFile(null);
@@ -94,27 +118,31 @@ const HostWorkshopPage: React.FC = () => {
         if (!form.title || !form.date) return;
         setIsSaving(true);
         try {
-            let uploadedImageUrl = editing?.image || (editing?.images && editing?.images[0]) || '';
+            let currentImageUrl = editing?.image || (editing?.images && editing?.images[0]) || '';
 
-            // Nếu user có chọn file ảnh mới -> upload
-            if (imageFile) {
-                const uploadRes = await mediaApi.upload(imageFile);
-                uploadedImageUrl = uploadRes.url;
-            }
+            // The backend expects standard ISO-8601 java.time.LocalDateTime format: YYYY-MM-DDTHH:mm:00
+            const formattedStartTime = `${form.date}T${form.time || '00:00'}:00`;
+            const formattedEndTime = `${form.date}T${form.endTime || '00:00'}:00`;
 
-            const payload: Partial<Workshop> = {
+            const payload: any = {
                 title: form.title,
                 category: form.category,
-                date: form.date,
-                time: form.time,
+                date: form.date, // legacy
+                time: form.time, // legacy
+                startDate: formattedStartTime, // fallback
+                startTime: formattedStartTime,
+                endTime: formattedEndTime,
                 price: Number(form.price),
-                maxSeats: Number(form.seats),
+                maxSeats: Number(form.seats), // legacy
+                capacity: Number(form.seats), // fallback
+                maxAttendees: Number(form.seats),
                 subtitle: form.description,
                 address: form.address,
-                materials: form.materials.split('\n').filter(Boolean),
+                location: form.address,
+                materials: form.materials,
                 availableSeats: Number(form.seats),
-                image: uploadedImageUrl,
-                images: uploadedImageUrl ? [uploadedImageUrl] : []
+                image: currentImageUrl,
+                images: currentImageUrl ? [currentImageUrl] : []
             };
 
             let savedId = editing?.id;
@@ -125,15 +153,23 @@ const HostWorkshopPage: React.FC = () => {
                 savedId = String(res.id || res.workshopId);
             }
 
+            if (imageFile && savedId) {
+                const uploadRes = await mediaApi.upload(imageFile, 'WORKSHOP', Number(savedId));
+                currentImageUrl = uploadRes.url;
+                payload.image = currentImageUrl;
+                payload.images = [currentImageUrl];
+                await workshopApi.update(String(savedId), payload);
+            }
+
             if (submitAfterSave && savedId) {
                 await workshopApi.submit(String(savedId));
             }
 
             fetchWorkshops();
             setModalOpen(false);
-        } catch (error) {
+        } catch (error: any) {
             console.error("Lưu workshop thất bại:", error);
-            alert("Lưu workshop hoặc tải ảnh thất bại, vui lòng thử lại!");
+            alert("Lưu workshop thất bại: " + (error.message || JSON.stringify(error)));
         } finally {
             setIsSaving(false);
         }
@@ -171,10 +207,10 @@ const HostWorkshopPage: React.FC = () => {
 
             {/* Filter tabs */}
             <div className="host-filter-tabs">
-                {(['all', 'APPROVED', 'DRAFT'] as const).map(f => (
-                    <button key={f} className={`host-tab-btn ${filter === f ? 'active' : ''}`} onClick={() => setFilter(f)}>
-                        {f === 'all' ? 'Tất cả' : f === 'APPROVED' ? '🟢 Đã duyệt' : '⚪ Nháp'}
-                        <span className="host-tab-count">{f === 'all' ? workshops.length : workshops.filter(w => w.status === f).length}</span>
+                {(['all', 'PUBLISHED', 'DRAFT'] as const).map(f => (
+                    <button key={f} className={`host-tab-btn ${filter === f ? 'active' : ''}`} onClick={() => setFilter(f as any)}>
+                        {f === 'all' ? 'Tất cả' : f === 'PUBLISHED' ? '🟢 Đã duyệt' : '⚪ Nháp'}
+                        <span className="host-tab-count">{f === 'all' ? workshops.length : workshops.filter(w => f === 'PUBLISHED' ? (w.status === 'PUBLISHED' || w.status === 'APPROVED' || w.status === 'HAPPENING') : (w.status === 'DRAFT' || !w.status)).length}</span>
                     </button>
                 ))}
             </div>
@@ -202,10 +238,10 @@ const HostWorkshopPage: React.FC = () => {
                                     <tr key={w.id}>
                                         <td className="td-title">{w.title}</td>
                                         <td className="td-tag">{w.category}</td>
-                                        <td className="td-muted">{new Date(w.date || Date.now()).toLocaleDateString('vi-VN')} {w.time || ''}</td>
+                                        <td className="td-muted">{formatWorkshopDate(w.startTime || w.startDate || w.date)}</td>
                                         <td className="td-amount">{new Intl.NumberFormat('vi-VN').format(w.price)}đ</td>
-                                        <td>{(w.maxSeats || 0) - (w.availableSeats || 0)}/{w.maxSeats || 0}</td>
-                                        <td><span className={`badge-status ${(w.status || 'DRAFT').toLowerCase()}`}>{STATUS_LABEL[w.status || 'DRAFT'] || 'Không rõ'}</span></td>
+                                        <td>{Math.max(0, (w.maxAttendees || w.capacity || w.maxSeats || 0) - (w.availableSeats || 0))}/{w.maxAttendees || w.capacity || w.maxSeats || 0}</td>
+                                        <td><span className={`badge-status ${getStatusBadge(w.status || 'DRAFT').cls}`}>{getStatusBadge(w.status || 'DRAFT').label}</span></td>
                                         <td>
                                             <div className="action-btns">
                                                 <button className="btn-icon edit" onClick={() => openEdit(w)} title="Sửa">✏️</button>
@@ -276,8 +312,12 @@ const HostWorkshopPage: React.FC = () => {
                                     <input type="date" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} />
                                 </div>
                                 <div className="form-group">
-                                    <label>Giờ bắt đầu</label>
+                                    <label>Giờ bắt đầu *</label>
                                     <input type="time" value={form.time} onChange={e => setForm(f => ({ ...f, time: e.target.value }))} />
+                                </div>
+                                <div className="form-group">
+                                    <label>Giờ kết thúc *</label>
+                                    <input type="time" value={form.endTime} onChange={e => setForm(f => ({ ...f, endTime: e.target.value }))} />
                                 </div>
                             </div>
 

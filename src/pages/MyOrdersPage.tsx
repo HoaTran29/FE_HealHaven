@@ -6,7 +6,6 @@ import './MyOrdersPage.css';
 // --- CẤU HÌNH TAB ---
 const TABS: { key: BookingStatus | 'ALL'; label: string }[] = [
     { key: 'ALL', label: 'Tất cả' },
-    { key: 'PENDING_CONFIRMATION', label: 'Chờ duyệt' },
     { key: 'CONFIRMED', label: 'Đã xác nhận' },
     { key: 'ATTENDED', label: 'Đã tham gia' },
     { key: 'CANCELLED', label: 'Đã hủy' },
@@ -14,7 +13,6 @@ const TABS: { key: BookingStatus | 'ALL'; label: string }[] = [
 
 const STATUS_CONFIG: Record<BookingStatus, { label: string; className: string }> = {
     PENDING: { label: 'Chờ thanh toán', className: 'status-pending' },
-    PENDING_CONFIRMATION: { label: '⏳ Đang chờ xác nhận', className: 'status-pending-confirm' },
     PAID: { label: 'Đã thanh toán', className: 'status-paid' },
     CONFIRMED: { label: 'Đã xác nhận', className: 'status-confirmed' },
     ATTENDED: { label: 'Đã tham gia', className: 'status-attended' },
@@ -79,13 +77,7 @@ interface OrderCardProps {
 }
 
 const OrderCard: React.FC<OrderCardProps> = ({ order, onCancelClick }) => {
-    // Ưu tiên hiển thị "Chờ duyệt" nếu bất kỳ trường nào báo hiệu trạng thái này
-    const isPendingConfirm = 
-        order.paymentStatus === 'PENDING_CONFIRMATION' || 
-        order.status === 'PENDING_CONFIRMATION' || 
-        order.bookingStatus === 'PENDING_CONFIRMATION';
-
-    const displayStatusKey = isPendingConfirm ? 'PENDING_CONFIRMATION' : (order.status || order.bookingStatus || 'PENDING');
+    const displayStatusKey = order.status || order.bookingStatus || 'PENDING';
     const status = STATUS_CONFIG[displayStatusKey as BookingStatus] || STATUS_CONFIG['PENDING'];
 
     return (
@@ -201,16 +193,7 @@ const MyOrdersPage: React.FC = () => {
     const filteredOrders = Array.isArray(orders) 
         ? (activeTab === 'ALL' 
             ? orders 
-            : orders.filter(o => {
-                const isPendingConfirm = 
-                    o.paymentStatus === 'PENDING_CONFIRMATION' || 
-                    o.status === 'PENDING_CONFIRMATION' || 
-                    o.bookingStatus === 'PENDING_CONFIRMATION';
-
-                if (activeTab === 'PENDING_CONFIRMATION') {
-                    return isPendingConfirm;
-                }
-                
+            : orders.filter(o => {                
                 if (activeTab === 'CONFIRMED') {
                     return o.status === 'CONFIRMED' || o.bookingStatus === 'CONFIRMED' || 
                            o.status === 'PAID' || o.bookingStatus === 'PAID' || o.paymentStatus === 'PAID';
@@ -244,16 +227,7 @@ const MyOrdersPage: React.FC = () => {
                         {tab.label}
                         {tab.key !== 'ALL' && Array.isArray(orders) && (
                             <span className="tab-count">
-                                {orders.filter(o => {
-                                    const isPendingConfirm = 
-                                        o.paymentStatus === 'PENDING_CONFIRMATION' || 
-                                        o.status === 'PENDING_CONFIRMATION' || 
-                                        o.bookingStatus === 'PENDING_CONFIRMATION';
-
-                                    if (tab.key === 'PENDING_CONFIRMATION') {
-                                        return isPendingConfirm;
-                                    }
-                                    
+                                {orders.filter(o => {                                    
                                     if (tab.key === 'CONFIRMED') {
                                         return o.status === 'CONFIRMED' || o.bookingStatus === 'CONFIRMED' || 
                                                o.status === 'PAID' || o.bookingStatus === 'PAID' || o.paymentStatus === 'PAID';

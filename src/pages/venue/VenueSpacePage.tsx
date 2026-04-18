@@ -81,11 +81,7 @@ const VenueSpacePage: React.FC = () => {
         setIsSaving(true);
 
         try {
-            let uploadedImageUrl = (editing?.imageUrls?.[0] || editing?.images?.[0] || '');
-            if (imageFile) {
-                const uploadRes = await mediaApi.upload(imageFile);
-                uploadedImageUrl = uploadRes.url;
-            }
+            let currentImageUrl = (editing?.imageUrls?.[0] || editing?.images?.[0] || '');
 
             const payload: Partial<Venue> = {
                 name: form.name,
@@ -95,14 +91,22 @@ const VenueSpacePage: React.FC = () => {
                 pricePerHour: Number(form.pricePerHour),
                 amenities: form.amenities.join(', '),
                 description: form.description,
-                imageUrls: uploadedImageUrl ? [uploadedImageUrl] : []
+                imageUrls: currentImageUrl ? [currentImageUrl] : []
             };
 
-            const vId = editing ? (editing.venueId || editing.id) : null;
+            let vId = editing ? (editing.venueId || editing.id) : null;
             if (editing && vId) {
                 await venueApi.update(String(vId), payload);
             } else {
-                await venueApi.create(payload);
+                const res: any = await venueApi.create(payload);
+                vId = res.id || res.venueId;
+            }
+
+            if (imageFile && vId) {
+                const uploadRes = await mediaApi.upload(imageFile, 'VENUE', Number(vId));
+                currentImageUrl = uploadRes.url;
+                payload.imageUrls = [currentImageUrl];
+                await venueApi.update(String(vId), payload);
             }
 
             fetchSpaces();

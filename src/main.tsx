@@ -33,16 +33,12 @@ const GalleryPage = React.lazy(() => import('./pages/GalleryPage.tsx'));
 const ReviewPage = React.lazy(() => import('./pages/ReviewPage.tsx'));
 const ArtisanProfilePage = React.lazy(() => import('./pages/ArtisanProfilePage.tsx'));
 const PaymentQrPage = React.lazy(() => import('./pages/PaymentQrPage.tsx'));
-const PaymentResultPage = React.lazy(() => import('./pages/PaymentResultPage.tsx'));
-
 // Admin Pages (Lazy Load)
 const AdminDashboardPage = React.lazy(() => import('./pages/admin/AdminDashboardPage.tsx'));
 const AdminUserPage = React.lazy(() => import('./pages/admin/AdminUserPage.tsx'));
 const AdminWorkshopPage = React.lazy(() => import('./pages/admin/AdminWorkshopPage.tsx'));
 const AdminVenuePage = React.lazy(() => import('./pages/admin/AdminVenuePage.tsx'));
 const AdminFinancePage = React.lazy(() => import('./pages/admin/AdminFinancePage.tsx'));
-
-const AdminPaymentPage = React.lazy(() => import('./pages/admin/AdminPaymentPage.tsx'));
 
 // Host Pages (Lazy Load)
 const HostDashboardPage = React.lazy(() => import('./pages/host/HostDashboardPage.tsx'));
@@ -88,8 +84,7 @@ const router = createBrowserRouter([
       { path: 'gallery', element: wrap(GalleryPage) },     // F1.3
       { path: 'review', element: wrap(ReviewPage) },       // F2.7
       { path: 'artisan/:slug', element: wrap(ArtisanProfilePage) }, // Artisan Profile
-      { path: 'payment/qr', element: wrap(PaymentQrPage) },         // VNPay QR (legacy)
-      { path: 'payment/result', element: wrap(PaymentResultPage) }, // VNPay callback
+      { path: 'payment/qr', element: wrap(PaymentQrPage) },         // SePay QR
     ]
   },
 
@@ -106,7 +101,6 @@ const router = createBrowserRouter([
       { path: 'workshops', element: wrap(AdminWorkshopPage) },   // F5.1
       { path: 'venues', element: wrap(AdminVenuePage) },      // F5.1
       { path: 'users', element: wrap(AdminUserPage) },       // F5.2
-      { path: 'payments', element: wrap(AdminPaymentPage) }, // NEW PAYMENT VERIFY
       { path: 'finance', element: wrap(AdminFinancePage) },    // F5.3 (host withdrawals)
     ]
   },

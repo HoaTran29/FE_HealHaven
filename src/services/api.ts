@@ -38,7 +38,12 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
     if (!res.ok) {
         const errBody = await res.json().catch(() => ({}));
         console.error(`❌ API Error: ${res.status} ${endpoint}`, errBody);
-        throw new Error(errBody?.message || `HTTP ${res.status}`);
+        
+        let errorMsg = errBody?.message || `HTTP ${res.status}`;
+        if (errBody?.errors) {
+            errorMsg += ' - ' + JSON.stringify(errBody.errors);
+        }
+        throw new Error(errorMsg);
     }
 
     if (res.status === 204) return null as T;
@@ -173,7 +178,7 @@ export const workshopApi = {
 // ============================================================
 // 3. BOOKINGS — /bookings (Protected)
 // ============================================================
-export type BookingStatus = 'PENDING' | 'PENDING_CONFIRMATION' | 'PAID' | 'CONFIRMED' | 'ATTENDED' | 'CANCELLED' | 'FAILED';
+export type BookingStatus = 'PENDING' | 'PAID' | 'CONFIRMED' | 'ATTENDED' | 'CANCELLED' | 'FAILED';
 
 export interface Booking {
     id: string; // fallback
@@ -202,7 +207,6 @@ export interface Booking {
 export interface CreateBookingPayload {
     workshopId: string;
     quantity: number;           // ⚠️ Renamed from seats as per documentation
-    paymentMethod?: 'vnpay' | 'momo' | 'transfer';
 }
 
 export const bookingApi = {
@@ -308,8 +312,9 @@ export const reviewApi = {
 // ============================================================
 export interface FinancialStats {
     totalRevenue: number;
-    totalCost: number;
-    profit: number;
+    totalExpense: number;
+    netProfit: number;
+    bookingCount?: number;
     monthlyData?: { month: string; revenue: number; cost: number }[];
 }
 
@@ -365,10 +370,12 @@ export interface MediaUploadResponse {
 }
 
 export const mediaApi = {
-    upload: (file: File): Promise<MediaUploadResponse> => {
+    upload: (file: File, targetType: string, targetId: number): Promise<MediaUploadResponse> => {
         const token = getToken();
         const formData = new FormData();
         formData.append('file', file);
+        formData.append('targetType', targetType);
+        formData.append('targetId', String(targetId));
         return fetch(`${BASE_URL}/media/upload`, {
             method: 'POST',
             headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -381,47 +388,6 @@ export const mediaApi = {
             });
     },
     delete: (mediaId: string) => request<void>(`/media/${mediaId}`, { method: 'DELETE' }),
-};
-
-// ============================================================
-// 11. PAYMENTS — VNPay (Protected + Public)
-// ============================================================
-
-/**
- * VNPay response khi verify payment return:
- * Success: { success: true, message: "Thanh toán thành công!", data: BookingResponse }
- * Failure: { success: false, message: "Thanh toán thất bại. Mã lỗi: 24" }
- */
-export interface VnpayReturnResult {
-    success: boolean;
-    message: string;
-    data?: Booking; // BookingResponse từ BE
-}
-
-export const paymentApi = {
-    // Legacy mock
-    mockSuccess: (bookingId: string) => request<Booking>(`/payments/mock/${bookingId}`, { method: 'POST' }),
-
-    /**
-     * Xác nhận thanh toán thủ công (User báo "Tôi đã chuyển khoản")
-     * POST /payments/confirm/{bookingId}
-     */
-    confirmPayment: (bookingId: string): Promise<any> =>
-        request<any>(`/payments/confirm/${bookingId}`, { method: 'POST' }),
-
-    /**
-     * Xác thực kết quả thanh toán sau khi VNPay redirect về.
-     * GET /payments/vnpay-return?vnp_Amount=...&vnp_ResponseCode=00&... — KHÔNG cần JWT
-     * queryString: window.location.search (đầy đủ query string từ URL hiện tại)
-     */
-    verifyVnpayReturn: async (queryString: string): Promise<VnpayReturnResult> => {
-        const token = getToken();
-        const res = await fetch(`${BASE_URL}/payments/vnpay-return${queryString}`, {
-            headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
-        const json: VnpayReturnResult = await res.json();
-        return json;
-    },
 };
 
 // ============================================================
@@ -503,12 +469,4 @@ export const adminApi = {
         request<void>(`/admin/withdrawals/${withdrawalId}/complete`, { method: 'PUT' }),
     rejectWithdrawal: (withdrawalId: number, reason: string) =>
         request<void>(`/admin/withdrawals/${withdrawalId}/reject`, { method: 'PUT', body: JSON.stringify({ reason }) }),
-
-    // 6. Payments
-    getPendingPayments: (page: number = 0, size: number = 10) =>
-        request<PageResponse<Booking>>(`/admin/payments/pending?page=${page}&size=${size}`),
-    approvePayment: (bookingId: string | number) =>
-        request<void>(`/admin/payments/${bookingId}/approve`, { method: 'PUT' }),
-    rejectPayment: (bookingId: string | number, note: string) =>
-        request<void>(`/admin/payments/${bookingId}/reject`, { method: 'PUT', body: JSON.stringify({ note }) }),
 };
