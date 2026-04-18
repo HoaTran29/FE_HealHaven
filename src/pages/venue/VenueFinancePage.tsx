@@ -67,7 +67,7 @@ const VenueFinancePage: React.FC = () => {
                 <div className="venue-stats-grid">
                     {[
                         { icon: '💰', label: 'Doanh thu', value: fmtMoney(stats?.totalRevenue || 14200000), color: '#16a34a' },
-                        { icon: '💳', label: 'Khả dụng để rút', value: fmtMoney(stats?.profit || 9840000), color: '#4f46e5' },
+                        { icon: '💳', label: 'Khả dụng để rút', value: fmtMoney(stats?.netProfit || 9840000), color: '#4f46e5' },
                         { icon: '⏳', label: 'Đang chờ xử lý', value: '4.360.000đ', color: '#d97706' },
                         { icon: '📊', label: 'Số dư ước tính', value: fmtMoney(stats?.totalRevenue || 42100000), color: '#7c3aed' },
                     ].map((s, i) => (
@@ -146,7 +146,7 @@ const VenueFinancePage: React.FC = () => {
                                 <div className="venue-modal-body">
                                     <div className="balance-info-v">
                                         <span>Số dư khả dụng:</span>
-                                        <strong className="available-v">{fmtMoney(stats?.profit || 9840000)}</strong>
+                                        <strong className="available-v">{fmtMoney(stats?.netProfit || 9840000)}</strong>
                                     </div>
                                     <div className="form-group2">
                                         <label>Số tiền rút (đ) *</label>

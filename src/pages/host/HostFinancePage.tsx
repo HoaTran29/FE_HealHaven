@@ -58,14 +58,14 @@ const HostFinancePage: React.FC = () => {
                 <div className="stat-card" style={{ '--stat-color': '#007BA2' } as React.CSSProperties}>
                     <div className="stat-icon">💳</div>
                     <div>
-                        <div className="stat-value">{fmtMoney(stats?.profit || 0)}</div>
+                        <div className="stat-value">{fmtMoney(stats?.netProfit || 0)}</div>
                         <div className="stat-label">Khả dụng để rút</div>
                     </div>
                 </div>
                 <div className="stat-card" style={{ '--stat-color': '#d97706' } as React.CSSProperties}>
                     <div className="stat-icon">⏳</div>
                     <div>
-                        <div className="stat-value">{fmtMoney(stats?.totalCost || 0)}</div>
+                        <div className="stat-value">{fmtMoney(stats?.totalExpense || 0)}</div>
                         <div className="stat-label">Chi phí / Hệ thống thu</div>
                     </div>
                 </div>
@@ -146,7 +146,7 @@ const HostFinancePage: React.FC = () => {
                                 <div className="host-modal-body">
                                     <div className="balance-info">
                                         <span>Số dư khả dụng:</span>
-                                        <strong className="balance-available">{fmtMoney(stats?.profit || 0)}</strong>
+                                        <strong className="balance-available">{fmtMoney(stats?.netProfit || 0)}</strong>
                                     </div>
                                     <div className="form-group">
                                         <label>Số tiền rút (đ) *</label>

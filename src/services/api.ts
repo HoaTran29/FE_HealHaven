@@ -132,7 +132,8 @@ export interface Workshop {
     images?: string[];
     lat?: number;
     lng?: number;
-    status?: 'DRAFT' | 'PENDING_APPROVAL' | 'APPROVED' | 'REJECTED';
+    maxAttendees?: number;
+    status?: 'DRAFT' | 'PENDING_APPROVAL' | 'APPROVED' | 'PUBLISHED' | 'HAPPENING' | 'CLOSED' | 'REJECTED' | 'CANCELLED' | 'COMPLETED';
     curriculum?: { name: string; time: string; active: boolean }[]; // Legacy fallback
 }
 
