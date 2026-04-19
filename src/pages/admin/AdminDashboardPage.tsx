@@ -4,7 +4,7 @@ import {
   CartesianGrid, Tooltip
 } from 'recharts';
 import { TrendingUp, Users, Clock, MapPin } from 'lucide-react';
-import { Link } from 'react-router-dom';
+
 import { adminApi, type AdminStatsOverview, type AdminRevenueData } from '../../services/api';
 import './AdminPage.css';
 
@@ -89,7 +89,6 @@ const AdminDashboardPage: React.FC = () => {
           )}
         </ResponsiveContainer>
       </div>
-    </div>
     </div>
   );
 };
