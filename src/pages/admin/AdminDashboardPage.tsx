@@ -1,29 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis,
-  CartesianGrid, Tooltip, PieChart, Pie, Cell, Legend
+  CartesianGrid, Tooltip
 } from 'recharts';
 import { TrendingUp, Users, Clock, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { adminApi, type AdminStatsOverview, type AdminRevenueData } from '../../services/api';
 import './AdminPage.css';
 
-const workshopCatData = [
-  { name: 'Thủ công', value: 38 },
-  { name: 'Hội họa', value: 24 },
-  { name: 'Ẩm thực', value: 18 },
-  { name: 'Gốm sứ', value: 12 },
-  { name: 'Khác', value: 8 },
-];
-const PIE_COLORS = ['#007BA2', '#2d9cdb', '#27ae60', '#f2994a', '#9b51e0'];
 
-const recentActivities = [
-  { msg: 'Workshop "Đan len" vừa được duyệt', time: '5p trước', type: 'approve' },
-  { msg: 'Host "Lê Thị C" đăng ký mới', time: '12p trước', type: 'user' },
-  { msg: 'Yêu cầu rút 8.000.000đ từ Trần A', time: '30p trước', type: 'finance' },
-  { msg: 'Địa điểm "Studio Xanh" chờ duyệt', time: '1h trước', type: 'venue' },
-  { msg: 'User "Nguyen F" bị báo cáo vi phạm', time: '2h trước', type: 'report' },
-];
 
 const fmtM = (v: number) => (v / 1000000).toFixed(1) + 'M';
 const fmtVND = (v: number) => new Intl.NumberFormat('vi-VN').format(v) + 'đ';
@@ -90,76 +75,21 @@ const AdminDashboardPage: React.FC = () => {
       </div>
 
       {/* Charts row */}
-      <div className="admin-charts-grid">
-        <div className="admin-card">
-          <h3 className="admin-card-title">Doanh thu hệ thống {new Date().getFullYear()}</h3>
-          <ResponsiveContainer width="100%" height={240}>
-            {isLoading ? <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>Đang tải biểu đồ...</div> : (
-              <AreaChart data={chartData} margin={{ top: 5, right: 10, left: 10, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#eef2f5" />
-                <XAxis dataKey="label" tick={{ fontSize: 12 }} />
-                <YAxis yAxisId="rev" tickFormatter={fmtM} tick={{ fontSize: 11 }} />
-                <Tooltip formatter={(v: number, name: string) => name === 'Doanh thu' ? fmtVND(v) : v} />
-                <Legend />
-                <Area yAxisId="rev" type="monotone" dataKey="value" name="Doanh thu" stroke="#007BA2" fill="#e8f4f8" strokeWidth={2} />
-              </AreaChart>
-            )}
-          </ResponsiveContainer>
-        </div>
-
-        <div className="admin-card">
-          <h3 className="admin-card-title">Phân loại Workshop</h3>
-          <ResponsiveContainer width="100%" height={240}>
-            <PieChart>
-              <Pie data={workshopCatData} cx="50%" cy="50%" outerRadius={90} dataKey="value"
-                label={({ name, percent }) => `${name} ${((percent as number) * 100).toFixed(0)}%`}
-                labelLine={false}
-              >
-                {workshopCatData.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
-              </Pie>
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
+      <div className="admin-card">
+        <h3 className="admin-card-title">Doanh thu hệ thống {new Date().getFullYear()}</h3>
+        <ResponsiveContainer width="100%" height={240}>
+          {isLoading ? <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>Đang tải biểu đồ...</div> : (
+            <AreaChart data={chartData} margin={{ top: 5, right: 10, left: 10, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#eef2f5" />
+              <XAxis dataKey="label" tick={{ fontSize: 12 }} />
+              <YAxis yAxisId="rev" tickFormatter={fmtM} tick={{ fontSize: 11 }} />
+              <Tooltip formatter={(v: number, name: string) => name === 'Doanh thu' ? fmtVND(v) : v} />
+              <Area yAxisId="rev" type="monotone" dataKey="value" name="Doanh thu" stroke="#007BA2" fill="#e8f4f8" strokeWidth={2} />
+            </AreaChart>
+          )}
+        </ResponsiveContainer>
       </div>
-
-      {/* Bottom row */}
-      <div className="admin-bottom-grid">
-        <div className="admin-card">
-          <h3 className="admin-card-title">Cần xử lý ngay</h3>
-          <div className="quick-actions">
-            <Link to="/admin/workshops" className="quick-action-row workshops">
-              <span className="qa-text">Workshop chờ phê duyệt</span>
-              <span className="qa-count">7</span>
-            </Link>
-            <Link to="/admin/venues" className="quick-action-row venues">
-              <span className="qa-text">Địa điểm chờ kiểm duyệt</span>
-              <span className="qa-count">3</span>
-            </Link>
-            <Link to="/admin/finance" className="quick-action-row finance">
-              <span className="qa-text">Lệnh rút tiền chờ xử lý</span>
-              <span className="qa-count">5</span>
-            </Link>
-            <Link to="/admin/users" className="quick-action-row users">
-              <span className="qa-text">Báo cáo người dùng vi phạm</span>
-              <span className="qa-count">2</span>
-            </Link>
-          </div>
-        </div>
-
-        <div className="admin-card">
-          <h3 className="admin-card-title">Hoạt động gần đây</h3>
-          <ul className="activity-list">
-            {recentActivities.map((a, i) => (
-              <li key={i} className={`activity-item activity-${a.type}`}>
-                <div className="activity-dot" />
-                <span className="activity-msg">{a.msg}</span>
-                <span className="activity-time">{a.time}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
+    </div>
     </div>
   );
 };
